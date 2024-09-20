@@ -230,7 +230,6 @@ class CommonService
                $mailResult = $dbAdapter->query($mailQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                if (count($mailResult) > 0) {
                     foreach ($mailResult as $result) {
-                         $alertMail = new Mail\Message();
 
                          $id = $result['id'];
                          $this->tempMailTable->updateTempMailStatus($id);
