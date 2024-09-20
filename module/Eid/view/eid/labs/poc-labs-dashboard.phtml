@@ -457,13 +457,13 @@ $endDate = date('Y-m');
 
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js"></script>
-<script src="https://code.highcharts.com/maps/highmaps.js"></script>
-<script src="https://code.highcharts.com/maps/modules/data.js"></script>
-<script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/maps/modules/offline-exporting.js"></script>
-<script src="https://code.highcharts.com/mapdata/countries/us/us-all.js"></script>
-<script src="https://code.highcharts.com/mapdata/custom/world.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js" integrity="sha384-M06Wz+wp7/Hfi8Ks7DJtWxAFDqihGPCsNmjmWhnUQ8vBTSwd/1Os0uhf2hcYXt2t" crossorigin="anonymous"></script>
+<script src="https://code.highcharts.com/maps/highmaps.js" integrity="sha384-hDhuwSF+sRAOUMXcDrTBCAtz53S+OtcQIaVplQXIvkun7Nu/7lSP1/jN8hJ1L07o" crossorigin="anonymous"></script>
+<script src="https://code.highcharts.com/maps/modules/data.js" integrity="sha384-hKBBt7f4FoxoG6tI9255s6ztwlQnok/eDg9ULvtkcS2BzmA3BltHKQqjX5firU0n" crossorigin="anonymous"></script>
+<script src="https://code.highcharts.com/maps/modules/exporting.js" integrity="sha384-iIafvPxt7arZGSNeMKRXbEr8N+ijzanJ60dtD21K9navK1tFiY0vuOeGVpIjPD9S" crossorigin="anonymous"></script>
+<script src="https://code.highcharts.com/maps/modules/offline-exporting.js" integrity="sha384-Lj2ktmBW/0wsRwmnbE6m6gp//rkDRovWuhjZP9qbWmPQ3WLDfgW3BZQYiitV37fX" crossorigin="anonymous"></script>
+<script src="https://code.highcharts.com/mapdata/countries/us/us-all.js" integrity="sha384-ClHQAXbtC3kWSw5KNd28omUB4SlEwK7XdkhQ5mQ9PAjhM1LRJSz2SW7WopWNXBIs" crossorigin="anonymous"></script>
+<script src="https://code.highcharts.com/mapdata/custom/world.js" integrity="sha384-zy+JztTdu1SEwLsl+oK4jMIXFxqyaAqmfmtB0O/2/uMF+REgoHvN2fj7W21YWXb+" crossorigin="anonymous"></script>
 
 <script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
 
@@ -662,6 +662,10 @@ $endDate = date('Y-m');
         var start = moment().subtract(12, 'months');
         var end = moment();
 
+        <?php
+        $minDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')";
+        ?>
+
         function cb(start, end) {
             $('#daterange-container span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
             $('#daterange').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
@@ -671,9 +675,7 @@ $endDate = date('Y-m');
             separator: ' to ',
             startDate: start,
             endDate: end,
-            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
-                minDate: moment().subtract(12, 'months'),
-            <?php } ?>
+            minDate: <?= $minDate; ?>,
             maxDate: moment(),
             ranges: {
                 'Today': [moment(), moment()],
@@ -949,7 +951,9 @@ $endDate = date('Y-m');
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         showModal('eid/labs/expand-bar-chart/?fromDate=' + fromDate + '&toDate=' + toDate + '&facilityId=' + facilityId + '&from=' + from, '800', '450');
     }
-
+    <?php
+    $startDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')";
+    ?>
     jQuery(function() {
         // set default dates
         var start = new Date();
@@ -963,9 +967,7 @@ $endDate = date('Y-m');
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
-                startDate: end,
-            <?php } ?>
+            startDate: <?= $startDate; ?>,
             endDate: "0m"
         }).on('changeDate', function(e) {
             $('#dpMonthsEnd').val('');
@@ -979,9 +981,7 @@ $endDate = date('Y-m');
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
-                startDate: end,
-            <?php } ?>
+            startDate: <?= $startDate; ?>,
             endDate: "0m"
         })
     });

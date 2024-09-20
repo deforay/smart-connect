@@ -1,8 +1,5 @@
 <?php
 
-use Application\Service\CommonService;
-
-$common = new CommonService();
 $requestTypeOption = [];
 if (isset($requestType) && !empty($requestType)) {
     foreach ($requestType as $key => $value) {
@@ -215,7 +212,7 @@ if (isset($requestType) && !empty($requestType)) {
             $('#daterange-container-key-indicator span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
             $('#daterangeKeyIndicator').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
         }
-        <?php $minDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')"; ?>
+        <?php $minDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')"; ?>
         $('#daterange-container, #daterange-container-key-indicator').daterangepicker({
             'format': 'DD-MMM-YYYY',
             'separator': ' to ',

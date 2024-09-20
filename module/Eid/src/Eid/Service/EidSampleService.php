@@ -3,13 +3,10 @@
 namespace Eid\Service;
 
 use Exception;
-use JsonMachine\Items;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
-use Laminas\Db\Adapter\Adapter;
 use Application\Service\CommonService;
-use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class EidSampleService
@@ -28,12 +25,12 @@ class EidSampleService
 
 
     //get all sample types
-    public function getSampleType()
+    public function getSampleType($asArray = false)
     {
         /** @var \Application\Model\EidSampleTypeTable $eidSampleTypeDb */
 
         $eidSampleTypeDb = $this->sm->get('EidSampleTypeTable');
-        return $eidSampleTypeDb->fetchAllSampleType();
+        return $eidSampleTypeDb->fetchAllSampleType($asArray);
     }
 
     public function getStats($params)
@@ -139,9 +136,7 @@ class EidSampleService
             ->toArray();
         $columnList = array_map('current', $sResult);
 
-        $removeKeys = array(
-            'eid_id'
-        );
+        $removeKeys = ['eid_id'];
 
         $columnList = array_diff($columnList, $removeKeys);
 
@@ -155,17 +150,11 @@ class EidSampleService
             $counter++;
             $data = [];
             foreach ($columnList as $colName) {
-                $data[$colName] = isset($rowData[$colName]) ? $rowData[$colName] : null;
+                $data[$colName] = $rowData[$colName] ?? null;
             }
 
             $id = $sampleDb->insertOrUpdate($data);
             if (isset($id) && !empty($id) && is_numeric($id)) {
-                $params = array(
-                    "table" => "dash_form_eid",
-                    "field" => "eid_id",
-                    "id" => $id
-                );
-                //$apiTrackDb->updateFormAttributes($params, $currentDateTime);
                 $apiTrackDb->updateFacilityAttributes($data['facility_id'], $currentDateTime);
             }
             $numRows++;
@@ -183,10 +172,10 @@ class EidSampleService
         if (is_readable($fileName)) {
             unlink($fileName);
         }
-        $common = new CommonService();
+
         $apiTrackData = array(
             'tracking_id'                   => $timestamp,
-            'received_on'                   => $common->getDateTime(),
+            'received_on'                   => CommonService::getDateTime(),
             'number_of_records_received'    => $counter,
             'number_of_records_processed'   => $numRows,
             'source'                        => $source,
@@ -199,7 +188,7 @@ class EidSampleService
             'message'   => $numRows . ' uploaded successfully',
         );
         $apiTrackDb->insert($apiTrackData);
-        $trackApiDb->addApiTracking($common->generateUUID(), 1, $numRows, 'weblims-eid', 'eid', $_SERVER['REQUEST_URI'], $apiData, $response, 'json', $labId ?? $data['lab_id']);
+        $trackApiDb->addApiTracking(CommonService::generateUUID(), 1, $numRows, 'weblims-eid', 'eid', $_SERVER['REQUEST_URI'], $apiData, $response, 'json', $labId ?? $data['lab_id']);
         return $response;
     }
 
@@ -1095,9 +1084,10 @@ class EidSampleService
         return $this->eidSampleTable->fetchSampleTestedReason($params);
     }
 
-    public function getClinicSampleTestedResults($params, $sampleType)
+    public function getClinicSampleTestedResults($params)
     {
-        return $this->eidSampleTable->fetchClinicSampleTestedResults($params, $sampleType);
+        $sampleTypes = $this->getSampleType(asArray: true);
+        return $this->eidSampleTable->fetchClinicSampleTestedResults($params, $sampleTypes);
     }
 
     public function getAllTestResults($parameters)

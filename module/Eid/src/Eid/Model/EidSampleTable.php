@@ -8,19 +8,8 @@ use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use \Application\Service\CommonService;
 use Laminas\Db\TableGateway\AbstractTableGateway;
+use Laminas\Db\Sql\Predicate\Expression as WhereExpression;
 
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- * Description of Countries
- *
- * @author amit
- */
 class EidSampleTable extends AbstractTableGateway
 {
 
@@ -5042,10 +5031,10 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
                 $endDate = trim($s_c_date[1]);
             }
-            if ($params['age']['from'] == 'unknown') {
+            if (isset($params['age']['from']) && $params['age']['from'] == 'unknown') {
                 $caseQuery1 = new Expression("SUM(CASE WHEN ((vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported') and (vl.result like 'negative%' OR vl.result like 'Negative%')) THEN 1 ELSE 0 END)");
                 $caseQuery2 = new Expression("SUM(CASE WHEN ((vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported') and (vl.result like 'positive%' OR vl.result like 'Positive%' )) THEN 1 ELSE 0 END)");
-            } else {
+            } elseif (isset($params['age']['from']) && isset($params['age']['to'])) {
                 $from = $params['age']['from'];
                 $to = $params['age']['to'];
                 $caseQuery1 = new Expression("SUM(CASE WHEN ((vl.child_age $from AND vl.child_age  $to) and (vl.result like 'negative%' OR vl.result like 'Negative%')) THEN 1 ELSE 0 END)");
@@ -5210,43 +5199,39 @@ class EidSampleTable extends AbstractTableGateway
 
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $params['sampleCollectionDate']);
-            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
-                $startDate = trim($s_c_date[0]);
-            }
-            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
-                $endDate = trim($s_c_date[1]);
-            }
+
+            [$startDate, $endDate] = CommonService::convertDateRange($_POST['sampleCollectionDate']);
             $queryStr = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
-                    array(
+                    [
                         //"total" => new Expression('COUNT(*)'),
                         "day" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%b-%Y')"),
 
                         "positive" => new Expression("SUM(CASE WHEN (vl.specimen_type IN(?) AND (vl.result like 'not%' OR vl.result like 'Not%')) THEN 1 ELSE 0 END)", [$samples]),
                         "negative" => new Expression("SUM(CASE WHEN (vl.specimen_type IN(?) AND (vl.result like 'suppressed%' OR vl.result like 'Suppressed%' )) THEN 1 ELSE 0 END)", [$samples]),
-                    )
-                )->join(array('st' => 'r_eid_sample_type'), 'vl.specimen_type=st.sample_id', array('sample_name'))
-                ->where(array("DATE(vl.sample_collection_date) <= ? AND DATE(vl.sample_collection_date) >= ?", [$endDate, $startDate]));
+                    ]
+                )->join(['st' => 'r_eid_sample_type'], 'vl.specimen_type=st.sample_id', ['sample_name'])
+                ->where(new WhereExpression('DATE(vl.sample_collection_date) BETWEEN ? AND ?', [$startDate, $endDate]));
+
 
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $clinicIds = explode(',', $params['clinicId']);
-                $queryStr = $queryStr->where('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds);
+                $queryStr = $queryStr->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds));
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
-                    $queryStr = $queryStr->where('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities);
+                    $queryStr = $queryStr->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
                 }
             }
             if (isset($params['testResult']) && $params['testResult'] != '') {
                 $testResult = $params['testResult'];
-                $queryStr = $queryStr->where("(vl.result LIKE ? OR vl.result LIKE ?)", [$testResult . '%', ucwords($testResult) . '%']);
+                $queryStr = $queryStr->where(new WhereExpression("(vl.result LIKE ? OR vl.result LIKE ?)", [$testResult . '%', ucwords($testResult) . '%']));
             }
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
                 $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
-                $queryStr = $queryStr->where('vl.specimen_type = ?', [$sampleTypeId]);
+                $queryStr = $queryStr->where(new WhereExpression('vl.specimen_type = ?', [$sampleTypeId]));
             }
-            //print_r($params['age']);die;
+
             if (isset($params['age']) && trim($params['age']) != '') {
                 $age = explode(',', $params['age']);
                 $where = '';
@@ -5284,8 +5269,7 @@ class EidSampleTable extends AbstractTableGateway
             $queryStr = $queryStr->group(array(new Expression('WEEK(sample_collection_date)')));
             $queryStr = $queryStr->order(array(new Expression('WEEK(sample_collection_date)')));
             $queryStr = $sql->buildSqlString($queryStr);
-            //echo $queryStr;die;
-            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
             $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
@@ -5410,7 +5394,7 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($parameters['testResult']) && $parameters['testResult'] != '') {
-            $sQuery = $sQuery->where("(vl.result like '" . $parameters['testResult'] . "%' OR vl.result like '" . ucwords($parameters['testResult']) . "%' )");
+            $sQuery = $sQuery->where("(vl.result like '" . $parameters['testResult'] . "%' OR vl.result like '" . $parameters['testResult'] . "%' )");
         }
         if (isset($parameters['sampleTypeId']) && trim($parameters['sampleTypeId']) != '') {
             $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($parameters['sampleTypeId'])) . '"');
@@ -5518,15 +5502,15 @@ class EidSampleTable extends AbstractTableGateway
             $row = [];
             $sampleCollectionDate = '';
             if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
+                $sampleCollectionDate = CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
             }
             $sampleTestedDate = '';
             if (isset($aRow['sampleTestingDate']) && $aRow['sampleTestingDate'] != NULL && trim($aRow['sampleTestingDate']) != "" && $aRow['sampleTestingDate'] != '0000-00-00') {
-                $sampleTestedDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleTestingDate']);
+                $sampleTestedDate = CommonService::humanReadableDateFormat($aRow['sampleTestingDate']);
             }
             $pdfButtCss = ($aRow['result'] == null || trim($aRow['result']) == "") ? 'display:none' : '';
             $row[] = $aRow['sample_code'];
-            $row[] = ucwords($aRow['facility_name']);
+            $row[] = $aRow['facility_name'];
             $row[] = $sampleCollectionDate;
             $row[] = (isset($aRow['rejection_reason_name'])) ? ucwords($aRow['rejection_reason_name']) : '';
             $row[] = $sampleTestedDate;

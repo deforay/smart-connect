@@ -475,7 +475,7 @@ foreach ($sampleType as $samples) {
             separator: ' to ',
             startDate: start,
             endDate: end,
-            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
+            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) { ?>
                 minDate: moment().subtract(12, 'months'),
                 maxDate: moment(),
             <?php } ?>

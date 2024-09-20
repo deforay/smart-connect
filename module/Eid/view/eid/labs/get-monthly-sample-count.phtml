@@ -114,11 +114,8 @@ if (isset($result['eidResult']) && !empty($result['eidResult'])) {
                                 }
                         ?> {
                             name: '<?php echo $this->translate($key); ?>',
-                            <?php if ($key == 'Positive') { ?>
-                                color: '#ff1900',
-                            <?php } else if ($key == 'Negative') { ?>
-                                color: '#60d18f',
-                            <?php } ?>
+                            <?php $color = ($key == 'Positive') ? '#ff1900' : (($key == 'Negative') ? '#60d18f' : ''); ?>
+                            color: '<?php echo $color; ?>',
                             data: [<?php
                                     foreach ($condition as $count) {
                                         echo '{y:' . $count . '},';
@@ -128,7 +125,7 @@ if (isset($result['eidResult']) && !empty($result['eidResult'])) {
                     <?php
                             }
                         }
-                        if (count($positivityAvg) > 0) {
+                        if (!empty($positivityAvg)) {
                     ?> {
                         name: '<?php echo $this->translate('Positivity %'); ?>',
                         type: 'scatter',

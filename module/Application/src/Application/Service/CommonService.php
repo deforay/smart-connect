@@ -24,7 +24,6 @@ use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Application\Model\DashApiReceiverStatsTable;
-use Laminas\Mail\Transport\Smtp as SmtpTransport;
 use Application\Model\TempMailTable;
 
 use Symfony\Component\Mailer\Transport;
@@ -39,7 +38,7 @@ class CommonService
      /** @var TempMailTable TempMailTable */
      public TempMailTable $tempMailTable;
 
-     public function __construct($sm = null, $cache = null, $tempMailTable)
+     public function __construct($sm = null, $cache = null, $tempMailTable = null)
      {
           $this->sm = $sm;
           $this->cache = $cache;

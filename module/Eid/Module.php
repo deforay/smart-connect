@@ -41,9 +41,9 @@ class Module
                 {
                     public function __invoke($diContainer)
                     {
-                        $commonService = $diContainer->get('CommonService');
+                        $configService = $diContainer->get('ConfigService');
                         $sampleService = $diContainer->get('EidSampleService');
-                        return new \Eid\Controller\ClinicsController($sampleService, $commonService);
+                        return new \Eid\Controller\ClinicsController($sampleService, $configService);
                     }
                 },
             )

@@ -558,7 +558,7 @@ $endDate = date('Y-m');
             separator: ' to ',
             startDate: start,
             endDate: end,
-            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
+            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) { ?>
                 minDate: moment().subtract(12, 'months'),
             <?php } ?>
             maxDate: moment(),
@@ -724,7 +724,7 @@ $endDate = date('Y-m');
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
+            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) { ?>
                 startDate: end,
             <?php } ?>
             endDate: "0m"
@@ -740,7 +740,7 @@ $endDate = date('Y-m');
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
+            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) { ?>
                 startDate: end,
             <?php } ?>
             endDate: "0m"

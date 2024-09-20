@@ -15,7 +15,6 @@
         "laminas/laminas-mvc": "^3.7",
         "laminas/laminas-cache-storage-adapter-filesystem": "^2.3",
         "laminas/laminas-cache-storage-adapter-blackhole": "^2.3",
-        "laminas/laminas-mail": "^2.25",
         "laminas/laminas-serializer": "^2.17",
         "laminas/laminas-i18n": "^2.24",
         "laminas/laminas-session": "^2.17",

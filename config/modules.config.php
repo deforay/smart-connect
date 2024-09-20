@@ -12,7 +12,6 @@ return [
     'Laminas\Mvc\Middleware',
     'Laminas\Log',
     'Laminas\Di',
-    'Laminas\Mail',
     'Laminas\Mvc\I18n',
     'Laminas\I18n',
     'Laminas\Db',

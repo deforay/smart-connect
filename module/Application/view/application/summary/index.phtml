@@ -8,7 +8,7 @@ $loginContainer = new Container('credo');
 // $startArray = explode("-", $startDate);
 // $endArray = explode("-", $endDate);
 // // var_dump($loginContainer->sampleTable);die;
-// if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) {
+// if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) {
 //     $startYear = (int) date('Y', strtotime('-12 MONTH ' . date('Y-m-d')));
 //     $startMonth = (int) date('M', strtotime('-12 MONTH ' . date('Y-m-d')));
 //     $endYear = (int) date('y');
@@ -2268,7 +2268,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     }
 
     <?php
-    $startDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) ? 'end' : null;
+    $startDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) ? 'end' : null;
     ?>
 
     jQuery(function() {

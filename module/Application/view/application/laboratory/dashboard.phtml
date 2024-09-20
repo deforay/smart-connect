@@ -1128,7 +1128,7 @@ foreach ($sampleType as $samples) {
             $('#daterangeKeyIndicator').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
         }
         <?php
-        $minDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')";
+        $minDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')";
         ?>
 
         $('#daterange-container, #daterange-container-key-indicator').daterangepicker({
@@ -1342,7 +1342,7 @@ foreach ($sampleType as $samples) {
     //     });
     // }
     <?php
-    $startDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) ? 'end' : null;
+    $startDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) ? 'end' : null;
     ?>
     jQuery(function() {
         var start = new Date();

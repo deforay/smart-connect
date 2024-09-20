@@ -9,7 +9,7 @@ $loginContainer = new Container('credo');
 $startArray = explode("-", $startDate);
 $endArray = explode("-", $endDate);
 // var_dump($loginContainer->sampleTable);die;
-if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) {
+if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) {
     $startYear = (int) date('Y', strtotime('-12 MONTH ' . date('Y-m-d')));
     $startMonth = (int) date('M', strtotime('-12 MONTH ' . date('Y-m-d')));
     $endYear = (int) date('y');
@@ -1805,7 +1805,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
+            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) { ?>
                 startDate: end,
             <?php } ?>
             endDate: "0m"
@@ -1821,7 +1821,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
+            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) { ?>
                 startDate: end,
             <?php } ?>
             endDate: "0m"

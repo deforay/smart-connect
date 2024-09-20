@@ -2,10 +2,10 @@
 
 namespace Eid\Controller;
 
-use Zend\Debug\Debug;
 use Laminas\Json\Json;
 use Eid\Service\EidSampleService;
 use Laminas\View\Model\ViewModel;
+use Application\Service\ConfigService;
 use Laminas\Mvc\Controller\AbstractActionController;
 
 class ClinicsController extends AbstractActionController
@@ -14,7 +14,7 @@ class ClinicsController extends AbstractActionController
     private $sampleService = null;
     private $configService = null;
 
-    public function __construct(EidSampleService $sampleService, $configService)
+    public function __construct(EidSampleService $sampleService, ConfigService $configService)
     {
         $this->configService = $configService;
         $this->sampleService = $sampleService;
@@ -99,9 +99,9 @@ class ClinicsController extends AbstractActionController
             $params = $request->getPost();
 
             $sampleType = $this->sampleService->getSampleType();
-            $result = $this->sampleService->getClinicSampleTestedResults($params, $sampleType);
+            $result = $this->sampleService->getClinicSampleTestedResults($params);
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result, 'sampleType' => $sampleType))
+            $viewModel->setVariables(['result' => $result, 'sampleType' => $sampleType])
                 ->setTerminal(true);
             return $viewModel;
         }
