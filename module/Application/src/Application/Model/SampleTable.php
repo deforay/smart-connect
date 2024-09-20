@@ -1558,7 +1558,7 @@ class SampleTable extends AbstractTableGateway
                 }
             }
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $query->where("vl.arv_adherance_percentage = ?",$params['adherence']);
+                $query->where("vl.arv_adherance_percentage = ?", $params['adherence']);
                 //$query = $query->where(array("vl.arv_adherance_percentage = '" . $params['adherence'] . "'"));
             }
 
@@ -1853,7 +1853,7 @@ class SampleTable extends AbstractTableGateway
                     $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
                 }
             }
-            
+
             $query = $query->group(array(new Expression('WEEK(sample_collection_date)')));
             $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
             $queryStr = $sql->buildSqlString($query);
@@ -2081,7 +2081,6 @@ class SampleTable extends AbstractTableGateway
 
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
                 $rQuery->where(new WhereExpression("vl.arv_adherance_percentage = ?", $params['adherence']));
-
             }
             if (isset($params['gender'])) {
                 if ($params['gender'] == 'F') {
@@ -2112,7 +2111,7 @@ class SampleTable extends AbstractTableGateway
                     $rQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
                 }
             }
-            
+
             if (isset($params['testReason']) && trim($params['testReason']) != '') {
                 $rQuery->where(new WhereExpression("vl.reason_for_vl_testing ='" . base64_decode($params['testReason']) . "'"));
             }
@@ -7203,7 +7202,7 @@ class SampleTable extends AbstractTableGateway
                 )
                 ->join(array('tr' => 'r_vl_test_reasons'), 'tr.test_reason_id=vl.reason_for_vl_testing', array('test_reason_name'))
                 ->where(new WhereExpression('DATE(vl.sample_collection_date) BETWEEN ? AND ?', [$startDate, $endDate]));
-            
+
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $clinicIds = explode(',', $params['clinicId']);
                 $rQuery->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds));
@@ -7292,8 +7291,8 @@ class SampleTable extends AbstractTableGateway
                 } elseif ($params['isBreastfeeding'] == 'unreported') {
                     $rQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
                 }
-            }            
-            
+            }
+
             $rQueryStr = $sql->buildSqlString($rQuery);
             //$qResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $qResult = $this->commonService->cacheQuery($rQueryStr, $dbAdapter);
@@ -7911,7 +7910,7 @@ class SampleTable extends AbstractTableGateway
                 mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . 'backups', true);
             }
 
-            $csvFile = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . 'backups' . DIRECTORY_SEPARATOR . 'export-data-' . $startDate . '-' . $endDate . '-' . mt_rand() . '.csv';
+            $csvFile = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . 'backups' . DIRECTORY_SEPARATOR . 'export-data-' . $startDate . '-' . $endDate . '-' . CommonService::generateRandomString(6) . '.csv';
 
             CommonService::generateCsv($headings, $output, $csvFile);
 

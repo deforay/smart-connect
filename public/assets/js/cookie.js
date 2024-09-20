@@ -1,33 +1,28 @@
-function setCookie(c_name,value)
-{
-    var c_value=escape(value);
-    var date = new Date();
-    date.setTime(date.getTime()+(15*60*1000));
-    var expires = "; expires="+date.toGMTString();
-    document.cookie=c_name + "=" + c_value + expires+"; path=/";
-}
-function getCookie(c_name)
-{
-    var i,x,y,ARRcookies=document.cookie.split(";");
-    for (i=0;i<ARRcookies.length;i++)
-    {
-        x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
-        y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
-        x=x.replace(/^\s+|\s+$/g,"");
-        if (x==c_name)
-        {
-            return unescape(y);
-        }
-    }
+function setCookie(c_name, value, minutes = 15) {
+    let c_value = encodeURIComponent(value);
+    let date = new Date();
+    date.setTime(date.getTime() + (minutes * 60 * 1000));
+    let expires = "; expires=" + date.toUTCString();
+    document.cookie = c_name + "=" + c_value + expires + "; path=/";
 }
 
-function deleteCookie(c_name)
-{
-    var date = new Date();
-    date.setTime(date.getTime()+(-1*24*60*60*1000));
-    var expires = "; expires="+date.toGMTString();        
-    document.cookie = c_name+"="+""+expires+"; path=/";
+function getCookie(c_name) {
+    let name = encodeURIComponent(c_name) + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let cookiesArray = decodedCookie.split(';');
+    for (let i = 0; i < cookiesArray.length; i++) {
+        let cookie = cookiesArray[i].trim();
+        if (cookie.indexOf(name) === 0) {
+            return cookie.substring(name.length, cookie.length);
+        }
+    }
+    return null;
 }
+
+function deleteCookie(c_name) {
+    setCookie(c_name, "", -1);
+}
+
 
 
 jQuery.cookie = function (key, value, options) {
@@ -41,24 +36,33 @@ jQuery.cookie = function (key, value, options) {
         }
 
         if (typeof options.expires === 'number') {
-            var days = options.expires, t = options.expires = new Date();
+            let days = options.expires, t = options.expires = new Date();
             t.setDate(t.getDate() + days);
         }
 
         value = String(value);
 
-        return (document.cookie = [
+        // Extract assignment of document.cookie
+        let cookieString = [
             encodeURIComponent(key), '=',
             options.raw ? value : encodeURIComponent(value),
             options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
             options.path ? '; path=' + options.path : '',
             options.domain ? '; domain=' + options.domain : '',
             options.secure ? '; secure' : ''
-        ].join(''));
+        ].join('');
+
+        document.cookie = cookieString;
+
+        return cookieString;
     }
 
     // key and possibly options given, get cookie...
     options = value || {};
-    var result, decode = options.raw ? function (s) { return s; } : decodeURIComponent;
-    return (result = new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)').exec(document.cookie)) ? decode(result[1]) : null;
+    let result;
+    let decode = options.raw ? function (s) { return s; } : decodeURIComponent;
+
+    result = new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)').exec(document.cookie);
+
+    return result ? decode(result[1]) : null;
 };
