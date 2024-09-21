@@ -109,9 +109,8 @@ class EidSampleService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
 
         $fileName = $_FILES['eidFile']['name'];
-        $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
         $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $fileName = $ranNumber . "." . $extension;
+        $fileName = CommonService::generateRandomString(6) . "." . $extension;
 
         if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
             mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);

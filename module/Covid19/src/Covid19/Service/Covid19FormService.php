@@ -47,9 +47,8 @@ class Covid19FormService
             $labId = $_POST['labId'] ?? null;
 
             $fileName = $_FILES['covid19File']['name'];
-            $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
             $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            $fileName = $ranNumber . "." . $extension;
+            $fileName = CommonService::generateRandomString(6) . "." . $extension;
 
             if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
                 mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
@@ -161,9 +160,8 @@ class Covid19FormService
             $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
 
             $fileName = $_FILES['covid19File']['name'];
-            $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
             $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            $fileName = $ranNumber . "." . $extension;
+            $fileName = CommonService::generateRandomString(6) . "." . $extension;
 
             if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
                 mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
@@ -554,7 +552,7 @@ class Covid19FormService
                 $sQueryStr = $sql->buildSqlString($queryContainer->indicatorSummaryQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && !empty($sResult)) {
-                    $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+                    $excel = new Spreadsheet();
 
 
                     $sheet = $excel->getActiveSheet();
@@ -574,38 +572,26 @@ class Covid19FormService
                         $j++;
                     }
 
-                    $styleArray = array(
-                        'font' => array(
+                    $styleArray = [
+                        'font' => [
                             'bold' => true,
-                        ),
-                        'alignment' => array(
+                        ],
+                        'alignment' => [
                             'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
                             'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-                        ),
-                        'borders' => array(
-                            'outline' => array(
+                        ],
+                        'borders' => [
+                            'outline' => [
                                 'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                            ),
-                        )
-                    );
-                    $borderStyle = array(
-                        'alignment' => array(
-                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
-                        ),
-                        'borders' => array(
-                            'outline' => array(
-                                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                            ),
-                        )
-                    );
-                    $eRow = 0;
+                            ],
+                        ]
+                    ];
                     $sheet->setCellValue('A1', html_entity_decode($this->translator->translate('Months'), ENT_QUOTES, 'UTF-8'));
                     foreach ($keySummaryIndicators['month'] as $key => $month) {
                         $colNo = $key + 1;
                         $currentRow = 1;
-                        $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($month, ENT_QUOTES, 'UTF-8'));
-                        $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                        $sheet->getStyle($cellName . $currentRow)->applyFromArray($styleArray);
+                        $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($month, ENT_QUOTES, 'UTF-8'));
+                        $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $currentRow)->applyFromArray($styleArray);
                     }
 
 
@@ -628,9 +614,6 @@ class Covid19FormService
                             }
 
                             $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -730,16 +713,6 @@ class Covid19FormService
                         ),
                     )
                 );
-                $borderStyle = array(
-                    'alignment' => array(
-                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
-                    ),
-                    'borders' => array(
-                        'outline' => array(
-                            'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                        ),
-                    )
-                );
 
                 $sheet->setCellValue('A1', html_entity_decode($this->translator->translate('Facility'), ENT_QUOTES, 'UTF-8'));
                 $sheet->setCellValue('B1', html_entity_decode($this->translator->translate('Province'), ENT_QUOTES, 'UTF-8'));
@@ -770,11 +743,6 @@ class Covid19FormService
                         //     break;
                         // }
                         $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                        // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                        // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                        // $sheet->getDefaultRowDimension()->setRowHeight(20);
-                        // $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
-                        // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                         $colNo++;
                     }
                     $currentRow++;

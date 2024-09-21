@@ -475,10 +475,8 @@ foreach ($sampleType as $samples) {
             separator: ' to ',
             startDate: start,
             endDate: end,
-            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) { ?>
-                minDate: moment().subtract(12, 'months'),
-                maxDate: moment(),
-            <?php } ?>
+            minDate: <?= (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')" ?>,
+            maxDate: moment(),
             ranges: {
                 'Today': [moment(), moment()],
                 'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],

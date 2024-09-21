@@ -13,7 +13,7 @@ $startDate = date('Y-m', strtotime('+1 month', strtotime('-1 year')));
 $endDate = date('Y-m');
 ?>
 <link rel="stylesheet" href="<?php echo $this->basePath('assets/plugins/datepicker/datepicker3.css') ?>">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js" integrity="sha384-M06Wz+wp7/Hfi8Ks7DJtWxAFDqihGPCsNmjmWhnUQ8vBTSwd/1Os0uhf2hcYXt2t" crossorigin="anonymous"></script>
 
 
 
@@ -172,14 +172,13 @@ $endDate = date('Y-m');
                 $('#daterange-container span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
                 $('#daterange').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
             }
+
             $('#daterange-container').daterangepicker({
                 format: 'DD-MMM-YYYY',
                 separator: ' to ',
                 startDate: start,
                 endDate: end,
-                <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) { ?>
-                    minDate: moment().subtract(12, 'months'),
-                <?php } ?>
+                minDate: <?= (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')" ?>,
                 maxDate: moment(),
                 ranges: {
                     'Today': [moment(), moment()],

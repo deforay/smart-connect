@@ -1127,16 +1127,13 @@ foreach ($sampleType as $samples) {
             $('#daterange-container-key-indicator span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
             $('#daterangeKeyIndicator').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
         }
-        <?php
-        $minDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')";
-        ?>
 
         $('#daterange-container, #daterange-container-key-indicator').daterangepicker({
             'format': 'DD-MMM-YYYY',
             'separator': ' to ',
             'startDate': start,
             'endDate': end,
-            'minDate': <?php echo $minDate; ?>,
+            'minDate': <?= (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')" ?>,
             'maxDate': moment(),
             'ranges': {
                 'Today': [moment(), moment()],
