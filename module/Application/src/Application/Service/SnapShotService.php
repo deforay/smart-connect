@@ -2,20 +2,11 @@
 
 namespace Application\Service;
 
-use Exception;
-use JsonMachine\Items;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
-use Application\Model\SampleTable;
-use Application\Model\FacilityTable;
 use Application\Service\CommonService;
-use Laminas\Cache\Pattern\ObjectCache;
-use Application\Model\LocationDetailsTable;
-use JsonMachine\JsonDecoder\ExtJsonDecoder;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use Application\Model\DashApiReceiverStatsTable;
 
 class SnapShotService
 {
@@ -33,18 +24,19 @@ class SnapShotService
     }
     public function getSnapshotData($params)
     {
+
         $loginContainer = new Container('credo');
         $mappedFacilities = $loginContainer->mappedFacilities ?? null;
         $testTypeQuery = [];
         $where = [];
 
         if (isset($params['collectionDate']) && !empty($params['collectionDate'])) {
-            $date = explode(" to ", $params['collectionDate']);
-            $where[] = " DATE(sample_collection_date) >= '" . $this->commonService->isoDateFormat($date[0]) . "' AND DATE(sample_collection_date) <= '" . $this->commonService->isoDateFormat($date[1]) . "' ";
+            [$from, $to] = CommonService::convertDateRange($params['collectionDate']);
+            $where[] = " DATE(sample_collection_date) BETWEEN '$from' AND '$to' ";
         }
         if (isset($params['testedDate']) && !empty($params['testedDate'])) {
-            $date = explode(" to ", $params['testedDate']);
-            $where[] = " DATE(sample_tested_datetime) >= '" . $this->commonService->isoDateFormat($date[0]) . "' AND DATE(sample_tested_datetime) <= '" . $this->commonService->isoDateFormat($date[1]) . "' ";
+            [$from, $to] = CommonService::convertDateRange($params['testedDate']);
+            $where[] = " DATE(sample_tested_datetime) BETWEEN '$from' AND '$to' ";
         }
         if (isset($params['provinceName']) && !empty($params['provinceName'])) {
             $where[] = " facility_state_id IN(" . implode(",", $params['provinceName']) . ") ";
@@ -67,55 +59,57 @@ class SnapShotService
         if (isset($where) && !empty($where)) {
             $whereQuery = " WHERE " . implode(" AND ", $where);
         }
-        $types = array("vl", "eid", "tb", "covid19", "hepatitis");
+        $types = ["vl", "eid", "tb", "covid19", "hepatitis"];
         if (isset($params['testType']) && !empty($params['testType'])) {
             $types = $params['testType'];
         }
         if (isset($types) && !empty($types)) {
             foreach ($types as $type) {
-                $q = " SELECT count(*) AS reg, 
-                SUM(CASE WHEN 
-                    (
-                        sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'
-                    ) THEN 1 ELSE 0 END
-                ) AS 'totalReceived',
-                
-                SUM(CASE WHEN 
+                $q = " SELECT count(*) AS reg,
+                SUM(CASE WHEN
+                    (sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')
+                        THEN 1 ELSE 0 END) AS 'totalReceived',
+
+                SUM(CASE WHEN
                     (
                         sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'
                     ) THEN 1 ELSE 0 END
                 ) AS 'totalTested',
 
-                SUM(CASE WHEN 
+                SUM(CASE WHEN
                     (
-                        (reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection !='' AND reason_for_sample_rejection!= 0) OR (is_sample_rejected like 'yes') 
-                        AND 
+                        (reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection !='' AND reason_for_sample_rejection!= 0) OR (is_sample_rejected like 'yes')
+                        AND
                         (sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')
                     ) THEN 1 ELSE 0 END
                 ) AS 'totalRejected',
-                
-                SUM(CASE WHEN 
+
+                SUM(CASE WHEN
                     (
-                        (sample_collection_date IS NOT NULL AND sample_collection_date NOT LIKE '' AND DATE(sample_collection_date) NOT LIKE '0000:00:00' AND DATE(sample_collection_date) !='1970-01-01') 
-                        AND 
+                        (sample_collection_date IS NOT NULL AND sample_collection_date NOT LIKE '' AND DATE(sample_collection_date) NOT LIKE '0000:00:00' AND DATE(sample_collection_date) !='1970-01-01')
+                        AND
                         (is_sample_rejected like 'yes' OR result IS NULL OR result LIKE '' OR result_status IN(2,4,5,10))
                     ) THEN 1 ELSE 0 END
                 ) AS 'totalPending',
-                facility_name FROM dash_form_" . $type . " AS " . $type . " INNER JOIN facility_details as f ON " . $type . ".lab_id = f.facility_id ";
+                facility_name FROM dash_form_$type AS $type INNER JOIN facility_details as f ON $type lab_id = f.facility_id ";
 
                 if (!empty($params['flag']) && $params['flag'] == 'poc') {
-                    $q .= " INNER JOIN instrument_machines as icm ON " . $type . ".import_machine_name = icm.config_machine_id ";
+                    $q .= " INNER JOIN instrument_machines as icm ON $type.import_machine_name = icm.config_machine_id ";
                 }
-                $q .= $whereQuery . " GROUP BY f.facility_id ";
+                $q .= "$whereQuery GROUP BY f.facility_id ";
                 $testTypeQuery[] = $q;
             }
         }
 
-        $sql = "SELECT t.facility_name AS clinicName, sum(t.reg) AS total, sum(t.totalReceived) AS totalReceived, sum(t.totalTested) AS totalTested, sum(t.totalRejected) AS totalRejected, sum(t.totalPending) AS totalPending";
-        $sql .= " FROM (
-                " . implode(" UNION ALL ", $testTypeQuery) . "
-             ) t GROUP BY clinicName ORDER BY total DESC";
-        // die($sql);
+
+        $testTypeQuery = implode(" UNION ALL ", $testTypeQuery);
+        $sql = "SELECT t.facility_name AS clinicName,
+                        SUM(t.reg) AS total,
+                        SUM(t.totalReceived) AS totalReceived,
+                        SUM(t.totalTested) AS totalTested,
+                        SUM(t.totalRejected) AS totalRejected,
+                        SUM(t.totalPending) AS totalPending
+                            FROM ($testTypeQuery) t GROUP BY clinicName ORDER BY total DESC";
         return $this->adapter->query($sql, Adapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
@@ -224,33 +218,29 @@ class SnapShotService
                 $query['rejected'][] = $sql->buildSqlString($rejectedQuery);
             }
         }
-        $sql = "SELECT SUM(t.recevied) AS 'Total Samples', 
+        $quickStatsQuery = implode(" UNION ALL ", $query['quickStats']);
+        $sql = "SELECT SUM(t.recevied) AS 'Total Samples',
             SUM(t.tested) AS 'Samples Tested',
             SUM(t.gender) AS 'Gender Missing',
             SUM(t.age) AS 'Age Missing',
             SUM(t.less6) AS 'Results Not Available (< 6 months)',
             SUM(t.greater6) AS 'Results Not Available (> 6 months)' ";
-        $sql .= " FROM (
-                " . implode(" UNION ALL ", $query['quickStats']) . "
-        ) t ";
-        // die($sql);
+        $sql .= " FROM ($quickStatsQuery) t ";
+
         $finalResult['quickStats'] = $this->adapter->query($sql, Adapter::QUERY_MODE_EXECUTE)->current();
-        // echo "<pre>";print_r($query);die;
-        foreach (array('received', 'tested', 'rejected') as $r) {
+
+        foreach (['received', 'tested', 'rejected'] as $r) {
             $sql = "SELECT SUM(t.total) AS total, t." . $r . "Date ";
             $sql .= " FROM (
                     " . implode(" UNION ALL ", $query[$r]) . "
             ) t GROUP BY " . $r . "Date ORDER BY " . $r . "Date DESC";
-            // $q[$r] = $sql;
             $result = $this->adapter->query($sql, Adapter::QUERY_MODE_EXECUTE)->toArray();
             $totalSum = 0;
             foreach ($result as $rRow) {
-                // $displayDate = $common->humanReadableDateFormat($rRow[$r.'Date']);
                 $displayDate = date("d-M-Y", strtotime($rRow[$r . 'Date']));
                 $finalResult[$r][] = array(array('total' => $rRow['total']), 'date' => $displayDate, $r . 'Date' => $displayDate, $r . 'Total' => $totalSum += $rRow['total']);
             }
         }
-        // die;
-        return array('quickStats' => $finalResult['quickStats'] ?? null, 'scResult' => $finalResult['received'] ?? null, 'stResult' => $finalResult['tested'] ?? null, 'srResult' => $finalResult['rejected'] ?? null);
+        return ['quickStats' => $finalResult['quickStats'] ?? null, 'scResult' => $finalResult['received'] ?? null, 'stResult' => $finalResult['tested'] ?? null, 'srResult' => $finalResult['rejected'] ?? null];
     }
 }

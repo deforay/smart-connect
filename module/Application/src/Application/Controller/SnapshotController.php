@@ -2,15 +2,18 @@
 
 namespace Application\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\View\Model\ViewModel;
 use Laminas\Json\Json;
+use Laminas\View\Model\ViewModel;
+use Application\Service\CommonService;
+use Application\Service\SnapShotService;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Db\Sql\Predicate\Expression as WhereExpression;
 
 class SnapshotController extends AbstractActionController
 {
 
-    private \Application\Service\CommonService $commonService;
-    private \Application\Service\SnapShotService $snapshotService;
+    private CommonService $commonService;
+    private SnapShotService $snapshotService;
 
     public function __construct($commonService, $snapshotService)
     {
