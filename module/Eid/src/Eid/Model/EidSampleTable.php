@@ -59,8 +59,7 @@ class EidSampleTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $queryStr = $queryStr->where("(sample_collection_date is not null AND sample_collection_date not like '')
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND DATE(sample_collection_date) BETWEEN '$startMonth'AND '$endMonth' ");
         }
 
         $queryStr = $sql->buildSqlString($queryStr);

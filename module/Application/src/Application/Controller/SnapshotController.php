@@ -7,7 +7,6 @@ use Laminas\View\Model\ViewModel;
 use Application\Service\CommonService;
 use Application\Service\SnapShotService;
 use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\Db\Sql\Predicate\Expression as WhereExpression;
 
 class SnapshotController extends AbstractActionController
 {
