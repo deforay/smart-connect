@@ -5109,7 +5109,7 @@ class EidSampleTable extends AbstractTableGateway
             $rQuery = $sql->select()->from(array('vl' => $this->table))
                 ->columns(array('total' => new Expression('COUNT(*)'), 'monthDate' => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%M-%Y')")))
                 ->join(array('tr' => 'r_eid_test_reasons'), 'tr.test_reason_id=vl.reason_for_eid_test', array('test_reason_name'))
-                ->where(new WhereExpression("DATE(vl.sample_collection_date) >= ? ", "DATE(vl.sample_collection_date) <= ? "), [$startDate, $endDate])
+                ->where(new WhereExpression("DATE(vl.sample_collection_date) >= ? AND DATE(vl.sample_collection_date) <= ? ", [$startDate, $endDate]))
                 //->where('vl.facility_id !=0')
                 //->where('vl.reason_for_eid_test="'.$reason['test_reason_id'].'"');
                 ->group('tr.test_reason_id');
@@ -5383,7 +5383,7 @@ class EidSampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
             ->join(array('r_r_r' => 'r_eid_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
-            $sQuery = $sQuery->where(new WhereExpression("DATE(vl.sample_collection_date) >= ? ", "DATE(vl.sample_collection_date) <= ? "), [$startDate, $endDate]);
+            $sQuery = $sQuery->where(new WhereExpression("DATE(vl.sample_collection_date) >= ? AND DATE(vl.sample_collection_date) <= ? ", [$startDate, $endDate]));
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
             $sQuery = $sQuery->where(new WhereExpression('vl.facility_id IN ( ? )', [$parameters['clinicId']]));

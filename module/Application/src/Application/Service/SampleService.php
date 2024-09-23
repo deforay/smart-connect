@@ -410,7 +410,7 @@ class SampleService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
 
-        if (property_exists($queryContainer, 'resultQuery') && $queryContainer->resultQuery !== null) {
+        if (isset($queryContainer->resultQuery) && $queryContainer->resultQuery !== null) {
             try {
 
                 $sql = new Sql($this->dbAdapter);
@@ -543,7 +543,7 @@ class SampleService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
 
-        if (property_exists($queryContainer, 'resultQuery') && $queryContainer->resultQuery !== null) {
+        if (isset($queryContainer->resultQuery) && $queryContainer->resultQuery !== null) {
             try {
 
                 $sql = new Sql($this->dbAdapter);
