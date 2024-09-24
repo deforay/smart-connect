@@ -133,7 +133,7 @@ class EidSummaryService
     public function exportIndicatorResultExcel($params)
     {
         $queryContainer = new Container('query');
-        if (property_exists($queryContainer, 'indicatorSummaryQuery') && $queryContainer->indicatorSummaryQuery !== null) {
+        if (isset($queryContainer->indicatorSummaryQuery) && $queryContainer->indicatorSummaryQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
@@ -160,10 +160,29 @@ class EidSummaryService
                         $j++;
                     }
 
+                    $styleArray = array(
+                        'font' => array(
+                            'bold' => true,
+                        ),
+                        'alignment' => array(
+                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+
                     $sheet->setCellValue('A1', html_entity_decode($this->translator->translate('Months'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->getStyle('A1')->applyFromArray($styleArray);
+                    
                     foreach ($keySummaryIndicators['month'] as $key => $month) {
                         $colNo = $key + 1;
                         $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . '1', html_entity_decode($month));
+                        $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . '1')->applyFromArray($styleArray);
+
                     }
 
 

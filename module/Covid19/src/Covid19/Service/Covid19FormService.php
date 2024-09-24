@@ -545,7 +545,7 @@ class Covid19FormService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
 
-        if (property_exists($queryContainer, 'indicatorSummaryQuery') && $queryContainer->indicatorSummaryQuery !== null) {
+        if (isset($queryContainer->indicatorSummaryQuery) && $queryContainer->indicatorSummaryQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);

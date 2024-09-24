@@ -837,7 +837,7 @@ class EidSampleService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        if (property_exists($queryContainer, 'resultQuery') && $queryContainer->resultQuery !== null) {
+        if (isset($queryContainer->resultQuery) && $queryContainer->resultQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
@@ -1098,12 +1098,12 @@ class EidSampleService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        if (property_exists($queryContainer, 'resultQuery') && $queryContainer->resultQuery !== null) {
+        if (isset($queryContainer->resultQuery) && $queryContainer->resultQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
                 $hQueryStr = $sql->buildSqlString($queryContainer->highVlSampleQuery);
-                // echo ($hQueryStr);die;
+                //echo ($hQueryStr);die;
                 $sResult = $dbAdapter->query($hQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();

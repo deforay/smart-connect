@@ -36,14 +36,16 @@ class CommonService
 
      public $sm = null;
      public $cache = null;
-     /** @var TempMailTable TempMailTable */
-     public TempMailTable $tempMailTable;
+     /** @var TempMailTable|null */
+     public ?TempMailTable $tempMailTable = null;
 
      public function __construct($sm = null, $cache = null, $tempMailTable = null)
      {
           $this->sm = $sm;
           $this->cache = $cache;
-          $this->tempMailTable = $tempMailTable;
+          if ($tempMailTable !== null) {
+               $this->tempMailTable = $tempMailTable;
+           }
      }
 
      public function startsWith($string, $startString)
