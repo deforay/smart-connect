@@ -5383,7 +5383,7 @@ class EidSampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
             ->join(array('r_r_r' => 'r_eid_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
-            $sQuery = $sQuery->where(new WhereExpression("DATE(vl.sample_collection_date) >= ? ", "DATE(vl.sample_collection_date) <= ? "), [$startDate, $endDate]);
+            $sQuery = $sQuery->where(new WhereExpression("DATE(vl.sample_collection_date) >= ? AND DATE(vl.sample_collection_date) <= ? ", [$startDate, $endDate]));
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
             $sQuery = $sQuery->where(new WhereExpression('vl.facility_id IN ( ? )', [$parameters['clinicId']]));

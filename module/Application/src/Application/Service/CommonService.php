@@ -36,7 +36,7 @@ class CommonService
      public $sm = null;
      public $cache = null;
      /** @var TempMailTable TempMailTable */
-     public TempMailTable $tempMailTable;
+     public $tempMailTable;
 
      public function __construct($sm = null, $cache = null, $tempMailTable = null)
      {
