@@ -1343,7 +1343,6 @@ class SampleService
 
                     $id = $sampleDb->insertOrUpdate($data);
                     if (false !== $id && !empty($id) && is_numeric($id)) {
-                        //$this->apiTrackerTable->updateFormAttributes($params, $currentDateTime);
                         $this->apiTrackerTable->updateFacilityAttributes(
                             $data['facility_id'],
                             $currentDateTime

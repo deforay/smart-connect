@@ -29,6 +29,7 @@ use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Application\Model\DashApiReceiverStatsTable;
+use Generator;
 
 class CommonService
 {
@@ -1247,13 +1248,13 @@ class CommonService
           }
      }
 
-     public static function convertDateRange(?string $dateRange): array
+     public static function convertDateRange(?string $dateRange, $seperator = "to"): array
      {
-          if ($dateRange === null || $dateRange === '') {
+          if ($dateRange === null || $dateRange === '' || !str_contains($dateRange, $seperator)) {
                return ['', ''];
           }
 
-          $dates = explode("to", $dateRange ?? '');
+          $dates = explode($seperator, $dateRange ?? '');
           $dates = array_map('trim', $dates);
 
           $startDate = empty($dates[0]) ? '' : self::isoDateFormat($dates[0]);
@@ -1451,12 +1452,13 @@ class CommonService
           return is_array($variable) || $variable instanceof Traversable;
      }
 
-     private static function cleanupGenerator($generator, $filePath, $deleteSourceFile = true)
+     private static function dataGenerator($apiData, $filePath, $deleteSourceFile = true): Generator
      {
-          foreach ($generator as $item) {
+          foreach ($apiData as $item) {
                yield $item;
           }
-          if ($deleteSourceFile) {
+
+          if ($deleteSourceFile && file_exists($filePath)) {
                unlink($filePath);
           }
      }
@@ -1491,17 +1493,16 @@ class CommonService
                               'decoder' => new ExtJsonDecoder(true)
                          ]);
                          $timestamp = iterator_to_array($timestampData)['timestamp'] ?? time();
-                    } else {
-                         $timestamp = time();
                     }
                }
 
-               return $returnTimestamp ? [self::cleanupGenerator($apiData, $tempFilePath, $deleteSourceFile), $timestamp] : self::cleanupGenerator($apiData, $tempFilePath, $deleteSourceFile);
+               $generator = self::dataGenerator($apiData, $tempFilePath, $deleteSourceFile);
+               return $returnTimestamp ? [$generator, $timestamp] : $generator;
           } catch (Throwable $e) {
+               error_log($e->getMessage());
                if ($deleteSourceFile && file_exists($tempFilePath) && $tempFilePath !== $filePath) {
                     unlink($tempFilePath);
                }
-               error_log($e->getMessage());
                return $returnTimestamp ? [null, null] : null;
           }
      }
