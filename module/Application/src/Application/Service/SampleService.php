@@ -1307,7 +1307,7 @@ class SampleService
             ];
             $allColumns = "SELECT COLUMN_NAME
                             FROM INFORMATION_SCHEMA.COLUMNS
-                            WHERE TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_vl'";
+                            WHERE TABLE_SCHEMA = '$dbname' AND table_name='dash_form_vl'";
 
             $allColResult = $this->dbAdapter->query($allColumns, Adapter::QUERY_MODE_EXECUTE)->toArray();
             $columnList = array_map('current', $allColResult);
@@ -1325,11 +1325,11 @@ class SampleService
 
             $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
 
-            if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName)) {
-                if (is_readable($fileName)) {
-                    [$apiData, $timestamp] = CommonService::processJsonFile($fileName);
-                }
+
+            if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName) && is_readable($fileName)) {
+                [$apiData, $timestamp] = CommonService::processJsonFile($fileName);
             }
+
 
             $numRows = $counter = 0;
             $currentDateTime = CommonService::getDateTime();
@@ -1693,10 +1693,10 @@ class SampleService
         ini_set("memory_limit", -1);
         if (trim($params) === '' || trim($params) == '[]') {
             http_response_code(400);
-            $response = array(
-                'status'    => 'fail',
-                'message'   => 'Missing data in API request',
-            );
+            $response = [
+                'status' => 'fail',
+                'message' => 'Missing data in API request',
+            ];
         }
 
         $sampleDb = $this->sm->get('SampleTableWithoutCache');
@@ -1726,12 +1726,12 @@ class SampleService
                 $instanceCode = 'nrl-weblims';
 
                 // Check duplicate data
-                $province = $provinceDb->select(array('province_name' => $row['ProvinceName']))->current();
+                $province = $provinceDb->select(['province_name' => $row['ProvinceName']])->current();
                 if (!$province) {
-                    $provinceDb->insert(array(
-                        'province_name'     => $row['ProvinceName'],
-                        'updated_datetime'  => CommonService::getDateTime()
-                    ));
+                    $provinceDb->insert([
+                        'province_name' => $row['ProvinceName'],
+                        'updated_datetime' => CommonService::getDateTime()
+                    ]);
                     $province['province_id'] = $provinceDb->lastInsertValue;
                 }
 

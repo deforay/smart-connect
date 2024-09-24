@@ -2,15 +2,14 @@
 
 namespace Eid\Service;
 
+use Exception;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
-use Laminas\Db\Adapter\Adapter;
 use Application\Service\CommonService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use Laminas\Db\TableGateway\AbstractTableGateway;
 
 class EidSummaryService
 {
@@ -188,14 +187,14 @@ class EidSummaryService
                         $currentRow++;
                     }
 
-                    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
+                    $writer = IOFactory::createWriter($excel, 'Xlsx');
                     $filename = 'EID-SUMMARY-KEY-INDICATORS-' . date('d-M-Y-H-i-s') . '.xlsx';
                     $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
                     return "";
                 }
-            } catch (\Exception $exc) {
+            } catch (Exception $exc) {
                 error_log("SUMMARY-INDICATORS-RESULT-REPORT--" . $exc->getMessage());
                 return "";
             }
@@ -303,7 +302,7 @@ class EidSummaryService
             } else {
                 return "";
             }
-        } catch (\Exception $exc) {
+        } catch (Exception $exc) {
             error_log("EID-Facility-Wise-Positive-Rate-" . $exc->getMessage());
             return "";
         }

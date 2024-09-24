@@ -2,6 +2,7 @@
 
 namespace Application\Service;
 
+use Exception;
 use Laminas\Session\Container;
 
 class FacilityService
@@ -25,7 +26,7 @@ class FacilityService
                 $alertContainer = new Container('alert');
                 $alertContainer->alertMsg = 'Facility details added successfully';
             }
-        } catch (\Exception $exc) {
+        } catch (Exception $exc) {
             $adapter->rollBack();
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
