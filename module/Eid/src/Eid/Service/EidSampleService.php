@@ -899,9 +899,9 @@ class EidSampleService
 
                     $sheet->getStyle('A1:F1')->applyFromArray($styleArray);
                     $currentRow = 2;
-                    $endColumn = 5;
+                    $endColumn = 6;
                     foreach ($output as $rowData) {
-                        $colNo = 0;
+                        $colNo = 1;
                         foreach ($rowData as $field => $value) {
                             if (!isset($value)) {
                                 $value = "";
