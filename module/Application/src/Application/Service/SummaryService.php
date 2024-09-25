@@ -134,7 +134,7 @@ class SummaryService
     public function exportIndicatorResultExcel($params)
     {
         $queryContainer = new Container('query');
-        if (property_exists($queryContainer, 'indicatorSummaryQuery') && $queryContainer->indicatorSummaryQuery !== null) {
+        if (isset($queryContainer->indicatorSummaryQuery) && $queryContainer->indicatorSummaryQuery !== null) {
             try {
 
                 $sql = new Sql($this->dbAdapter);
@@ -187,14 +187,14 @@ class SummaryService
                     );
                     $eRow = 0;
                     $sheet->setCellValue('A1', html_entity_decode($this->translator->translate('Months'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->getStyle('A1')->applyFromArray($styleArray);
+
                     foreach ($keySummaryIndicators['month'] as $key => $month) {
                         $colNo = $key + 1;
                         $currentRow = 1;
-                        $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($month, ENT_QUOTES, 'UTF-8'));
-                        $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                        $sheet->getStyle($cellName . $currentRow)->applyFromArray($styleArray);
+                        $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($month, ENT_QUOTES, 'UTF-8'));
+                        $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $currentRow)->applyFromArray($styleArray);
                     }
-
 
                     foreach ($keySummaryIndicators['sample'] as $key => $indicators) {
                         $row = [];
@@ -215,9 +215,6 @@ class SummaryService
                             }
 
                             $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;

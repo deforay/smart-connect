@@ -22,7 +22,7 @@ class VlsmCovid19Controller extends AbstractRestfulController
     public function create($params)
     {
         // Ensure to parse raw input data if $_POST and $_FILES are empty
-        CommonService::parseMultipartFormData();
+        CommonService::parseMultipartFormData(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19");
         if (!isset($params['api-version'])) {
             $params['api-version'] = 'v1';
         }

@@ -1620,6 +1620,9 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             },
             function(data) {
                 $("#samplesReceivedBarChartContainer").html(data);
+            }).always(function() {
+                // Unblock UI after the request completes
+                $.unblockUI();
             });
     }
 
@@ -1638,6 +1641,9 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             },
             function(data) {
                 $("#positiveRateBarChartContainer").html(data);
+            }).always(function() {
+                // Unblock UI after the request completes
+                $.unblockUI();
             });
     }
 
@@ -1656,6 +1662,9 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             },
             function(data) {
                 $("#samplesRejectedBarChartContainer").html(data);
+            }).always(function() {
+                // Unblock UI after the request completes
+                $.unblockUI();
             });
     }
 

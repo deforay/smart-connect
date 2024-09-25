@@ -2,15 +2,14 @@
 
 namespace Eid\Service;
 
+use Exception;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
-use Laminas\Db\Adapter\Adapter;
 use Application\Service\CommonService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use Laminas\Db\TableGateway\AbstractTableGateway;
 
 class EidSummaryService
 {
@@ -134,7 +133,7 @@ class EidSummaryService
     public function exportIndicatorResultExcel($params)
     {
         $queryContainer = new Container('query');
-        if (property_exists($queryContainer, 'indicatorSummaryQuery') && $queryContainer->indicatorSummaryQuery !== null) {
+        if (isset($queryContainer->indicatorSummaryQuery) && $queryContainer->indicatorSummaryQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
@@ -161,10 +160,29 @@ class EidSummaryService
                         $j++;
                     }
 
+                    $styleArray = array(
+                        'font' => array(
+                            'bold' => true,
+                        ),
+                        'alignment' => array(
+                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+
                     $sheet->setCellValue('A1', html_entity_decode($this->translator->translate('Months'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->getStyle('A1')->applyFromArray($styleArray);
+                    
                     foreach ($keySummaryIndicators['month'] as $key => $month) {
                         $colNo = $key + 1;
                         $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . '1', html_entity_decode($month));
+                        $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . '1')->applyFromArray($styleArray);
+
                     }
 
 
@@ -188,14 +206,14 @@ class EidSummaryService
                         $currentRow++;
                     }
 
-                    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
+                    $writer = IOFactory::createWriter($excel, 'Xlsx');
                     $filename = 'EID-SUMMARY-KEY-INDICATORS-' . date('d-M-Y-H-i-s') . '.xlsx';
                     $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
                     return "";
                 }
-            } catch (\Exception $exc) {
+            } catch (Exception $exc) {
                 error_log("SUMMARY-INDICATORS-RESULT-REPORT--" . $exc->getMessage());
                 return "";
             }
@@ -303,7 +321,7 @@ class EidSummaryService
             } else {
                 return "";
             }
-        } catch (\Exception $exc) {
+        } catch (Exception $exc) {
             error_log("EID-Facility-Wise-Positive-Rate-" . $exc->getMessage());
             return "";
         }

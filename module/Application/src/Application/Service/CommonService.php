@@ -9,40 +9,43 @@ use ZipArchive;
 use Traversable;
 use DateInterval;
 use DateTimeZone;
-use Laminas\Mail;
 use Ramsey\Uuid\Uuid;
+use RuntimeException;
 use DateTimeImmutable;
 use JsonMachine\Items;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Insert;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
+use Symfony\Component\Mime\Email;
+use Application\Model\TempMailTable;
+use Symfony\Component\Mailer\Mailer;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Symfony\Component\Mailer\Transport;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Application\Model\DashApiReceiverStatsTable;
-use Application\Model\TempMailTable;
-
-use Symfony\Component\Mailer\Transport;
-use Symfony\Component\Mailer\Mailer;
-use Symfony\Component\Mime\Email;
+use Generator;
 
 class CommonService
 {
 
      public $sm = null;
      public $cache = null;
-     /** @var TempMailTable TempMailTable */
-     public $tempMailTable;
+     /** @var TempMailTable|null */
+     public ?TempMailTable $tempMailTable = null;
 
      public function __construct($sm = null, $cache = null, $tempMailTable = null)
      {
           $this->sm = $sm;
           $this->cache = $cache;
-          $this->tempMailTable = $tempMailTable;
+          if ($tempMailTable !== null) {
+               $this->tempMailTable = $tempMailTable;
+           }
      }
 
      public function startsWith($string, $startString)
@@ -579,7 +582,7 @@ class CommonService
 
           $extension = strtolower(pathinfo($_FILES['referenceFile']['name'], PATHINFO_EXTENSION));
           $newFileName = self::generateRandomString(12) . "." . $extension;
-          $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $newFileName;
+          $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference" . DIRECTORY_SEPARATOR . $newFileName;
 
           if (move_uploaded_file($_FILES['referenceFile']['tmp_name'], $fileName)) {
                // Check if the file is readable after being moved
@@ -622,14 +625,14 @@ class CommonService
 
                     foreach ((array)$apiData->geographical_divisions->tableData as $row) {
                          $lData = (array)$row;
-                         $locationData = array(
-                              'geo_id'       => $lData['geo_id'],
-                              'geo_parent'   => $lData['geo_parent'],
-                              'geo_name'     => $lData['geo_name'],
-                              'geo_code'     => $lData['geo_code'],
-                              'geo_status'     => $lData['geo_status'],
-                              'updated_datetime'  => $lData['updated_datetime']
-                         );
+                         $locationData = [
+                              'geo_id' => $lData['geo_id'],
+                              'geo_parent' => $lData['geo_parent'],
+                              'geo_name' => $lData['geo_name'],
+                              'geo_code' => $lData['geo_code'],
+                              'geo_status' => $lData['geo_status'],
+                              'updated_datetime' => $lData['updated_datetime']
+                         ];
                          $locationDb->insert($locationData);
                     }
                }
@@ -1247,13 +1250,13 @@ class CommonService
           }
      }
 
-     public static function convertDateRange(?string $dateRange): array
+     public static function convertDateRange(?string $dateRange, $seperator = "to"): array
      {
-          if ($dateRange === null || $dateRange === '') {
+          if ($dateRange === null || $dateRange === '' || !str_contains($dateRange, $seperator)) {
                return ['', ''];
           }
 
-          $dates = explode("to", $dateRange ?? '');
+          $dates = explode($seperator, $dateRange ?? '');
           $dates = array_map('trim', $dates);
 
           $startDate = empty($dates[0]) ? '' : self::isoDateFormat($dates[0]);
@@ -1323,7 +1326,7 @@ class CommonService
           $result = false;
           if (!empty($json) && !empty($fileName)) {
                $zip = new ZipArchive();
-               $zipPath = $fileName . '.zip';
+               $zipPath = "$fileName.zip";
 
                if ($zip->open($zipPath, ZipArchive::CREATE) === true) {
                     $zip->addFromString(basename($fileName), $json);
@@ -1356,12 +1359,12 @@ class CommonService
 
                foreach ($optionList as $optId => $optName) {
                     $selectedText = '';
-                    if (!empty($selectedOptions)) {
-                         if (is_array($selectedOptions) && in_array($optId, $selectedOptions)) {
-                              $selectedText = "selected='selected'";
-                         } elseif ($optId == $selectedOptions) {
-                              $selectedText = "selected='selected'";
-                         }
+                    if (
+                         !empty($selectedOptions)
+                         && ((is_array($selectedOptions) && in_array($optId, $selectedOptions))
+                              || ($optId == $selectedOptions))
+                    ) {
+                         $selectedText = "selected='selected'";
                     }
                     $response .= "<option value='" . addslashes($optId) . "' $selectedText>" . addslashes($optName) . "</option>";
                }
@@ -1404,41 +1407,60 @@ class CommonService
           return $bytes === "\x1f\x8b";
      }
 
-     public static function ungzipFile($sourceFilePath, $destinationFilePath)
+     public static function gunzip(string $sourceFilePath, string $destinationFilePath): bool
      {
           $bufferSize = 4096; // Adjust buffer size as needed
 
+          // Validate that the source file exists and is readable
+          if (!is_readable($sourceFilePath)) {
+               throw new RuntimeException("Source file is not readable or does not exist: $sourceFilePath");
+          }
+
+          // Attempt to open both source and destination
           $source = gzopen($sourceFilePath, 'rb');
+          if ($source === false) {
+               throw new RuntimeException("Failed to open source gzip file: $sourceFilePath");
+          }
+
           $destination = fopen($destinationFilePath, 'wb');
-
-          if (!$source || !$destination) {
-
-               error_log("Error opening gzip file");
-               return false; // Handle error opening file
+          if ($destination === false) {
+               gzclose($source); // Ensure source is closed if destination opening fails
+               throw new RuntimeException("Failed to open destination file: $destinationFilePath");
           }
 
-          while (!gzeof($source)) {
-               $chunk = gzread($source, $bufferSize);
-               fwrite($destination, $chunk);
+          try {
+               // Read from gzip and write to destination in chunks
+               while (!gzeof($source)) {
+                    $chunk = gzread($source, $bufferSize);
+                    if ($chunk === false) {
+                         throw new RuntimeException("Error reading from gzip file: $sourceFilePath");
+                    }
+                    if (fwrite($destination, $chunk) === false) {
+                         throw new RuntimeException("Error writing to destination file: $destinationFilePath");
+                    }
+               }
+          } finally {
+               // Ensure resources are always closed, even in case of errors
+               gzclose($source);
+               fclose($destination);
           }
-
-          gzclose($source);
-          fclose($destination);
 
           return true;
      }
+
 
      public static function isTraversable($variable)
      {
           return is_array($variable) || $variable instanceof Traversable;
      }
 
-     private static function cleanupGenerator($generator, $filePath, $deleteSourceFile = true)
+     private static function dataGenerator($apiData, $filePath, $deleteSourceFile = true): Generator
      {
-          foreach ($generator as $item) {
+          foreach ($apiData as $item) {
                yield $item;
           }
-          if ($deleteSourceFile) {
+
+          if ($deleteSourceFile && file_exists($filePath)) {
                unlink($filePath);
           }
      }
@@ -1455,7 +1477,7 @@ class CommonService
 
                     if ($isGzipped) {
                          $tempFilePath = dirname($filePath) . DIRECTORY_SEPARATOR . 'json_' . uniqid() . ".json";
-                         self::ungzipFile($filePath, $tempFilePath);
+                         self::gunzip($filePath, $tempFilePath);
                          if ($deleteSourceFile) {
                               unlink($filePath);
                          }
@@ -1473,17 +1495,16 @@ class CommonService
                               'decoder' => new ExtJsonDecoder(true)
                          ]);
                          $timestamp = iterator_to_array($timestampData)['timestamp'] ?? time();
-                    } else {
-                         $timestamp = time();
                     }
                }
 
-               return $returnTimestamp ? [self::cleanupGenerator($apiData, $tempFilePath, $deleteSourceFile), $timestamp] : self::cleanupGenerator($apiData, $tempFilePath, $deleteSourceFile);
+               $generator = self::dataGenerator($apiData, $tempFilePath, $deleteSourceFile);
+               return $returnTimestamp ? [$generator, $timestamp] : $generator;
           } catch (Throwable $e) {
+               error_log($e->getMessage());
                if ($deleteSourceFile && file_exists($tempFilePath) && $tempFilePath !== $filePath) {
                     unlink($tempFilePath);
                }
-               error_log($e->getMessage());
                return $returnTimestamp ? [null, null] : null;
           }
      }
@@ -1527,7 +1548,7 @@ class CommonService
           return $object;
      }
 
-     public static function parseMultipartFormData()
+     public static function parseMultipartFormData($folderPath)
      {
           if (!empty($_FILES) || !empty($_POST)) {
                return; // No need to parse if $_FILES or $_POST is already populated
@@ -1567,14 +1588,14 @@ class CommonService
 
                $body = substr($body, 0, strlen($body) - 2);
                if ($filename) {
-                    $tempFilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $filename;
-                    file_put_contents($tempFilePath, $body);
+                    $finalFilePath = $folderPath . DIRECTORY_SEPARATOR . $filename;
+                    file_put_contents($finalFilePath, $body);
                     $_FILES[$name] = [
                          'name' => $filename,
-                         'type' => mime_content_type($tempFilePath),
-                         'tmp_name' => $tempFilePath,
+                         'type' => mime_content_type($finalFilePath),
+                         'tmp_name' => $finalFilePath,
                          'error' => UPLOAD_ERR_OK,
-                         'size' => filesize($tempFilePath),
+                         'size' => filesize($finalFilePath),
                     ];
                } else {
                     $_POST[$name] = $body;
