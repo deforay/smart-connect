@@ -145,10 +145,10 @@ if (sizeof($sampleResult) > 0) {
 
 
           if (isset($result['patient_first_name']) && $result['patient_first_name'] != NULL && trim($result['patient_first_name']) != '') {
-               $patientFirstName = ucwords($common->crypto('decrypt', $result['patient_first_name'], $result['patient_art_no']));
+               $patientFirstName = ucwords($result['patient_first_name']);
           }
           if (isset($result['patient_last_name']) && $result['patient_last_name'] != NULL && trim($result['patient_last_name']) != '') {
-               $patientLastName = ucwords($common->crypto('decrypt', $result['patient_last_name'], $result['patient_art_no']));
+               $patientLastName = ucwords($result['patient_last_name']);
           }
 
           if (isset($result['patient_mobile_number']) && $result['patient_mobile_number'] != NULL && trim($result['patient_mobile_number']) != '') {

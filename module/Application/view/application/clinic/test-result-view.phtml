@@ -13,11 +13,11 @@ $patientMobileNumber = '';
 
 if (isset($result[0]['patient_first_name']) && $result[0]['patient_first_name'] != NULL && trim($result[0]['patient_first_name']) != '') {
 
-     $patientFirstName = ucwords($common->crypto('decrypt', $result[0]['patient_first_name'], $result[0]['patient_art_no']));
+     $patientFirstName = ucwords($result[0]['patient_first_name']);
 }
 if (isset($result[0]['patient_last_name']) && $result[0]['patient_last_name'] != NULL && trim($result[0]['patient_last_name']) != '') {
 
-     $patientLastName = ucwords($common->crypto('decrypt', $result[0]['patient_last_name'], $result[0]['patient_art_no']));
+     $patientLastName = ucwords($result[0]['patient_last_name']);
 }
 if (isset($result[0]['patient_mobile_number']) && $result[0]['patient_mobile_number'] != NULL && trim($result[0]['patient_mobile_number']) != '') {
      $patientMobileNumber = $result[0]['patient_mobile_number'];
