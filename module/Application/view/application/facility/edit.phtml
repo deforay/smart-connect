@@ -69,7 +69,7 @@
                                                 <?php
                                                 foreach ($facilityType as $fType) {
                                                 ?>
-                                                    <option value="<?php echo $fType['facility_type_id']; ?>" <?php echo ($facility->facility_type == $fType['facility_type_id']) ? "selected='selected'" : ''; ?>><?php echo ucwords($fType['facility_type']); ?></option>
+                                                    <option value="<?php echo $fType['facility_type_id']; ?>" <?php echo ($facility->facility_type == $fType['facility_type_id']) ? "selected='selected'" : ''; ?>><?php echo ucwords($fType['facility_type_name']); ?></option>
                                                 <?php
                                                 }
                                                 ?>
