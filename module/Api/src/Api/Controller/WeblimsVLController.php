@@ -26,11 +26,8 @@ class WeblimsVLController extends AbstractRestfulController
     }
     public function create($params)
     {
-        // Ensure to parse raw input data if $_POST and $_FILES are empty
-        CommonService::parseMultipartFormData();
-
-        $params = file_get_contents('php://input');
-        $response = $this->sampleService->saveWeblimsVLAPI($params);
+        $phpInput = file_get_contents('php://input');
+        $response = $this->sampleService->saveWeblimsVLAPI($phpInput);
         return new JsonModel($response);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Application\Service;
 
+use Exception;
 use Laminas\Session\Container;
 
 class UserService
@@ -53,7 +54,7 @@ class UserService
                 $alertContainer = new Container('alert');
                 $alertContainer->alertMsg = 'User details added successfully';
             }
-        } catch (\Exception $exc) {
+        } catch (Exception $exc) {
             $adapter->rollBack();
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
@@ -71,7 +72,7 @@ class UserService
                 $alertContainer = new Container('alert');
                 $alertContainer->alertMsg = 'User details updated successfully';
             }
-        } catch (\Exception $exc) {
+        } catch (Exception $exc) {
             $adapter->rollBack();
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
