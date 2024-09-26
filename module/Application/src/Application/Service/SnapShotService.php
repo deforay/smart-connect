@@ -103,22 +103,30 @@ class SnapShotService
 
             $testTypeQuery[] = $select->getSqlString($dbAdapter->getPlatform());
         }
+        //print_r($testTypeQuery);die;
 
-        // Combine all queries
-        $testTypeQuery = implode(" UNION ALL ", $testTypeQuery);
+        // Ensure testTypeQuery is not empty
+        if (!empty($testTypeQuery)) {
 
-        // Final query to get aggregated results
-        $finalQuery = "SELECT t.facility_name AS clinicName,
-                            SUM(t.reg) AS total,
-                            SUM(t.totalReceived) AS totalReceived,
-                            SUM(t.totalTested) AS totalTested,
-                            SUM(t.totalRejected) AS totalRejected,
-                            SUM(t.totalPending) AS totalPending
-                        FROM ($testTypeQuery) t
-                        GROUP BY clinicName
-                        ORDER BY total DESC";
+            // Combine all queries
+            $testTypeQuery = implode(" UNION ALL ", $testTypeQuery);
 
-        return $this->adapter->query($finalQuery, Adapter::QUERY_MODE_EXECUTE)->toArray();
+            // Final query to get aggregated results
+            $finalQuery = "SELECT t.facility_name AS clinicName,
+                                SUM(t.reg) AS total,
+                                SUM(t.totalReceived) AS totalReceived,
+                                SUM(t.totalTested) AS totalTested,
+                                SUM(t.totalRejected) AS totalRejected,
+                                SUM(t.totalPending) AS totalPending
+                            FROM ($testTypeQuery) t
+                            GROUP BY clinicName
+                            ORDER BY total DESC";
+
+            return $this->adapter->query($finalQuery, Adapter::QUERY_MODE_EXECUTE)->toArray();
+        } else {
+            // Handle the case where no query parts were generated
+            return [];
+        }
     }
 
 
