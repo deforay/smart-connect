@@ -70,7 +70,7 @@
         series: [{
                 type: 'column',
                 name: 'No. of Samples Tested',
-                data: [<?php if (isset($result['date']) && !empty($result['date'])) {
+                data: [<?php if (isset($result['totalSamples']) && !empty($result['totalSamples'])) {
                             echo implode(",", $result['totalSamples']); 
                     } ?>],
                 color: '#7CB5ED',

@@ -1,8 +1,9 @@
 <?php
 
 use Zend\Debug\Debug;
-$val1 =  (($result['total_positive_samples'] / $result['total_samples']) * 100);
-$val2 = (($result['total_negative_samples'] / $result['total_samples']) * 100); 
+$val1 = ($result['total_samples'] > 0) ? (($result['total_positive_samples'] / $result['total_samples']) * 100) : 0;
+$val2 = ($result['total_samples'] > 0) ? (($result['total_negative_samples'] / $result['total_samples']) * 100) : 0;
+
 if($result['total_positive_samples'] != null && $result['total_negative_samples'] != null && $result['total_samples'] != null){
 ?>
 <script>
