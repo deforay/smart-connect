@@ -463,7 +463,7 @@ class SampleTable extends AbstractTableGateway
             $notTargetTotal = 0;
             $query = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
-                    array(
+                    [
                         "total" => new Expression('COUNT(*)'),
                         "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
 
@@ -478,7 +478,7 @@ class SampleTable extends AbstractTableGateway
                         "OGreaterThan1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL or vl.patient_gender = '' or vl.patient_gender = 'Not Recorded' or vl.patient_gender = 'not recorded') and (vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)) THEN 1 ELSE 0 END)"),
                         "OLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL or vl.patient_gender ='NULL' or vl.patient_gender = '' or vl.patient_gender = 'Not Recorded' or vl.patient_gender = 'not recorded' or vl.patient_gender = 'Unreported' or vl.patient_gender = 'unreported') and (vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
                         //"OTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and vl.patient_gender NOT in('m','Male','M','MALE','f','Female','F','FEMALE')) THEN 1 ELSE 0 END)")
-                    )
+                    ]
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
                 $query = $query->where('vl.lab_id IN (' . $params['facilityId'] . ')');
@@ -524,7 +524,6 @@ class SampleTable extends AbstractTableGateway
     public function fetchLabTurnAroundTime($params)
     {
 
-        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = [];
@@ -568,69 +567,47 @@ class SampleTable extends AbstractTableGateway
             // $startMonth = date("Y-m", strtotime(trim($startMonth))) . "-01";
             // $endMonth = date("Y-m", strtotime(trim($endMonth))) . "-31";
 
-            $query = $sql->select()->from(array('vl' => $this->table))
+            $query = $sql->select()->from(['vl' => $this->table])
                 ->columns(
                     [
-                        // "total_samples_collected" => new Expression('COUNT(*)'),
-                        // "month" => new Expression("MONTH(result_approved_datetime)"),
-                        // "year" => new Expression("YEAR(result_approved_datetime)"),
-                        // "AvgDiff" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                        // "monthDate" => new Expression("DATE_FORMAT(DATE(result_approved_datetime), '%b-%Y')"),
-                        // "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.vl_result_category IS NULL OR vl.vl_result_category = '' OR vl.vl_result_category = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
-
                         "totalSamples" => new Expression('COUNT(vl_sample_id)'),
                         "monthDate" => new Expression("DATE_FORMAT(DATE(vl.sample_tested_datetime), '%b-%Y')"),
-                        //"daydiff" => new Expression('AVG(ABS(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date)))'),
-                        "AvgTestedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
-                        "AvgReceivedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_received_at_lab_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
+                        "AvgCollectedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
+                        "AvgCollectedReceived" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_received_at_lab_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
                         "AvgReceivedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_received_at_lab_datetime))) AS DECIMAL (10,2))'),
-                        "AvgReceivedPrinted" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.result_printed_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))')
+                        "AvgCollectedPrinted" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.result_printed_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))')
                     ]
                 );
-            // $query = $query->where(
-            //     "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')
-            //     AND (vl.sample_tested_datetime is not null AND vl.sample_tested_datetime not like '' AND DATE(vl.sample_tested_datetime) not like '1970-01-01' AND DATE(vl.sample_tested_datetime) not like '0000-00-00')"
-            // );
+
             $query = $query->where("DATE(vl.sample_tested_datetime) BETWEEN '$startMonth' AND '$endMonth'");
             $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 365;
             $query = $query->where("
                                 (DATEDIFF(sample_tested_datetime,sample_collection_date) < '$skipDays' AND
                                 DATEDIFF(sample_tested_datetime,sample_collection_date) >= 0)");
-            // $query = $query->where('
-            //         (DATEDIFF(result_printed_datetime,sample_collection_date) < ' . $skipDays . ' AND
-            //         DATEDIFF(result_printed_datetime,sample_collection_date) >= 0)');
+
 
             if ($facilityIdList != null) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
             }
             $query = $query->group('monthDate');
-            // $query = $query->group(array(new Expression('YEAR(vl.result_approved_datetime)')));
-            // $query = $query->group(array(new Expression('MONTH(vl.result_approved_datetime)')));
-            // $query = $query->order(array(new Expression('DATE(vl.result_approved_datetime) ASC')));
+
             $query = $query->order('sample_tested_datetime ASC');
             $queryStr = $sql->buildSqlString($query);
-            //error_log($queryStr);
-            // echo $queryStr;die;
-            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
             $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
 
             foreach ($sampleResult as $sRow) {
-                /* $result['all'][$j] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] != NULL && $sRow["AvgDiff"] > 0) ? round($sRow["AvgDiff"], 2) : null;
-                //$result['lab'][$j] = (isset($labsubQueryResult[0]["labCount"]) && $labsubQueryResult[0]["labCount"] != NULL && $labsubQueryResult[0]["labCount"] > 0) ? round($labsubQueryResult[0]["labCount"],2) : 0;
-                $result['sample']['Samples Collected'][$j] = (isset($sRow['total_samples_collected']) && $sRow['total_samples_collected'] != NULL) ? $sRow['total_samples_collected'] : null;
-                $result['sample']['Results Not Available'][$j] = (isset($sRow['total_samples_pending']) && $sRow['total_samples_pending'] != NULL) ? $sRow['total_samples_pending'] : null;
-                $result['date'][$j] = $sRow["monthDate"];
-                $j++; */
+
                 if ($sRow["monthDate"] == null) {
                     continue;
                 }
 
                 $result['totalSamples'][$j] = (isset($sRow["totalSamples"]) && $sRow["totalSamples"] > 0 && $sRow["totalSamples"] != null) ? $sRow["totalSamples"] : 'null';
-                $result['sampleTestedDiff'][$j] = (isset($sRow["AvgTestedDiff"]) && $sRow["AvgTestedDiff"] > 0 && $sRow["AvgTestedDiff"] != null) ? round($sRow["AvgTestedDiff"], 2) : 'null';
-                $result['sampleReceivedDiff'][$j] = (isset($sRow["AvgReceivedDiff"]) && $sRow["AvgReceivedDiff"] > 0 && $sRow["AvgReceivedDiff"] != null) ? round($sRow["AvgReceivedDiff"], 2) : 'null';
-                $result['sampleReceivedTested'][$j] = (isset($sRow["AvgReceivedTested"]) && $sRow["AvgReceivedTested"] > 0 && $sRow["AvgReceivedTested"] != null) ? round($sRow["AvgReceivedTested"], 2) : 'null';
-                $result['sampleCollectedPrinted'][$j] = (isset($sRow["AvgReceivedPrinted"]) && $sRow["AvgReceivedPrinted"] > 0 && $sRow["AvgReceivedPrinted"] != null) ? round($sRow["AvgReceivedPrinted"], 2) : 'null';
+                $result['tatCollectedTested'][$j] = (isset($sRow["AvgCollectedTested"]) && $sRow["AvgCollectedTested"] > 0 && $sRow["AvgCollectedTested"] != null) ? round($sRow["AvgCollectedTested"], 2) : 'null';
+                $result['tatCollectedReceived'][$j] = (isset($sRow["AvgCollectedReceived"]) && $sRow["AvgCollectedReceived"] > 0 && $sRow["AvgCollectedReceived"] != null) ? round($sRow["AvgCollectedReceived"], 2) : 'null';
+                $result['tatReceivedTested'][$j] = (isset($sRow["AvgReceivedTested"]) && $sRow["AvgReceivedTested"] > 0 && $sRow["AvgReceivedTested"] != null) ? round($sRow["AvgReceivedTested"], 2) : 'null';
+                $result['tatCollectedPrinted'][$j] = (isset($sRow["AvgCollectedPrinted"]) && $sRow["AvgCollectedPrinted"] > 0 && $sRow["AvgCollectedPrinted"] != null) ? round($sRow["AvgCollectedPrinted"], 2) : 'null';
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
             }

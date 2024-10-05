@@ -283,7 +283,7 @@ class FacilityTable extends AbstractTableGateway
             $facilityId = (int) base64_decode($params['facilityId']);
             $uploadFolder = realpath(UPLOAD_PATH);
             $sanitizedLogo = basename($params['removedLogo']);
-            $removedFilePath = UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $sanitizedLogo;
+            $removedFilePath = $uploadFolder . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $sanitizedLogo;
             if (isset($params['existLogo']) && trim($params['existLogo']) == '' && file_exists($removedFilePath)) {
                 unlink($removedFilePath);
                 $imageData = ['facility_logo' => ''];

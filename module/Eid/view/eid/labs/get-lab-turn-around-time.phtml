@@ -77,42 +77,42 @@
                 yAxis: 1
             },
             <?php
-            if (isset($result['sampleReceivedDiff'])) {
+            if (isset($result['tatCollectedReceived'])) {
             ?> {
                     connectNulls: false,
                     showInLegend: true,
                     name: 'Collected - Received at Lab',
-                    data: [<?php echo implode(",", $result['sampleReceivedDiff']); ?>],
+                    data: [<?php echo implode(",", $result['tatCollectedReceived']); ?>],
                     color: '#edb47c',
                 },
             <?php
             }
-            if (isset($result['sampleReceivedTested'])) {
+            if (isset($result['tatReceivedTested'])) {
             ?> {
                     connectNulls: false,
                     showInLegend: true,
                     name: 'Received - Tested',
-                    data: [<?php echo implode(",", $result['sampleReceivedTested']); ?>],
+                    data: [<?php echo implode(",", $result['tatReceivedTested']); ?>],
                     color: '#0f3f6e',
                 },
             <?php
             }
-            if (isset($result['sampleCollectedPrinted'])) {
+            if (isset($result['tatCollectedPrinted'])) {
             ?> {
                     connectNulls: false,
                     showInLegend: true,
                     name: '<?= $this->translate('Received - Printed') ?>',
-                    data: [<?php echo implode(",", $result['sampleCollectedPrinted']); ?>],
+                    data: [<?php echo implode(",", $result['tatCollectedPrinted']); ?>],
                     color: '#000',
                 },
             <?php
             }
-            if (isset($result['sampleTestedDiff'])) {
+            if (isset($result['tatCollectedTested'])) {
             ?> {
                     connectNulls: false,
                     showInLegend: true,
                     name: 'Collected - Tested',
-                    data: [<?php echo implode(",", $result['sampleTestedDiff']); ?>],
+                    data: [<?php echo implode(",", $result['tatCollectedTested']); ?>],
                     color: '#ed7c7d',
                 },
             <?php

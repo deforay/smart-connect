@@ -2457,8 +2457,8 @@ class Covid19FormTable extends AbstractTableGateway
                         "totalSamples" => new Expression('COUNT(*)'),
                         "monthDate" => new Expression("DATE_FORMAT(DATE(covid19.sample_tested_datetime), '%b-%Y')"),
                         "daydiff" => new Expression('ABS(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))'),
-                        "AvgTestedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,covid19.sample_tested_datetime,covid19.sample_collection_date))) AS DECIMAL (10,2))'),
-                        "AvgReceivedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,covid19.sample_received_at_lab_datetime,covid19.sample_collection_date))) AS DECIMAL (10,2))'),
+                        "AvgCollectedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,covid19.sample_tested_datetime,covid19.sample_collection_date))) AS DECIMAL (10,2))'),
+                        "AvgCollectedReceived" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,covid19.sample_received_at_lab_datetime,covid19.sample_collection_date))) AS DECIMAL (10,2))'),
                         "AvgReceivedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,covid19.sample_tested_datetime,covid19.sample_received_at_lab_datetime))) AS DECIMAL (10,2))'),
                     )
                 );
@@ -2500,9 +2500,9 @@ class Covid19FormTable extends AbstractTableGateway
                 }
 
                 $result['totalSamples'][$j] = (isset($sRow["totalSamples"]) && $sRow["totalSamples"] > 0 && $sRow["totalSamples"] != null) ? $sRow["totalSamples"] : 'null';
-                $result['sampleTestedDiff'][$j] = (isset($sRow["AvgTestedDiff"]) && $sRow["AvgTestedDiff"] > 0 && $sRow["AvgTestedDiff"] != null) ? round($sRow["AvgTestedDiff"], 2) : 'null';
-                $result['sampleReceivedDiff'][$j] = (isset($sRow["AvgReceivedDiff"]) && $sRow["AvgReceivedDiff"] > 0 && $sRow["AvgReceivedDiff"] != null) ? round($sRow["AvgReceivedDiff"], 2) : 'null';
-                $result['sampleReceivedTested'][$j] = (isset($sRow["AvgReceivedTested"]) && $sRow["AvgReceivedTested"] > 0 && $sRow["AvgReceivedTested"] != null) ? round($sRow["AvgReceivedTested"], 2) : 'null';
+                $result['tatCollectedTested'][$j] = (isset($sRow["AvgCollectedTested"]) && $sRow["AvgCollectedTested"] > 0 && $sRow["AvgCollectedTested"] != null) ? round($sRow["AvgCollectedTested"], 2) : 'null';
+                $result['tatCollectedReceived'][$j] = (isset($sRow["AvgCollectedReceived"]) && $sRow["AvgCollectedReceived"] > 0 && $sRow["AvgCollectedReceived"] != null) ? round($sRow["AvgCollectedReceived"], 2) : 'null';
+                $result['tatReceivedTested'][$j] = (isset($sRow["AvgReceivedTested"]) && $sRow["AvgReceivedTested"] > 0 && $sRow["AvgReceivedTested"] != null) ? round($sRow["AvgReceivedTested"], 2) : 'null';
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
             }
