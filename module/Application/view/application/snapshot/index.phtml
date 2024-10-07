@@ -316,29 +316,26 @@ if (isset($requestType) && !empty($requestType)) {
             function(data) {
                 if (data != "" || data != null || data != undefined) {
                     $('#loadData').html(data);
-                    if ($('#regTable tbody tr').length > 1) {
-                        $('#regTable').dataTable({
-                            "bAutoWidth": false,
-                            "bProcessing": true,
-                            "aaSorting": [
-                                [1, "desc"]
-                            ],
-                            "aoColumns": [{
-                                    "sClass": "center",
-                                    "bSortable": false
-                                }, {
-                                    "sClass": "center"
-                                },
-                                {
-                                    "sClass": "center"
-                                },
-                                {
-                                    "sClass": "center"
-                                }
-                            ]
-                        });
-                    }
-                    
+                    $('#regTable').dataTable({
+                        "bAutoWidth": false,
+                        "bProcessing": true,
+                        "aaSorting": [
+                            [1, "desc"]
+                        ],
+                        "aoColumns": [{
+                                "sClass": "center",
+                                "bSortable": false
+                            }, {
+                                "sClass": "center"
+                            },
+                            {
+                                "sClass": "center"
+                            },
+                            {
+                                "sClass": "center"
+                            }
+                        ]
+                    });
                 }
             });
         getSampleResult();
