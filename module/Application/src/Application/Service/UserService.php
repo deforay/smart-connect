@@ -32,10 +32,10 @@ class UserService
         return $this->usersTable->fetchUsers();
     }
 
-    public function fetchRoles()
+    public function fetchAllRoles()
     {
         $db = $this->sm->get('RolesTable');
-        return $db->fetchRoles();
+        return $db->fetchAllRoles();
     }
 
     public function getUser($userId)

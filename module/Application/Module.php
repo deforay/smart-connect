@@ -58,6 +58,7 @@ use Application\Model\SampleRejectionReasonTable;
 use Application\Model\EidSampleRejectionReasonTable;
 use Application\Model\Covid19SampleRejectionReasonsTable;
 use Application\Model\HepatitisSampleRejectionReasonTable;
+use Application\Service\RoleService;
 
 class Module
 {
@@ -258,14 +259,6 @@ class Module
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new CountriesTable($dbAdapter);
-					}
-				},
-				'RolesTable'  => new class
-				{
-					public function __invoke($diContainer)
-					{
-						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
-						return new RolesTable($dbAdapter);
 					}
 				},
 				'UserOrganizationsMapTable'  => new class
@@ -565,6 +558,15 @@ class Module
 						return new HepatitisTestReasonsTable($dbAdapter);
 					}
 				},
+				'RolesTable'  => new class
+				{
+					public function __invoke($diContainer)
+					{
+						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
+						$commonService = $diContainer->get('CommonService');
+						return new RolesTable($dbAdapter, $commonService, $diContainer);
+					}
+				},
 
 				'CommonService'  => new class
 				{
@@ -644,6 +646,14 @@ class Module
 					{
 
 						return new ApiSyncHistoryService($diContainer);
+					}
+				},
+				'RoleService' => new class
+				{
+					public function __invoke($diContainer)
+					{
+
+						return new RoleService($diContainer);
 					}
 				},
 				'translator' => 'Laminas\Mvc\I18n\TranslatorFactory',
@@ -787,6 +797,14 @@ class Module
 						$snapshotService = $diContainer->get('SnapShotService');
 						$commonService = $diContainer->get('CommonService');
 						return new \Application\Controller\SnapshotController($commonService, $snapshotService);
+					}
+				},
+				'Application\Controller\RolesController' => new class
+				{
+					public function __invoke($diContainer)
+					{
+						$roleService = $diContainer->get('RoleService');
+						return new \Application\Controller\RolesController($roleService);
 					}
 				},
 			),

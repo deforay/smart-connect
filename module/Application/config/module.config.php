@@ -208,6 +208,16 @@ return array(
                     ),
                 ),
             ),
+            'roles' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/roles[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => Controller\RolesController::class,
+                        'action' => 'index',
+                    ),
+                ),
+            ),
         ),
     ),
     'service_manager' => [

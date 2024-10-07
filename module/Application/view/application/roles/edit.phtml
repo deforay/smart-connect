@@ -1,0 +1,360 @@
+<style>
+	.privilege-switch {
+		display: flex;
+		overflow: hidden;
+	}
+
+	.privilege-switch input {
+		position: absolute !important;
+		clip: rect(0, 0, 0, 0);
+		height: 1px;
+		width: 1px;
+		border: 0;
+		overflow: hidden;
+	}
+
+	.privilege-switch label {
+		background-color: #e4e4e4;
+		color: rgba(0, 0, 0, 0.6);
+		font-size: 14px;
+		line-height: 1;
+		text-align: center;
+		padding: 8px 16px;
+		margin-right: -1px;
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+		transition: all 0.1s ease-in-out;
+	}
+
+	.privilege-switch label:hover {
+		cursor: pointer;
+	}
+
+	.privilege-switch input:checked+label {
+		box-shadow: none;
+	}
+
+	.privilege-switch label:first-of-type {
+		border-radius: 4px 0 0 4px;
+	}
+
+	.privilege-switch label:last-of-type {
+		border-radius: 0 4px 4px 0;
+	}
+
+	.deny-label {
+		background-color: #d9534f !important;
+		color: white !important;
+	}
+
+	.allow-label {
+		background-color: #398439 !important;
+		color: white !important;
+	}
+
+	.normal-label {
+		background-color: #e4e4e4 !important;
+		color: black !important;
+	}
+
+	h2 {
+		font-size: 18px;
+		margin-bottom: 8px;
+	}
+
+	.privilege-div {
+		margin-top: 5px;
+		border: 1px solid #eee;
+		padding: 10px;
+	}
+</style>
+<link rel="stylesheet" type="text/css" href="<?php echo $this->basePath('assets/global/css/jasny-bootstrap.min.css'); ?>" />
+<!-- BEGIN PAGE HEADER-->
+<!-- BEGIN THEME PANEL -->
+<!-- END THEME PANEL -->
+<!-- BEGIN PAGE BAR -->
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <a href="/"><?php echo $this->translate('Dashboard'); ?></a>
+            <i class="fa fa-circle"></i>
+        </li>
+        <li>
+            <a href="/roles"><?php echo $this->translate('Role'); ?></a>
+            <i class="fa fa-circle"></i>
+        </li>
+        <li>
+            <?php echo $this->translate('Edit'); ?>
+        </li>
+    </ul>
+</div>
+<!-- END PAGE BAR -->
+<!-- BEGIN PAGE TITLE-->
+<h3 class="page-title"> <?php echo $this->translate('Edit Role'); ?>
+</h3>
+<!-- END PAGE TITLE-->
+<!-- END PAGE HEADER-->
+<div class="row">
+    <div class="col-md-12">
+        <!-- BEGIN EXAMPLE TABLE PORTLET-->
+        <div class="portlet light bordered">
+            <div class="portlet-body">
+                <div class="portlet-body form">
+                    <form class="form-horizontal" name="editRoleInformation" id="editRoleInformation" enctype="multipart/form-data" method="post" action="/roles/edit" role="form" autocomplete="off">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="roleName" class="col-lg-4 control-label"><?php echo $this->translate('role Name'); ?> <span class="font-red-mint">*</span></label>
+                                        <div class="col-lg-7">
+                                            <input type="text" class="form-control isRequired" id="roleName" name="roleName" placeholder="<?php echo $this->translate('role Name'); ?>" title="<?php echo $this->translate('Please enter role name'); ?>" value="<?php echo $result->role_name; ?>" onblur="checkNameValidation('dash_user_roles','role_name',this,'<?php echo "role_id##" . $result->role_id; ?>','<?php echo $this->translate('The role name that you entered already exists.Enter another name'); ?>',null)" />
+                                            <input type="hidden" class="form-control" id="roleId" name="roleId" value="<?php echo base64_encode($result->role_id); ?>" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="roleCode" class="col-lg-4 control-label"><?php echo $this->translate('Role Code'); ?></label>
+                                        <div class="col-lg-7">
+                                            <input type="text" class="form-control" id="roleCode" name="roleCode" placeholder="<?php echo $this->translate('Role Code'); ?>" title="<?php echo $this->translate('Please enter role code'); ?>" value="<?php echo $result->role_code; ?>" onblur="checkNameValidation('dash_user_roles','role_code',this,'<?php echo "role_id##" . $result->role_id; ?>','<?php echo $this->translate('The code that you entered already exists.Try another code'); ?>',null)" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="status" class="col-lg-4 control-label"><?php echo $this->translate('Status'); ?></label>
+                                        <div class="col-lg-7">
+                                            <select class="form-control isRequired" name="status" id="status" title="<?php echo $this->translate('Please select the status'); ?>">
+                                                <option value="">--<?php echo $this->translate('Select'); ?>--</option>
+                                                <option value="active" "<?php echo ($result->status == 'active' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Active'); ?></option>
+                                                <option value="inactive" "<?php echo ($result->status == 'inactive' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Inactive'); ?></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-2 control-label">Note:</label>
+                                <div class="col-sm-10">
+                                    <p class="form-control-static">Unless you choose "access" the people belonging to this role will not be able to access other rights like "add", "edit" etc.</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="privilege-switch super-switch">
+                                        <input type="radio" class='' id="allowAllPrivileges" name="allPrivilegesRadio" value="yes" /></a>
+                                        <label for="allowAllPrivileges">Select All</label>
+                                        <input type="radio" class='' name="allPrivilegesRadio" id="denyAllPrivileges" name="switch-one" value="no"/></a>
+                                        <label for="denyAllPrivileges">Unselect All</label>
+                                    </div>
+								</div>
+                            </div>
+                            <table aria-describedby="table" class="table table-striped responsive-utilities">
+										<tbody>
+										<?php
+										foreach ($rolesresult as $value) { ?>
+											<tr class="togglerTr">
+												<th style="background-color:#eee;">
+													<div class="card-header">
+														<h4 class="card-title" style="font-weight: bold;"><?php echo ucwords($value['display_name'])  ?></h4>
+														<div class="card-actions">
+															<div class="super-switch privilege-switch pull-right">
+																<?php 
+																	 $displayName = str_replace(' ', '', $value['display_name']);
+																	 echo '<input type="radio" class="" id="all' . $displayName . '" 
+																			name="' . $displayName . '" 
+																			onclick="togglePrivilegesForThisResource(\'' . $displayName . '\', true);">
+																		   <label for="all' . $displayName . '">All</label>';
+																 
+																	 echo '<input type="radio" class="" id="none' . $displayName . '" 
+																			name="' . $displayName . '" 
+																			onclick="togglePrivilegesForThisResource(\'' . $displayName . '\', false);">
+																		   <label for="none' . $displayName . '">None</label>';
+																?>
+															</div>
+														</div>
+													</div>
+												</th>
+											</tr>
+											<tr>
+												<td style="text-align:center;vertical-align:middle;" class="privilegesNode" id="<?php echo $displayName; ?>">
+													<div class="row ">
+													<?php foreach ($value['privileges'] as $privilege) { 
+														$isPrivilegeMatched = false;
+
+														// Check if resourceResult is not empty
+														if (!empty($resourceResult)) {
+															// Loop through resourceResult to check for matching privilege_id
+															foreach ($resourceResult as $result) {
+																if (isset($result['privilege_id']) && $result['privilege_id'] == $privilege['privilege_id']) {
+																	$isPrivilegeMatched = true;
+																	break; // Exit loop as we found a match
+																}
+															}
+														}
+														if ($isPrivilegeMatched) {
+															$allowActive = ' active ';
+															$allowChecked = "checked";
+															$denyActive = "";
+															$denyChecked = "";
+															$allowStyle = "allow-label";
+															$denyStyle = "";
+														} else {
+															$denyActive = ' active ';
+															$denyChecked = " checked='' ";
+															$allowActive = "";
+															$allowChecked = "";
+															$denyStyle = "deny-label";
+															$allowStyle = "";
+														}
+														?>
+														
+														<div class="col-md-3 privilege-div">
+															<strong class="privilege-label"><?php echo ucwords($privilege['display_name'])  ?></strong>
+															<br>
+															<div class="privilege-switch" style="margin: 30px 0 36px 90px;">
+																<?php
+																	echo '<input type="radio" class="selectPrivilege" name="resource[' . $value['resource_id'] . '][' . $privilege['privilege_name'] . ']" value="allow" id="selectPrivilege[' . $value['resource_id'] . '][' . $privilege['privilege_name'] . ']" '.$allowChecked .'>';
+																	echo '<label for="selectPrivilege[' . $value['resource_id'] . '][' . $privilege['privilege_name'] . ']" class="' .$allowStyle. '">Yes</label>';
+																	
+																	echo '<input type="radio" class="unselectPrivilege" name="resource[' . $value['resource_id'] . '][' . $privilege['privilege_name'] . ']" value="deny" id="unselectPrivilege[' . $value['resource_id'] . '][' . $privilege['privilege_name'] . ']" '.$denyChecked.'>';
+																	echo '<label for="unselectPrivilege[' . $value['resource_id'] . '][' . $privilege['privilege_name'] . ']" class="' .$denyStyle. '">No</label>';
+																?>
+															</div>
+														</div>
+													<?php } ?>
+													</div>
+												</td>
+											</tr>
+											<?php } ?>
+										</tbody>
+									</table>
+                        </div>
+                        <div class="form-actions">
+                            <div class="row">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <input type="button" class="btn green" value="<?php echo $this->translate('Submit'); ?>" onclick="validateNow();return false;">
+                                    <a href="<?php echo $this->url('roles', array('action' => 'index')); ?>" class="btn default"><?php echo $this->translate('Cancel'); ?></a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- END EXAMPLE TABLE PORTLET-->
+    </div>
+</div>
+<script type="text/javascript">
+
+    duplicateName = true;
+
+    function validateNow() {
+        flag = deforayValidator.init({
+            formId: 'editRoleInformation'
+        });
+        if (flag) {
+            if (duplicateName) {
+                $.blockUI();
+                document.getElementById('editRoleInformation').submit();
+            }
+        }
+    }
+
+    function checkNameValidation(tableName, fieldName, obj, fnct, msg) {
+        checkValue = document.getElementById(obj.id).value;
+        if ($.trim(checkValue) != '') {
+            $.post("<?php echo $this->url('common', array('action' => 'index')); ?>", {
+                    tableName: tableName,
+                    fieldName: fieldName,
+                    value: checkValue,
+                    fnct: fnct
+                },
+                function(data) {
+                    if (data > 0) {
+                        alert(msg);
+                        duplicateName = false;
+                        document.getElementById(obj.id).value = "";
+                    } else {
+                        duplicateName = true;
+                    }
+                });
+        }
+    }
+
+    $("#allowAllPrivileges").click(function() {
+		$('.unselectPrivilege').prop('checked', false);
+		$('.selectPrivilege').prop('checked', true);
+		$('.unselectPrivilege').next('label').addClass('normal-label');
+		$('.selectPrivilege').next('label').addClass('allow-label');
+		$(this).next('label').addClass('allow-label');
+		$("#denyAllPrivileges").next('label').addClass('normal-label');
+
+		$('.unselectPrivilege').next('label').removeClass('deny-label');
+		$('.selectPrivilege').next('label').removeClass('normal-label');
+		$(this).next('label').removeClass('deny-label');
+		$("#allowAllPrivileges").next('label').removeClass('normal-label');
+	});
+
+	$("#denyAllPrivileges").click(function() {
+		$('.selectPrivilege').prop('checked', false);
+		$('.unselectPrivilege').prop('checked', true);
+		$('.unselectPrivilege').next('label').addClass('deny-label');
+		$('.selectPrivilege').next('label').addClass('normal-label');
+		$(this).next('label').addClass('deny-label');
+		$("#allowAllPrivileges").next('label').addClass('normal-label');
+
+		$('.unselectPrivilege').next('label').removeClass('normal-label');
+		$('.selectPrivilege').next('label').removeClass('allow-label');
+		$(this).next('label').removeClass('allow-label');
+		$("#denyAllPrivileges").next('label').removeClass('normal-label');
+
+	});
+
+    $('.privilege-switch input').click(function() {
+		val = $(this).val();
+		if (val == "deny") {
+			$(this).closest('.privilege-switch').find('.unselectPrivilege').next('label').addClass('deny-label');
+			$(this).closest('.privilege-switch').find('.selectPrivilege').next('label').addClass('normal-label');
+			$(this).closest('.privilege-switch').find('.unselectPrivilege').next('label').removeClass('normal-label');
+			$(this).closest('.privilege-switch').find('.selectPrivilege').next('label').removeClass('allow-label');
+		} else if (val == "allow") {
+			$(this).closest('.privilege-switch').find('.unselectPrivilege').next('label').addClass('normal-label');
+			$(this).closest('.privilege-switch').find('.selectPrivilege').next('label').addClass('allow-label');
+			$(this).closest('.privilege-switch').find('.unselectPrivilege').next('label').removeClass('deny-label');
+			$(this).closest('.privilege-switch').find('.selectPrivilege').next('label').removeClass('normal-label');
+		}
+	});
+
+    function togglePrivilegesForThisResource(obj, checked) {
+		if (checked == true) {
+			$("#" + obj).find('.selectPrivilege').prop('checked', true);
+			$("#" + obj).find('.unselectPrivilege').prop('checked', false);
+			$("#" + obj).find('.unselectPrivilege').next('label').addClass('normal-label');
+			$("#" + obj).find('.selectPrivilege').next('label').addClass('allow-label');
+			$("#all" + obj).next('label').addClass('allow-label');
+			$("#none" + obj).next('label').addClass('normal-label');
+
+			$("#" + obj).find('.unselectPrivilege').next('label').removeClass('deny-label');
+			$("#" + obj).find('.selectPrivilege').next('label').removeClass('normal-label');
+			$("#all" + obj).next('label').removeClass('normal-label');
+			$("#none" + obj).next('label').removeClass('deny-label');
+
+		} else if (checked == false) {
+			$("#" + obj).find('.selectPrivilege').prop('checked', false);
+			$("#" + obj).find('.unselectPrivilege').prop('checked', true);
+			$("#" + obj).find('.unselectPrivilege').next('label').addClass('deny-label');
+			$("#" + obj).find('.selectPrivilege').next('label').addClass('normal-label');
+			$("#all" + obj).next('label').addClass('normal-label');
+			$("#none" + obj).next('label').addClass('deny-label');
+
+			$("#" + obj).find('.unselectPrivilege').next('label').removeClass('normal-label');
+			$("#" + obj).find('.selectPrivilege').next('label').removeClass('allow-label');
+			$("#all" + obj).next('label').removeClass('allow-label');
+			$("#none" + obj).next('label').removeClass('normal-label');
+		}
+	}
+</script>

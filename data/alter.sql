@@ -741,3 +741,25 @@ ALTER TABLE `dash_form_vl` CHANGE `sample_received_at_vl_lab_datetime` `sample_r
 
 -- Thana 07-May-2024
 INSERT INTO `dash_global_config` (`name`, `display_name`, `value`, `status`) VALUES ('left_top_logo', 'Left Top Logo', 'logoz05b13.png', 'active');
+
+
+-- Brindha 04-Oct-2024
+Drop Table `roles`;
+ALTER TABLE roles_privileges_map 
+DROP FOREIGN KEY roles_privileges_map_ibfk_1;
+
+ALTER TABLE roles_privileges_map 
+ADD CONSTRAINT roles_privileges_map_ibfk_1 
+FOREIGN KEY (role_id) 
+REFERENCES dash_user_roles(role_id);
+
+INSERT INTO `resources` (`resource_id`, `display_name`) VALUES 
+('Application\\Controller\\ConfigController', 'Global Config'),
+('Application\\Controller\\UsersController', 'Manage Users');
+INSERT INTO `privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES 
+('Application\\Controller\\ConfigController', 'index', 'Access'),
+('Application\\Controller\\ConfigController', 'edit', 'Edit'),
+('Application\\Controller\\UsersController', 'index', 'Access'),
+('Application\\Controller\\UsersController', 'add', 'Add'),
+('Application\\Controller\\UsersController', 'edit', 'Edit');
+

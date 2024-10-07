@@ -367,6 +367,11 @@ if (!isset($activeTab)) {
                                         <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('API History'); ?></span>
                                     </a>
                                 </li>
+                                <li class="nav-item end <?php echo ($activeTab == 'roles') ? " active open" : ""; ?>">
+                                    <a href="<?php echo $this->url('roles', array('action' => 'index')) ?>" class="nav-link ">
+                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Roles'); ?></span>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     <?php } ?>
