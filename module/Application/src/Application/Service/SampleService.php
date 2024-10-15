@@ -1160,8 +1160,8 @@ class SampleService
 
     public function getAllSamples($parameters)
     {
-
-        return $this->sampleTable->fetchAllSamples($parameters);
+        $acl = $this->sm->get('AppAcl');
+        return $this->sampleTable->fetchAllSamples($parameters, $acl);
     }
 
     public function removeDuplicateSampleRows($params)

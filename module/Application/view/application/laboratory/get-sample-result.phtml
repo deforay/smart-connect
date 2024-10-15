@@ -44,7 +44,11 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                         $totalSample = $statValue;
                     }
                     if ($statName !=  $this->translate('Total Samples')) {
-                        $samplePercentage = ' (' . round(($statValue / $totalSample) * 100, 2) . '%)';
+                        if ($totalSample > 0) {
+                            $samplePercentage = ' (' . round(($statValue / $totalSample) * 100, 2) . '%)';
+                        } else {
+                            $samplePercentage = ' (0%)';
+                        }
                     }
                     if (strpos($statName, '(<') != false) {
                         $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">' . ($statName) . '</a>';

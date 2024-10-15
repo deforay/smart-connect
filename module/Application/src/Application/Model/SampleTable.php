@@ -4657,9 +4657,8 @@ class SampleTable extends AbstractTableGateway
         return $output;
     }
 
-    public function fetchAllSamples($parameters)
+    public function fetchAllSamples($parameters, $acl)
     {
-        $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
@@ -4813,6 +4812,9 @@ class SampleTable extends AbstractTableGateway
 
 
         $buttText = $this->commonService->translate('Edit');
+        $loginContainer = new Container('credo');
+        $role = $loginContainer->roleCode;
+        $update = (bool) $acl->isAllowed($role, 'DataManagement\Controller\DuplicateDataController', 'edit');
         foreach ($rResult as $aRow) {
             $sampleCollectionDate = '';
             if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
@@ -4831,7 +4833,9 @@ class SampleTable extends AbstractTableGateway
             $row[] = (isset($aRow['sample_name'])) ? ucwords($aRow['sample_name']) : '';
             $row[] = $aRow['result'];
             $row[] = ucwords($aRow['status_name']);
-            $row[] = '<a href="/data-management/duplicate-data/edit/' . base64_encode($aRow['vl_sample_id']) . '" class="btn green" title="Edit">' . $buttText . '</a>';
+            if ($update) {
+                $row[] = '<a href="/data-management/duplicate-data/edit/' . base64_encode($aRow['vl_sample_id']) . '" class="btn green" title="Edit">' . $buttText . '</a>';
+            }
             $output['aaData'][] = $row;
         }
         return $output;

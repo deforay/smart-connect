@@ -1,3 +1,9 @@
+<?php
+use Laminas\Session\Container;
+$sessionLogin = new Container('credo');
+$role = $sessionLogin->roleCode;
+$acl=$this->layout()->acl;
+?>
     <!-- BEGIN PAGE HEADER-->
     <!-- BEGIN PAGE BAR -->
     <div class="page-bar">
@@ -15,7 +21,11 @@
 
     <!-- END PAGE BAR -->
     <!-- BEGIN PAGE TITLE-->
-    <h3 class="page-title"> <?php echo $this->translate('Config'); ?> <a href="<?php echo $this->url('config', array('action' => 'edit')); ?>" class="btn btn-primary pull-right" style="margin-top:-5px;"><i class="fa fa-edit"></i>&nbsp;<?php echo $this->translate('Edit Config'); ?></a></h3>
+    <h3 class="page-title"> <?php echo $this->translate('Config'); ?> 
+    <?php if ($acl->isAllowed($role, 'Application\Controller\UsersController', 'add')) { ?>
+        <a href="<?php echo $this->url('config', array('action' => 'edit')); ?>" class="btn btn-primary pull-right" style="margin-top:-5px;"><i class="fa fa-edit"></i>&nbsp;<?php echo $this->translate('Edit Config'); ?></a>
+    <?php } ?>
+    </h3>
     <!-- END PAGE TITLE-->
     <!-- END PAGE HEADER-->
     <div class="row">

@@ -1,4 +1,14 @@
-
+<?php
+use Laminas\Session\Container;
+$sessionLogin = new Container('credo');
+$role = $sessionLogin->roleCode;
+$acl=$this->layout()->acl;
+if ($acl->isAllowed($role, 'Application\Controller\UsersController', 'edit')) {
+    $editAction = '{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center","bSortable":false}';
+}else{
+    $editAction = '{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"}';
+}
+?>
            <!-- BEGIN PAGE HEADER-->
                     <!-- BEGIN THEME PANEL -->
                     <!-- END THEME PANEL -->
@@ -32,8 +42,10 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="btn-group pull-right">
-                                                    <a href="/users/add" class="btn sbold green"> <?php echo $this->translate('Add New'); ?>                                                    <i class="fa fa-plus"></i>
+                                                <?php if ($acl->isAllowed($role, 'Application\Controller\UsersController', 'add')) { ?>
+                                                    <a href="/users/add" class="btn sbold green"> <?php echo $this->translate('Add New'); ?>  <i class="fa fa-plus"></i>
                                                     </a>
+                                                <?php } ?>
                                                 </div>
                                             </div>
                                         </div>
@@ -45,7 +57,9 @@
                                                             <th> <?php echo $this->translate('Role'); ?> </th>
                                                             <th> <?php echo $this->translate('Email'); ?> </th>
                                                             <th> <?php echo $this->translate('Mobile'); ?> </th>
-                                                            <th> <?php echo $this->translate('Action'); ?> </th>
+                                                            <?php if ($acl->isAllowed($role, 'Application\Controller\UsersController', 'edit')) { ?>
+                                                                <th> <?php echo $this->translate('Action'); ?> </th>
+                                                            <?php } ?>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -71,11 +85,7 @@
         "bProcessing": true,
         "bServerSide": true,
          "aoColumns": [
-		{"sClass":"center"},
-        {"sClass":"center"},
-        {"sClass":"center"},
-        {"sClass":"center"},
-        {"sClass":"center","bSortable":false}
+            <?php echo $editAction;?>
             ],
         "sAjaxSource": "<?php echo $this->url('users',array('action' => 'index')); ?>",
          "fnServerData": function ( sSource, aoData, fnCallback ) {

@@ -92,7 +92,7 @@ class FacilityTable extends AbstractTableGateway
         return $facilityId;
     }
 
-    public function fetchAllFacility($parameters)
+    public function fetchAllFacility($parameters, $acl)
     {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
@@ -210,13 +210,18 @@ class FacilityTable extends AbstractTableGateway
         );
 
         $buttText = $this->commonService->translate('Edit');
+        $loginContainer = new Container('credo');
+        $role = $loginContainer->roleCode;
+        $update = (bool) $acl->isAllowed($role, 'Application\Controller\FacilityController', 'edit');
         foreach ($rResult as $aRow) {
             $row = [];
             $row[] = $aRow['facility_code'];
             $row[] = ucwords($aRow['facility_name']);
             $row[] = ucwords($aRow['facility_type']);
             $row[] = ucwords($aRow['status']);
-            $row[] = '<a href="edit/' . base64_encode($aRow['facility_id']) . '" class="btn green" style="margin-right: 2px;" title="' . $buttText . '"><i class="fa fa-pencil"> ' . $buttText . '</i></a>';
+            if ($update) {
+                $row[] = '<a href="edit/' . base64_encode($aRow['facility_id']) . '" class="btn green" style="margin-right: 2px;" title="' . $buttText . '"><i class="fa fa-pencil"> ' . $buttText . '</i></a>';
+            }
             $output['aaData'][] = $row;
         }
         return $output;

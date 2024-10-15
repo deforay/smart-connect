@@ -1,11 +1,22 @@
 <?php
 
 use Application\Service\CommonService;
+use Laminas\Session\Container;
 
 $common = new CommonService();
 foreach ($requestType as $key => $value) {
 	$requestTypeOption[$value['request_type']] = $value['request_type'];
 }
+
+$sessionLogin = new Container('credo');
+$role = $sessionLogin->roleCode;
+$acl=$this->layout()->acl;
+if ($acl->isAllowed($role, 'Application\Controller\ApiSyncHistoryController', 'show-params')) {
+    $action = '{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center","bSortable":false}';
+}else{
+    $action = '{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"}';
+}
+
 ?>
 <div class="page-bar">
 	<ul class="page-breadcrumb">
@@ -91,7 +102,9 @@ foreach ($requestType as $key => $value) {
 								<th style="width:10%;"><?php echo $this->translate('Test Type'); ?></th>
 								<th style="width:15%;"><?php echo $this->translate('URL'); ?></th>
 								<th style="width:15%;"><?php echo $this->translate('Synced On'); ?></th>
-								<th style="width:15%;"><?php echo $this->translate('Action'); ?> </th>
+								<?php if ($acl->isAllowed($role, 'Application\Controller\ApiSyncHistoryController', 'show-params')) { ?>
+								 <th style="width:15%;"><?php echo $this->translate('Action'); ?> </th>
+								<?php } ?>
 							</tr>
 						</thead>
 						<tbody>
@@ -166,27 +179,8 @@ foreach ($requestType as $key => $value) {
 			"bAutoWidth": false,
 			"bProcessing": true,
 			"bServerSide": true,
-			"aoColumns": [{
-					"sClass": "center",
-				}, {
-					"sClass": "center"
-				},
-				{
-					"sClass": "center"
-				},
-				{
-					"sClass": "center"
-				},
-				{
-					"sClass": "center"
-				},
-				{
-					"sClass": "center"
-				},
-				{
-					"sClass": "center",
-					"bSortable": false
-				}
+			"aoColumns": [
+				<?php echo $action;?>
 			],
 			"sAjaxSource": "<?php echo $this->url('api-sync-history', array('action' => 'index')); ?>",
 			"fnServerData": function(sSource, aoData, fnCallback) {

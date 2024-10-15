@@ -32,7 +32,8 @@
         "spatie/once": "^3.1",
         "symfony/mailer": "^7.1",
         "tecnickcom/tcpdf": "^6.7",
-        "setasign/fpdi": "^2.6"
+        "setasign/fpdi": "^2.6",
+        "laminas/laminas-permissions-acl": "^2.16"
     },
     "autoload": {
         "psr-4": {

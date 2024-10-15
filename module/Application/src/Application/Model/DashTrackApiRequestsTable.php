@@ -8,6 +8,7 @@ use Laminas\Db\Sql\Sql;
 use Laminas\Db\TableGateway\AbstractTableGateway;
 use \Application\Service\CommonService;
 use Laminas\Json\Expr;
+use Laminas\Session\Container;
 
 class DashTrackApiRequestsTable extends AbstractTableGateway
 {
@@ -28,7 +29,7 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
     }
-    public function fetchAllDashTrackApiRequestsByGrid($parameters)
+    public function fetchAllDashTrackApiRequestsByGrid($parameters, $acl)
     {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
@@ -159,6 +160,9 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
             "aaData" => array()
         );
         $xdays = 10;
+        $loginContainer = new Container('credo');
+        $role = $loginContainer->roleCode;
+        $view = (bool) $acl->isAllowed($role, 'Application\Controller\ApiSyncHistoryController', 'show-params');
         foreach ($rResult as $key => $aRow) {
             $row = [];
             $row[] = $aRow['transaction_id'];
@@ -167,8 +171,9 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
             $row[] = strtoupper($aRow['test_type']);
             $row[] = $aRow['api_url'];
             $row[] = $common->humanReadableDateFormat($aRow['requested_on'], true);
-            $row[] = '<a href="javascript:void(0);" class="btn btn-success btn-xs" style="margin-right: 2px;" title="Result" onclick="showModal(\'/api-sync-history/show-params/' . base64_encode($aRow['api_track_id']) . '\',1200,720);"> Show Params</a>';
-            
+            if ($view) {
+                $row[] = '<a href="javascript:void(0);" class="btn btn-success btn-xs" style="margin-right: 2px;" title="Result" onclick="showModal(\'/api-sync-history/show-params/' . base64_encode($aRow['api_track_id']) . '\',1200,720);"> Show Params</a>';
+            }
             $output['aaData'][] = $row;
         }
         return $output;

@@ -58,19 +58,28 @@ class RolesTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($this->adapter);
-        $resourceQuery = $sql->select()->from('resources')->order('display_name');
+        $resourceQuery = $sql->select()->from('dash_resources')->order('display_name');
         $resourceQueryStr = $sql->buildSqlString($resourceQuery); // Get the string of the Sql, instead of the Select-instance
         $resourceResult = $dbAdapter->query($resourceQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $n = count($resourceResult);
         for ($i = 0; $i < $n; $i++) {
-            $privilageQuery = $sql->select()->from('privileges')->where(array('resource_id' => $resourceResult[$i]['resource_id']))->order('display_name');
+            $privilageQuery = $sql->select()->from('dash_privileges')->where(array('resource_id' => $resourceResult[$i]['resource_id']))->order('display_name');
             $privilageQueryStr = $sql->buildSqlString($privilageQuery); // Get the string of the Sql, instead of the Select-instance
             $resourceResult[$i]['privileges'] = $dbAdapter->query($privilageQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         }
         return $resourceResult;
     }
 
-    public function fetchAllRoleDetails($parameters)
+    public function fetchRoles()
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('r' => 'dash_user_roles'));
+        $sQueryStr = $sql->buildSqlString($sQuery);
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+    }
+
+    public function fetchAllRoleDetails($parameters, $acl)
     {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
@@ -187,12 +196,17 @@ class RolesTable extends AbstractTableGateway
         );
 
         $buttText = $this->commonService->translate('Edit');
+        $loginContainer = new Container('credo');
+        $role = $loginContainer->roleCode;
+        $update = (bool) $acl->isAllowed($role, 'Application\Controller\RolesController', 'edit');
         foreach ($rResult as $aRow) {
             $row = [];
             $row[] = $aRow['role_name'];
             $row[] = ucwords($aRow['role_code']);
             $row[] = ucwords($aRow['status']);
-            $row[] = '<a href="edit/' . base64_encode($aRow['role_id']) . '" class="btn green" style="margin-right: 2px;" title="' . $buttText . '"><i class="fa fa-pencil"> ' . $buttText . '</i></a>';
+            if ($update) {
+             $row[] = '<a href="edit/' . base64_encode($aRow['role_id']) . '" class="btn green" style="margin-right: 2px;" title="' . $buttText . '"><i class="fa fa-pencil"> ' . $buttText . '</i></a>';
+            }
             $output['aaData'][] = $row;
         }
         return $output;
@@ -220,13 +234,13 @@ class RolesTable extends AbstractTableGateway
             $role = $dbAdapter->query($roleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $roleId = $role[0]['role_id'];
 
-            $mapQuery = $sql->select()->from('roles_privileges_map')->where(array('role_id' => $roleId));
+            $mapQuery = $sql->select()->from('dash_roles_privileges_map')->where(array('role_id' => $roleId));
             $roleMapCheckQueryStr = $sql->buildSqlString($mapQuery);
             $roleMapCheck = $dbAdapter->query($roleMapCheckQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
             if (!empty($roleMapCheck)) {
                 //  delete records before insert
-                $delete = $sql->delete('roles_privileges_map');
+                $delete = $sql->delete('dash_roles_privileges_map');
                 $delete->where(array('role_id' => $roleId));
                 // Execute the delete statement
                 $statement = $sql->prepareStatementForSqlObject($delete);
@@ -236,14 +250,14 @@ class RolesTable extends AbstractTableGateway
             foreach ($params['resource'] as $resourceName => $privileges) {
                 foreach ($privileges as $key => $privilege) {
                     if ($privilege === 'allow') {
-                        $query = $sql->select()->from('privileges')->where(array('resource_id' => $resourceName, 'privilege_name' => $key));
+                        $query = $sql->select()->from('dash_privileges')->where(array('resource_id' => $resourceName, 'privilege_name' => $key));
                         $privilegeQueryStr = $sql->buildSqlString($query); // Get the string of the Sql, instead of the Select-instance
                         $privilegeRes = $dbAdapter->query($privilegeQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                         $privilegeId = $privilegeRes[0]['privilege_id'];
 
                         $sql = new Sql($dbAdapter);
                        
-                        $insert = $sql->insert('roles_privileges_map');
+                        $insert = $sql->insert('dash_roles_privileges_map');
                         $data = array(
                             'role_id' => $roleId,
                             'privilege_id' => $privilegeId
@@ -266,10 +280,39 @@ class RolesTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $rolePrivmaps = [];
         if($roleId != '') {
-            $query = $sql->select()->from('roles_privileges_map')->where(array('role_id' => $roleId));
+            $query = $sql->select()->from('dash_roles_privileges_map')->where(array('role_id' => $roleId));
             $privMapQueryStr = $sql->buildSqlString($query); // Get the string of the Sql, instead of the Select-instance
             $rolePrivmaps = $dbAdapter->query($privMapQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         }
         return $rolePrivmaps;
+    }
+
+    public function fecthAllActiveRoles()
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($this->adapter);
+        $query = $sql->select()->from('dash_user_roles')->order('role_name')->where(array('status' => 'active'));
+        $roleQueryStr = $sql->buildSqlString($query); // Get the string of the Sql, instead of the Select-instance
+        return $dbAdapter->query($roleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+    }
+
+    public function getAllPrivilegesMap(){
+        $sql = new Sql($this->adapter);
+        $dbAdapter = $this->adapter;
+
+        $selectRolePrivileges = $sql->select()->from('dash_roles_privileges_map')->columns(['role_id', 'privilege_id']);
+        $rolePrivilegesQueryStr = $sql->buildSqlString($selectRolePrivileges);
+        $rolePrivileges = $dbAdapter->query($rolePrivilegesQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $rolePrivileges;
+    }
+
+    public function getAllPrivileges(){
+        $sql = new Sql($this->adapter);
+        $dbAdapter = $this->adapter;
+
+        $selectPrivileges = $sql->select()->from('dash_privileges')->columns(['privilege_id', 'resource_id', 'privilege_name']);
+        $privilegesQueryStr = $sql->buildSqlString($selectPrivileges);
+        $privileges = $dbAdapter->query($privilegesQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $privileges;
     }
 }

@@ -17,7 +17,8 @@ class ApiSyncHistoryService
     public function getAllDashTrackApiRequestsByGrid($parameters)
     {
         $db = $this->sm->get('DashTrackApiRequestsTable');
-        return $db->fetchAllDashTrackApiRequestsByGrid($parameters);
+        $acl = $this->sm->get('AppAcl');
+        return $db->fetchAllDashTrackApiRequestsByGrid($parameters, $acl);
     }
     
     public function getSyncHistoryType()

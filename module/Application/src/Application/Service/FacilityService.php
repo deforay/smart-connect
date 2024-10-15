@@ -61,7 +61,8 @@ class FacilityService
     public function getAllFacility($parameters)
     {
         $db = $this->sm->get('FacilityTable');
-        return $db->fetchAllFacility($parameters);
+        $acl = $this->sm->get('AppAcl');
+        return $db->fetchAllFacility($parameters, $acl);
     }
     public function fetchFacilityType()
     {

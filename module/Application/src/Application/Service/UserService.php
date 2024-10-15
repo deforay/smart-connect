@@ -38,6 +38,12 @@ class UserService
         return $db->fetchAllRoles();
     }
 
+    public function fetchRoles()
+    {
+        $db = $this->sm->get('RolesTable');
+        return $db->fetchRoles();
+    }
+
     public function getUser($userId)
     {
         return $this->usersTable->getUser($userId);
@@ -93,7 +99,8 @@ class UserService
 
     public function getAllUsers($parameters)
     {
-        return $this->usersTable->fetchAllUsers($parameters);
+        $acl = $this->sm->get('AppAcl');
+        return $this->usersTable->fetchAllUsers($parameters, $acl);
     }
 
     public function userLoginApi($params)

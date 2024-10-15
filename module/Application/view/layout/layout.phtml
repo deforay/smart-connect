@@ -8,11 +8,141 @@ $languagecontainer = new Container('language');
 $config = $this->GetConfigData();
 $activeModule = $this->GetActiveModules();
 $languagecontainer->locale = $this->GetLocaleData('locale', $config['language']);
+$acl=$this->layout()->acl;
+$role = $loginContainer->roleCode;
 
 if (!isset($activeTab)) {
     $activeTab = '';
 }
 
+$vlMenu = "";
+$eidMenu = "";
+$covid19Menu = "";
+$dataManagementMenu = "";
+$snapshotMenu = "";
+$adminMenu = "";
+if (isset($acl) && $acl->isAllowed($role, 'Application\\Controller\\SummaryController', 'dashboard')) {
+    $vlMenu .= '<li class="nav-item start ' . (($activeTab == 'summary') ? " active open" : "") . '">
+                    <a href="' .$this->url('summary', array('action' => 'dashboard')) .'" class="nav-link ">
+                        <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Summary') . '</span>
+                    </a>
+                </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Application\\Controller\\LaboratoryController', 'dashboard')) {
+    $vlMenu .= '<li class="nav-item end ' . (($activeTab == 'laboratory') ? " active open" : "") . '">
+                    <a href="' . $this->url('laboratory', array('action' => 'dashboard')) .'" class="nav-link ">
+                        <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Labs Dashboard') . '</span>
+                    </a>
+                </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Application\\Controller\\ClinicController', 'dashboard')) {
+    $vlMenu .= '<li class="nav-item end ' . (($activeTab == 'clinics') ? " active open" : "") . '">
+                    <a href="' . $this->url('clinics', array('action' => 'dashboard')) .'" class="nav-link ">
+                        <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Clinics Dashboard') . '</span>
+                    </a>
+                </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Eid\\Controller\\SummaryController', 'dashboard')) {                                
+
+    $eidMenu .= '<li class="nav-item start' . (($activeTab == 'eid-summary') ? " active open" : "") . '">
+                    <a href="' . $this->url('eid-summary', array('action' => 'dashboard')) .'" class="nav-link ">
+                        <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Summary') . '</span>
+                    </a>
+                </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Eid\\Controller\\LabsController', 'dashboard')) {                                
+    $eidMenu .= '<li class="nav-item end ' . (($activeTab == 'eid-labs') ? " active open" : "") . '">
+                    <a href="' . $this->url('eid-labs', array('action' => 'dashboard')) .'" class="nav-link ">
+                        <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Labs Dashboard') . '</span>
+                    </a>
+                </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Eid\\Controller\\LabsController', 'poc-labs-dashboard')) {
+    $eidMenu .= '<li class="nav-item end ' . (($activeTab == 'eid-poc-labs') ? " active open" : "") . '">
+                    <a href="' . $this->url('eid-labs', array('action' => 'poc-labs-dashboard')) .'" class="nav-link ">
+                        <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('POC Labs Dashboard') . '</span>
+                    </a>
+                </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Eid\\Controller\\ClinicsController', 'dashboard')) {
+    $eidMenu .= '<li class="nav-item end ' . (($activeTab == 'eid-clinics') ? " active open" : "") . '">
+                    <a href="' . $this->url('eid-clinics', array('action' => 'dashboard')) .'" class="nav-link ">
+                        <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Clinics Dashboard') . '</span>
+                    </a>
+                </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Covid19\\Controller\\SummaryController', 'dashboard')) {
+
+    $covid19Menu .= '<li class="nav-item start ' . (($activeTab == 'covid19-summary') ? " active open" : "") . '">
+                        <a href="' . $this->url('covid19-summary', array('action' => 'dashboard')) .'" class="nav-link ">
+                            <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Summary') .'</span>
+                        </a>
+                    </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Covid19\\Controller\\LabsController', 'dashboard')) {                                
+    $covid19Menu .= '<li class="nav-item end ' . (($activeTab == 'covid19-labs') ? " active open" : "") . '">
+                        <a href="' . $this->url('covid19-labs', array('action' => 'dashboard')) .'" class="nav-link ">
+                            <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Labs Dashboard') . '</span>
+                        </a>
+                    </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'DataManagement\\Controller\\DuplicateDataController', 'index')) {
+
+    $dataManagementMenu .= '<li class="nav-item start ' . (($activeTab == 'duplicate-data') ? " active open" : "") . '">
+                                <a href="' . $this->url('duplicate-data') .'" class="nav-link ">
+                                    <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Duplicate Data') . '</span>
+                                </a>
+                            </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Application\\Controller\\SnapshotController', 'index')) {
+    $snapshotMenu .= '<li class="nav-item ' . (($activeTab == 'snap-data') ? " active open " : "") . '">
+                        <a href="' . $this->url('snapshot', array('action' => 'index')) .'" class="nav-link active">
+                            <i class="fa fa-picture-o"></i> <span class="title">' . $this->translate('Snapshot') . '</span>
+                        </a>
+                    </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Application\\Controller\\ConfigController', 'index')) {
+    $adminMenu .= '<li class="nav-item start ' . (($activeTab == 'config') ? " active open" : "") .'">
+                        <a href="' . $this->url('config', array('action' => 'index')) . '" class="nav-link ">
+                            <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Global Config') . '</span>
+                        </a>
+                   </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\UsersController', 'index')) {
+    $adminMenu .= '<li class="nav-item end ' . (($activeTab == 'users') ? 'active open' : '') . '">
+                        <a href="' . $this->url('users', array('action' => 'index')) . '" class="nav-link ">
+                            <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Users') . '</span>
+                        </a>
+                  </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\FacilityController', 'index')) {
+    $adminMenu .= '<li class="nav-item end ' . (($activeTab == 'facility') ? " active open" : "") . '">
+                        <a href="' . $this->url('facility', array('action' => 'index')) .'" class="nav-link ">
+                            <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Facilities') . '</span>
+                        </a>
+                   </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\SyncStatusController', 'index')) {
+    $adminMenu .= '<li class="nav-item end ' . (($activeTab == 'status') ? " active open" : "") . '">
+                        <a href="' . $this->url('sync-status', array('action' => 'index')) .'" class="nav-link ">
+                            <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Sync Status') . '</span>
+                        </a>
+                    </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistoryController', 'index')) {
+    $adminMenu .= '<li class="nav-item end ' . (($activeTab == 'sync-history') ? " active open" : "") . '">
+                        <a href="' . $this->url('api-sync-history', array('action' => 'index')) .'" class="nav-link ">
+                            <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('API History') . '</span>
+                        </a>
+                    </li>';
+}
+if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\RolesController', 'index')) {
+    $adminMenu .= '<li class="nav-item end ' . (($activeTab == 'roles') ? " active open" : "") . '">
+                        <a href="' . $this->url('roles', array('action' => 'index')) .'" class="nav-link ">
+                            <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Roles') . '</span>
+                        </a>
+                    </li>';
+}
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
@@ -196,11 +326,7 @@ if (!isset($activeTab)) {
                         <!-- END SIDEBAR TOGGLER BUTTON -->
                     </li>
                     <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
-                    <?php $vlRoleCheck = false;
-                    if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 3 || $loginContainer->role == 5) {
-                        $vlRoleCheck = true;
-                    }
-                    if ($vlRoleCheck && $activeModule['vl']) { ?>
+                    <?php if ($activeModule['vl'] && trim($vlMenu) != "") { ?>
                         <li class="nav-item <?php echo ($activeTab == 'summary' || $activeTab == 'laboratory' || $activeTab == 'clinics') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="fa fa-flask"></i>
@@ -208,31 +334,11 @@ if (!isset($activeTab)) {
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-
-                                <li class="nav-item start <?php echo ($activeTab == 'summary') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('summary', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
-                                    </a>
-                                </li>
-                                <?php
-                                if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 5) { ?>
-                                    <li class="nav-item end <?php echo ($activeTab == 'laboratory') ? " active open" : ""; ?>">
-                                        <a href="<?php echo $this->url('laboratory', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
-                                        </a>
-                                    </li>
-                                <?php }
-                                if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 3 || $loginContainer->role == 5) { ?>
-                                    <li class="nav-item end <?php echo ($activeTab == 'clinics') ? " active open" : ""; ?>">
-                                        <a href="<?php echo $this->url('clinics', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Clinics Dashboard'); ?></span>
-                                        </a>
-                                    </li>
-                                <?php } ?>
+                                <?php echo $vlMenu; ?>
                             </ul>
                         </li>
-                    <?php } ?>
-                    <?php if ($vlRoleCheck && $activeModule['eid']) { ?>
+                    <?php } 
+                    if ($activeModule['eid'] && trim($eidMenu) != "") { ?>
                         <li class="nav-item <?php echo ($activeTab == 'eid-summary' || $activeTab == 'eid-labs' || $activeTab == 'eid-clinics' || $activeTab == 'eid-poc-labs') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="fa fa-child"></i>
@@ -240,36 +346,11 @@ if (!isset($activeTab)) {
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-
-                                <li class="nav-item start <?php echo ($activeTab == 'eid-summary') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('eid-summary', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
-                                    </a>
-                                </li>
-                                <?php
-                                if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 5) { ?>
-                                    <li class="nav-item end <?php echo ($activeTab == 'eid-labs') ? " active open" : ""; ?>">
-                                        <a href="<?php echo $this->url('eid-labs', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
-                                        </a>
-                                    </li>
-                                    <?php if (isset($activeModule['poc']) && $activeModule['poc']) { ?>
-                                        <li class="nav-item end <?php echo ($activeTab == 'eid-poc-labs') ? " active open" : ""; ?>">
-                                            <a href="<?php echo $this->url('eid-labs', array('action' => 'poc-labs-dashboard')) ?>" class="nav-link ">
-                                                <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('POC Labs Dashboard'); ?></span>
-                                            </a>
-                                        </li>
-                                    <?php } ?>
-                                    <li class="nav-item end <?php echo ($activeTab == 'eid-clinics') ? " active open" : ""; ?>">
-                                        <a href="<?php echo $this->url('eid-clinics', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Clinics Dashboard'); ?></span>
-                                        </a>
-                                    </li>
-                                <?php } ?>
+                                <?php echo $eidMenu; ?>
                             </ul>
                         </li>
-                    <?php } ?>
-                    <?php if ($vlRoleCheck && $activeModule['covid19']) { ?>
+                    <?php } 
+                    if ($activeModule['covid19'] && trim($covid19Menu) != "") { ?>
                         <li class="nav-item <?php echo ($activeTab == 'covid19-summary' || $activeTab == 'covid19-labs') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="viruses" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="svg-inline--fa fa-viruses fa-w-20">
@@ -279,34 +360,11 @@ if (!isset($activeTab)) {
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-                                <li class="nav-item start <?php echo ($activeTab == 'covid19-summary') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('covid19-summary', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
-                                    </a>
-                                </li>
-                                <?php
-                                if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 5) { ?>
-                                    <li class="nav-item end <?php echo ($activeTab == 'covid19-labs') ? " active open" : ""; ?>">
-                                        <a href="<?php echo $this->url('covid19-labs', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
-                                        </a>
-                                    </li>
-                                <?php } ?>
+                                <?php echo $covid19Menu; ?>
                             </ul>
                         </li>
-                    <?php } ?>
-                    <?php
-                    if ($loginContainer->role == 1 || $loginContainer->role == 4) { ?>
-                        <!--<li class="nav-item < ?php echo ($activeTab == 'hubs-dashboard' ? " active open " : ""); ?>">
-                                 <a href="/hubs/dashboard" class="nav-link nav-toggle">
-                                     <i class="icon-home"></i>
-                                     <span class="title">< ?php echo $this->translate('Hubs Dashboard'); ?></span>
-                                     <span class="selected"></span>
-                                 </a>
-
-                            </li>-->
-                    <?php } ?>
-                    <?php if ($loginContainer->role == 1 || $loginContainer->role == 5) { ?>
+                    <?php } 
+                    if (trim($dataManagementMenu) != "") { ?>
                         <li class="nav-item <?php echo ($activeTab == 'duplicate-data') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-briefcase"></i>
@@ -314,22 +372,14 @@ if (!isset($activeTab)) {
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-                                <li class="nav-item start <?php echo ($activeTab == 'duplicate-data') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('duplicate-data') ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Duplicate Data'); ?></span>
-                                    </a>
-                                </li>
+                                <?php echo $dataManagementMenu; ?>
                             </ul>
                         </li>
                     <?php }
-                    if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 5) { ?>
-                        <li class="nav-item <?php echo ($activeTab == 'snap-data') ? " active open " : ""; ?>">
-                            <a href="<?php echo $this->url('snapshot', array('action' => 'index')) ?>" class="nav-link active">
-                                <i class="fa fa-picture-o"></i> <span class="title"><?php echo $this->translate('Snapshot'); ?></span>
-                            </a>
-                        </li>
-                    <?php }
-                    if ($loginContainer->role == 1) { ?>
+                    if (trim($snapshotMenu) != "") { ?>
+                        <?php echo $snapshotMenu; ?>
+                    <?php } 
+                    if (trim($adminMenu) != "") { ?>
                         <li class="nav-item <?php echo ($activeTab == 'config' || $activeTab == 'users' || $activeTab == 'facility' || $activeTab == 'import') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-equalizer"></i>
@@ -337,61 +387,11 @@ if (!isset($activeTab)) {
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-                                <li class="nav-item start <?php echo ($activeTab == 'config') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('config', array('action' => 'index')) ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Global Config'); ?></span>
-                                    </a>
-                                </li>
-                                <li class="nav-item end <?php echo ($activeTab == 'users') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('users', array('action' => 'index')) ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Users'); ?></span>
-                                    </a>
-                                </li>
-                                <li class="nav-item end <?php echo ($activeTab == 'facility') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('facility', array('action' => 'index')) ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Facilities'); ?></span>
-                                    </a>
-                                </li>
-                                <!-- <li class="nav-item end <?php echo ($activeTab == 'status') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('status', array('action' => 'index')) ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Status'); ?></span>
-                                    </a>
-                                </li> -->
-                                <li class="nav-item end <?php echo ($activeTab == 'status') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('sync-status', array('action' => 'index')) ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Sync Status'); ?></span>
-                                    </a>
-                                </li>
-                                <li class="nav-item end <?php echo ($activeTab == 'sync-history') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('api-sync-history', array('action' => 'index')) ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('API History'); ?></span>
-                                    </a>
-                                </li>
-                                <li class="nav-item end <?php echo ($activeTab == 'roles') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('roles', array('action' => 'index')) ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Roles'); ?></span>
-                                    </a>
-                                </li>
+                                <?php echo $adminMenu; ?>
                             </ul>
                         </li>
                     <?php } ?>
-                    <!--
-                        <li class="nav-item < ?php echo ($activeTab == 'vl-request' ? " active open " : ""); ?> ">
-                            <a href="javascript:;" class="nav-link nav-toggle">
-                                <i class="icon-settings"></i>
-                                <span class="title">VL Request</span>
-                                <span class="arrow"></span>
-                            </a>
-                            <ul class="sub-menu">
-                                <li class="nav-item  < ?php echo (isset($activeMenu) && $activeMenu == 'vl-request' ? " active open " : ""); ?>  ">
-                                    <a href="/vl-request/import-file" class="nav-link ">
-                                      <i class="fa fa-angle-right"></i>   <span class="title">Import Excel</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        -->
-                    <?php if (isset($loginContainer->accessType) && $loginContainer->accessType == '4') { ?>
+                    <!-- <?php  if (isset($loginContainer->accessType) && $loginContainer->accessType == '4') { ?>
 
                         <li class="nav-item <?php echo ($activeTab == 'admin' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
@@ -449,11 +449,7 @@ if (!isset($activeTab)) {
                                         <i class="fa fa-angle-right"></i> <span class="title">VL Test Request</span>
                                     </a>
                                 </li>
-                                <!-- <li class="nav-item">
-                                    <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Create Batch</span>
-                                    </a>
-                                </li> -->
+                                
                                 <li class="nav-item">
                                     <a href="javascript:;" class="nav-link ">
                                         <i class="fa fa-angle-right"></i> <span class="title">Sample Shipment</span>
@@ -496,11 +492,7 @@ if (!isset($activeTab)) {
                                         <i class="fa fa-angle-right"></i> <span class="title">VL Test Request</span>
                                     </a>
                                 </li>
-                                <!-- <li class="nav-item">
-                                    <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Create Batch</span>
-                                    </a>
-                                </li> -->
+                                
                                 <li class="nav-item">
                                     <a href="javascript:;" class="nav-link ">
                                         <i class="fa fa-angle-right"></i> <span class="title">Sample Shipment</span>
@@ -538,11 +530,7 @@ if (!isset($activeTab)) {
                                     </a>
                                 </li>
 
-                                <!-- <li class="nav-item">
-                                    <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Batch Creation</span>
-                                    </a>
-                                </li> -->
+                                
                                 <li class="nav-item">
                                     <a href="javascript:;" class="nav-link ">
                                         <i class="fa fa-print"></i> <span class="title">Print VL Test Results</span>
@@ -565,7 +553,7 @@ if (!isset($activeTab)) {
                                 </li>
                             </ul>
                         </li>
-                    <?php } ?>
+                    <?php } ?> -->
                 </ul>
                 <!-- END SIDEBAR MENU -->
                 <!-- END SIDEBAR MENU -->

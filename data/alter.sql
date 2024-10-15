@@ -742,24 +742,81 @@ ALTER TABLE `dash_form_vl` CHANGE `sample_received_at_vl_lab_datetime` `sample_r
 -- Thana 07-May-2024
 INSERT INTO `dash_global_config` (`name`, `display_name`, `value`, `status`) VALUES ('left_top_logo', 'Left Top Logo', 'logoz05b13.png', 'active');
 
-
 -- Brindha 04-Oct-2024
-Drop Table `roles`;
-ALTER TABLE roles_privileges_map 
-DROP FOREIGN KEY roles_privileges_map_ibfk_1;
+CREATE TABLE `dash_resources` (
+  `resource_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `display_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`resource_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-ALTER TABLE roles_privileges_map 
-ADD CONSTRAINT roles_privileges_map_ibfk_1 
-FOREIGN KEY (role_id) 
-REFERENCES dash_user_roles(role_id);
+CREATE TABLE `dash_privileges` (
+  `privilege_id` int NOT NULL AUTO_INCREMENT,
+  `resource_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
+  `privilege_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
+  `display_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`resource_id`,`privilege_name`),
+  UNIQUE KEY `resource_id_2` (`resource_id`,`privilege_name`),
+  UNIQUE KEY `privilege_id` (`privilege_id`),
+  KEY `resource_id` (`resource_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `resources` (`resource_id`, `display_name`) VALUES 
+CREATE TABLE `dash_roles_privileges_map` (
+  `map_id` int NOT NULL AUTO_INCREMENT,
+  `role_id` int NOT NULL,
+  `privilege_id` int NOT NULL,
+  PRIMARY KEY (`map_id`),
+  KEY `role_id` (`role_id`),
+  KEY `privilege_id` (`privilege_id`),
+  CONSTRAINT `dash_roles_privileges_map_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `dash_user_roles` (`role_id`),
+  CONSTRAINT `dash_roles_privileges_map_ibfk_2` FOREIGN KEY (`privilege_id`) REFERENCES `dash_privileges` (`privilege_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7857 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `dash_resources` (`resource_id`, `display_name`) VALUES 
+('Application\\Controller\\SummaryController', 'Manage Vl Summary'),
+('Application\\Controller\\LaboratoryController', 'Manage Vl Lab'),
+('Application\\Controller\\ClinicController', 'Manage Vl Clinic'),
+('Eid\\Controller\\SummaryController', 'Manage Eid Summary'),
+('Eid\\Controller\\LabsController', 'Manage Eid Lab'),
+('Eid\\Controller\\ClinicsController', 'Manage Eid Clinic'),
+('Covid19\\Controller\\SummaryController', 'Manage Covid19 Summary'),
+('Covid19\\Controller\\LabsController', 'Manage Covid19 Lab'),
+('DataManagement\\Controller\\DuplicateDataController', 'Manage Duplicate Data'),
+('Application\\Controller\\SnapshotController', 'Manage Snapshot'),
 ('Application\\Controller\\ConfigController', 'Global Config'),
-('Application\\Controller\\UsersController', 'Manage Users');
-INSERT INTO `privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES 
+('Application\\Controller\\UsersController', 'Manage Users'),
+('Application\\Controller\\FacilityController', 'Manage Facility'),
+('Application\\Controller\\SyncStatusController', 'Manage Sync Status'),
+('Application\\Controller\\ApiSyncHistoryController', 'Manage API History'),
+('Application\\Controller\\RolesController', 'Manage Roles');
+
+INSERT INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES 
+('Application\\Controller\\SummaryController', 'dashboard', 'Access'),
+('Application\\Controller\\LaboratoryController', 'dashboard', 'Access'),
+('Application\\Controller\\ClinicController', 'dashboard', 'Access'),
+('Eid\\Controller\\SummaryController', 'dashboard', 'Access'),
+('Eid\\Controller\\LabsController', 'dashboard', 'Access'),
+('Eid\\Controller\\LabsController', 'poc-labs-dashboard', 'Poc Labs Dashboard'),
+('Eid\\Controller\\ClinicsController', 'dashboard', 'Access'),
+('Covid19\\Controller\\SummaryController', 'dashboard', 'Access'),
+('Covid19\\Controller\\LabsController', 'dashboard', 'Access'),
+('DataManagement\\Controller\\DuplicateDataController', 'index', 'Access'),
+('DataManagement\\Controller\\DuplicateDataController', 'edit', 'Edit'),
+('Application\\Controller\\SnapshotController', 'index', 'Access'),
 ('Application\\Controller\\ConfigController', 'index', 'Access'),
 ('Application\\Controller\\ConfigController', 'edit', 'Edit'),
 ('Application\\Controller\\UsersController', 'index', 'Access'),
 ('Application\\Controller\\UsersController', 'add', 'Add'),
-('Application\\Controller\\UsersController', 'edit', 'Edit');
+('Application\\Controller\\UsersController', 'edit', 'Edit'),
+('Application\\Controller\\FacilityController', 'index', 'Access'),
+('Application\\Controller\\FacilityController', 'add', 'Add'),
+('Application\\Controller\\FacilityController', 'edit', 'Edit'),
+('Application\\Controller\\SyncStatusController', 'index', 'Access'),
+('Application\\Controller\\ApiSyncHistoryController', 'index', 'Access'),
+('Application\\Controller\\ApiSyncHistoryController', 'show-params', 'Show Params'),
+('Application\\Controller\\RolesController', 'index', 'Access'),
+('Application\\Controller\\RolesController', 'add', 'Add'),
+('Application\\Controller\\RolesController', 'edit', 'Edit');
 
+INSERT INTO `dash_roles_privileges_map` (`role_id`, `privilege_id`)
+SELECT '1', `privilege_id` 
+FROM `dash_privileges`;

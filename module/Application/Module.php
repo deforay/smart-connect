@@ -5,6 +5,8 @@ namespace Application;
 use Laminas\Mvc\MvcEvent;
 
 use Laminas\Session\Container;
+use Application\Model\Acl;
+use Application\Model\ResourcesTable;
 use Application\Model\RolesTable;
 use Application\Model\UsersTable;
 use Application\Model\GlobalTable;
@@ -86,10 +88,23 @@ class Module
 		$session = new Container('credo');
 		$tempName = explode('Controller', $e->getRouteMatch()->getParam('controller'));
 
-		if (substr($tempName[0], 0, -1) != 'Api' && $e->getRouteMatch()->getParam('controller') != 'Application\Controller\LoginController') {
+		$application = $e->getApplication();
+		$diContainer = $application->getServiceManager();
+		$viewModel = $application->getMvcEvent()->getViewModel();
+		
+		// Get the ACL service from the DI container
+		$acl = $diContainer->get('AppAcl');
+		
+		// Store the ACL in the session and view model
+		$viewModel->acl = $acl;
+		$session->acl = serialize($acl);
 
-			//$session->userId = 'guest';
-			//$session->accessType = 4;
+		$request = $e->getRequest();
+
+		if (!$request->isXmlHttpRequest() 
+			&& substr($tempName[0], 0, -1) != 'Api' 
+			&& $e->getRouteMatch()->getParam('controller') != 'Application\Controller\LoginController') {
+
 			if (empty($session->userId)) {
 				$url = $e->getRouter()->assemble(array(), array('name' => 'login'));
 				/** @var \Laminas\Http\Response $response */
@@ -108,6 +123,26 @@ class Module
 				$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
 				return $response;
 			} else {
+				// **ACL Permission Check for Controllers/Actions**:
+				// Get controller and action (resource and privilege)
+				$params = $e->getRouteMatch()->getParams();
+				$resource = $params['controller'];
+				$privilege = $params['action'];
+				$role = $session->roleCode;
+
+				// Check if the ACL allows access to the resource (controller/action)
+				if (!$acl->hasResource($resource) || !$acl->isAllowed($role, $resource, $privilege)) {
+					/** @var \Laminas\Http\Response $response */
+					$response = $e->getResponse();
+					$response->setStatusCode(403);
+
+					$stopCallBack = function ($event) use ($response) {
+						$event->stopPropagation();
+						return $response;
+					};
+					$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					return $response;
+				}
 
 				if ((substr($tempName[1], 1) == 'Clinic' || substr($tempName[0], 1) == 'Hubs')  && $session->role == '2') {
 					/** @var \Laminas\Http\Response $response */
@@ -228,6 +263,24 @@ class Module
 	{
 		return array(
 			'factories' => array(
+				'AppAcl' => new class
+                {
+                    public function __invoke($diContainer)
+                    {
+                        $resourcesTable = $diContainer->get('ResourcesTable');
+                        $rolesTable = $diContainer->get('RolesTable');
+                        // return new Acl($resourcesTable->fetchAllResourceMap(), $rolesTable->fecthAllActiveRoles());
+                        return new Acl($resourcesTable->fetchAllResourceMap(), $rolesTable->fecthAllActiveRoles(), $rolesTable->getAllPrivilegesMap(), $rolesTable->getAllPrivileges());
+                    }
+                },
+				'ResourcesTable' => new class
+                {
+                    public function __invoke($diContainer)
+                    {
+                        $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
+                        return new ResourcesTable($dbAdapter);
+                    }
+                },
 				'UsersTable' => new class
 				{
 					public function __invoke($diContainer)

@@ -1,6 +1,14 @@
 <?php
 use Laminas\Session\Container;
 $languagecontainer = new Container('language');
+$sessionLogin = new Container('credo');
+$role = $sessionLogin->roleCode;
+$acl=$this->layout()->acl;
+if ($acl->isAllowed($role, 'DataManagement\Controller\DuplicateDataController', 'edit')) {
+    $editAction = '{"sClass":"txtCenter","bSortable":false},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center","bSortable":false}';
+}else{
+    $editAction = '{"sClass":"txtCenter","bSortable":false}{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"}';
+}
 ?>
     <style>
         .col-sm-12{
@@ -81,7 +89,9 @@ $languagecontainer = new Container('language');
                                                 <th> <?php echo $this->translate('Sample Type'); ?></th>
                                                 <th> <?php echo $this->translate('Viral Load(cp/ml)'); ?> </th>
                                                 <th> <?php echo $this->translate('Status'); ?> </th>
-                                                <th> <?php echo $this->translate('Action'); ?> </th>
+                                                <?php if ($acl->isAllowed($role, 'DataManagement\Controller\DuplicateDataController', 'edit')) { ?>
+                                                    <th> <?php echo $this->translate('Action'); ?> </th>
+                                                <?php } ?>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -107,19 +117,7 @@ $languagecontainer = new Container('language');
             "bProcessing": true,
             "bServerSide": true,
             "aoColumns": [
-                {"sClass":"txtCenter","bSortable":false},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center","bSortable":false}
+                <?php echo $editAction;?>
             ],
             "iDisplayLength": 10,
             "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
