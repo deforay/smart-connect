@@ -38,7 +38,7 @@ class UsersTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('u' => 'dash_users'))
             ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id')
-            ->where(array('email' => $username, 'password' => $password));
+            ->where(array('email' => $username));
 
         if (isset($otp) && $otp != null && $otp != '') {
             $sQuery = $sQuery->where(array('otp' => $otp));
@@ -46,9 +46,15 @@ class UsersTable extends AbstractTableGateway
 
         $sQueryStr = $sql->buildSqlString($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+        $passwordValidation = false;
+        if ($rResult) {
+            $passwordValidation = password_verify($params['password'], $rResult[0]["password"]);
+        }
+
         $container = new Container('alert');
         $loginContainer = new Container('credo');
-        if (!empty($rResult)) {
+        if (!empty($rResult) && $passwordValidation) {
 
             date_default_timezone_set(isset($this->config['defaults']['time-zone']) ? $this->config['defaults']['time-zone'] : 'UTC');
             // Let us flush the file cache
@@ -160,15 +166,29 @@ class UsersTable extends AbstractTableGateway
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
+    public function passwordHash($password)
+    {
+        if (empty($password)) {
+            return null;
+        }
+
+        $options = [
+            'cost' => 14
+        ];
+
+        return password_hash($password, PASSWORD_BCRYPT, $options);
+    }
+
     public function addUser($params)
     {
         $userId = 0;
         if (isset($params['email']) && trim($params['email']) != "" && trim($params['password']) != "") {
+            $password = $this->passwordHash($params['password']);
             $newData = array(
                 'user_name' => $params['username'],
                 'email' => $params['email'],
                 'mobile' => $params['mobile'],
-                'password' => $params['password'],
+                'password' => $password,
                 'role' => $params['role'],
                 //'created_by'=>$credoContainer->userId,
                 //'created_on'=> new Expression('NOW()'),
@@ -233,8 +253,9 @@ class UsersTable extends AbstractTableGateway
                 //'created_on'=> new Expression('NOW()'),
                 'status' => $params['status']
             );
-            if (trim($params['password']) != "") {
-                $data['password'] = $params['password'];
+            if (isset($params['password']) && $params['password'] != '') {
+                $password = $this->passwordHash($params['password']);
+                $data['password'] = $password;
             }
             $this->update($data, array('user_id' => $userId));
             //remove user-facility map
@@ -396,10 +417,14 @@ class UsersTable extends AbstractTableGateway
 
             $sQuery = $sql->select()->from(array('u' => 'dash_users'))
                 ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id', array('role_code'))
-                ->where(array('email' => $username, 'password' => $password, 'u.status' => 'active', 'role' => '6'));
+                ->where(array('email' => $username, 'u.status' => 'active', 'role' => '6'));
             $sQueryStr = $sql->buildSqlString($sQuery);
             $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-            if ($rResult != "") {
+            $passwordValidation = false;
+            if ($rResult) {
+                $passwordValidation = password_verify($params['password'], $rResult['password']);
+            }
+            if ($rResult != "" && $passwordValidation) {
                 if (trim($rResult['api_token']) == '') {
                     $token = $this->generateApiToken();
                     $data = array('api_token' => $token);
