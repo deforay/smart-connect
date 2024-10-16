@@ -30,7 +30,7 @@ class SnapShotService
         $loginContainer = new Container('credo');
         $mappedFacilities = $loginContainer->mappedFacilities ?? null;
 
-        $types = $params['testType'] ?? ["vl", "eid", "covid19"];
+        $types = (!isset($params['testType']) || empty($params['testType'])) ? ["vl", "eid", "covid19"] : (array) $params['testType'];
         $testTypeQuery = [];
         $whereConditions = [];
 
@@ -81,10 +81,10 @@ class SnapShotService
                 ->from(["$type" => "dash_form_$type"])
                 ->columns([
                     'reg' => new Expression("COUNT(*)"),
-                    'totalReceived' => new Expression("SUM(CASE WHEN sample_collection_date IS NOT NULL AND sample_collection_date != '' AND DATE(sample_collection_date) NOT IN ('1970-01-01', '0000-00-00') THEN 1 ELSE 0 END)"),
-                    'totalTested' => new Expression("SUM(CASE WHEN sample_tested_datetime IS NOT NULL AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) NOT IN ('1970-01-01', '0000-00-00') THEN 1 ELSE 0 END)"),
-                    'totalRejected' => new Expression("SUM(CASE WHEN (reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection != '' AND reason_for_sample_rejection != 0) OR (is_sample_rejected LIKE 'yes') AND (sample_collection_date IS NOT NULL AND sample_collection_date != '' AND DATE(sample_collection_date) NOT IN ('1970-01-01', '0000-00-00')) THEN 1 ELSE 0 END)"),
-                    'totalPending' => new Expression("SUM(CASE WHEN (sample_collection_date IS NOT NULL AND sample_collection_date != '' AND DATE(sample_collection_date) NOT IN ('1970-01-01', '0000-00-00')) AND (is_sample_rejected LIKE 'yes' OR result IS NULL OR result = '' OR result_status IN (2,4,5,10)) THEN 1 ELSE 0 END)")
+                    'totalReceived' => new Expression("SUM(CASE WHEN sample_collection_date IS NOT NULL AND DATE(sample_collection_date) NOT IN ('1970-01-01', '0000-00-00') THEN 1 ELSE 0 END)"),
+                    'totalTested' => new Expression("SUM(CASE WHEN sample_tested_datetime IS NOT NULL AND DATE(sample_tested_datetime) NOT IN ('1970-01-01', '0000-00-00') THEN 1 ELSE 0 END)"),
+                    'totalRejected' => new Expression("SUM(CASE WHEN (reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection != '' AND reason_for_sample_rejection != 0) OR (is_sample_rejected LIKE 'yes') AND (sample_collection_date IS NOT NULL AND DATE(sample_collection_date) NOT IN ('1970-01-01', '0000-00-00')) THEN 1 ELSE 0 END)"),
+                    'totalPending' => new Expression("SUM(CASE WHEN (sample_collection_date IS NOT NULL AND DATE(sample_collection_date) NOT IN ('1970-01-01', '0000-00-00')) AND (is_sample_rejected LIKE 'yes' OR result IS NULL OR result = '' OR result_status IN (2,4,5,10)) THEN 1 ELSE 0 END)")
                 ])
                 ->join(['f' => 'facility_details'], "$type.lab_id = f.facility_id", ['facility_name']);
 
@@ -94,8 +94,10 @@ class SnapShotService
             }
 
             // Apply where conditions
-            foreach ($whereConditions as $condition) {
-                $select->where($condition);
+            if (!empty($whereConditions)) {
+                foreach ($whereConditions as $condition) {
+                    $select->where($condition);
+                }
             }
 
             // Group by and order by
