@@ -744,19 +744,19 @@ INSERT INTO `dash_global_config` (`name`, `display_name`, `value`, `status`) VAL
 
 
 -- Brindha 04-Oct-2024
-Drop Table `roles`;
-ALTER TABLE roles_privileges_map 
+
+ALTER TABLE roles_privileges_map
 DROP FOREIGN KEY roles_privileges_map_ibfk_1;
 
-ALTER TABLE roles_privileges_map 
-ADD CONSTRAINT roles_privileges_map_ibfk_1 
-FOREIGN KEY (role_id) 
+ALTER TABLE roles_privileges_map
+ADD CONSTRAINT roles_privileges_map_ibfk_1
+FOREIGN KEY (role_id)
 REFERENCES dash_user_roles(role_id);
 
-INSERT INTO `resources` (`resource_id`, `display_name`) VALUES 
+INSERT INTO `resources` (`resource_id`, `display_name`) VALUES
 ('Application\\Controller\\ConfigController', 'Global Config'),
 ('Application\\Controller\\UsersController', 'Manage Users');
-INSERT INTO `privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES 
+INSERT INTO `privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
 ('Application\\Controller\\ConfigController', 'index', 'Access'),
 ('Application\\Controller\\ConfigController', 'edit', 'Edit'),
 ('Application\\Controller\\UsersController', 'index', 'Access'),
