@@ -820,3 +820,20 @@ INSERT INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) 
 INSERT INTO `dash_roles_privileges_map` (`role_id`, `privilege_id`)
 SELECT '1', `privilege_id` 
 FROM `dash_privileges`;
+
+-- Brindha 16-Oct-2024
+INSERT INTO `dash_user_roles` (`role_id`, `role_name`, `role_code`, `status`) VALUES (NULL, 'Clinician', 'cli', 'active'), (NULL, 'Testing Lab Manager', 'tlm', 'active');
+
+INSERT INTO dash_roles_privileges_map (role_id, privilege_id)
+SELECT r.role_id, p.privilege_id
+FROM dash_user_roles r
+JOIN dash_privileges p
+ON p.resource_id in ('Application\\Controller\\SummaryController','Covid19\\Controller\\SummaryController','Eid\\Controller\\SummaryController','Application\\Controller\\ClinicController','Eid\\Controller\\ClinicsController','Application\\Controller\\SnapshotController')
+WHERE r.role_name = 'Clinician';
+
+INSERT INTO dash_roles_privileges_map (role_id, privilege_id)
+SELECT r.role_id, p.privilege_id
+FROM dash_user_roles r
+JOIN dash_privileges p
+ON p.resource_id in ('Application\\Controller\\SummaryController','Covid19\\Controller\\SummaryController','Eid\\Controller\\SummaryController','Application\\Controller\\LaboratoryController','Eid\\Controller\\LabsController','Covid19\\Controller\\LabsController','Application\\Controller\\SnapshotController')
+WHERE r.role_name = 'Testing Lab Manager';
