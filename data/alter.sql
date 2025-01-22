@@ -743,13 +743,13 @@ ALTER TABLE `dash_form_vl` CHANGE `sample_received_at_vl_lab_datetime` `sample_r
 INSERT INTO `dash_global_config` (`name`, `display_name`, `value`, `status`) VALUES ('left_top_logo', 'Left Top Logo', 'logoz05b13.png', 'active');
 
 -- Brindha 04-Oct-2024
-CREATE TABLE `dash_resources` (
+CREATE TABLE IF NOT EXISTS `dash_resources` (
   `resource_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `display_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`resource_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE `dash_privileges` (
+CREATE TABLE IF NOT EXISTS `dash_privileges` (
   `privilege_id` int NOT NULL AUTO_INCREMENT,
   `resource_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
   `privilege_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
@@ -758,9 +758,9 @@ CREATE TABLE `dash_privileges` (
   UNIQUE KEY `resource_id_2` (`resource_id`,`privilege_name`),
   UNIQUE KEY `privilege_id` (`privilege_id`),
   KEY `resource_id` (`resource_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE `dash_roles_privileges_map` (
+CREATE TABLE IF NOT EXISTS `dash_roles_privileges_map` (
   `map_id` int NOT NULL AUTO_INCREMENT,
   `role_id` int NOT NULL,
   `privilege_id` int NOT NULL,
@@ -771,7 +771,7 @@ CREATE TABLE `dash_roles_privileges_map` (
   CONSTRAINT `dash_roles_privileges_map_ibfk_2` FOREIGN KEY (`privilege_id`) REFERENCES `dash_privileges` (`privilege_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7857 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `dash_resources` (`resource_id`, `display_name`) VALUES 
+INSERT INTO `dash_resources` (`resource_id`, `display_name`) VALUES
 ('Application\\Controller\\SummaryController', 'Manage Vl Summary'),
 ('Application\\Controller\\LaboratoryController', 'Manage Vl Lab'),
 ('Application\\Controller\\ClinicController', 'Manage Vl Clinic'),
@@ -789,7 +789,7 @@ INSERT INTO `dash_resources` (`resource_id`, `display_name`) VALUES
 ('Application\\Controller\\ApiSyncHistoryController', 'Manage API History'),
 ('Application\\Controller\\RolesController', 'Manage Roles');
 
-INSERT INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES 
+INSERT INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
 ('Application\\Controller\\SummaryController', 'dashboard', 'Access'),
 ('Application\\Controller\\LaboratoryController', 'dashboard', 'Access'),
 ('Application\\Controller\\ClinicController', 'dashboard', 'Access'),
@@ -818,7 +818,7 @@ INSERT INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) 
 ('Application\\Controller\\RolesController', 'edit', 'Edit');
 
 INSERT INTO `dash_roles_privileges_map` (`role_id`, `privilege_id`)
-SELECT '1', `privilege_id` 
+SELECT '1', `privilege_id`
 FROM `dash_privileges`;
 
 -- Brindha 16-Oct-2024
