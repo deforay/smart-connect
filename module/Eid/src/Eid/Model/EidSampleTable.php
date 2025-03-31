@@ -2166,7 +2166,7 @@ class EidSampleTable extends AbstractTableGateway
                                                                                 WHEN (((eid.result is NOT NULL AND eid.result !='') OR (eid.reason_for_sample_rejection IS NOT NULL AND eid.reason_for_sample_rejection != '' AND eid.reason_for_sample_rejection != 0))) THEN 1
                                                                                 ELSE 0
                                                                                 END)"),
-                    $this->translator->translate("Gender Missing") => new Expression("SUM(CASE
+                    $this->translator->translate("Sex Missing") => new Expression("SUM(CASE
                                                                                     WHEN ((child_gender IS NULL OR child_gender ='' OR child_gender ='unreported' OR child_gender ='Unreported')) THEN 1
                                                                                     ELSE 0
                                                                                     END)"),
@@ -2338,7 +2338,7 @@ class EidSampleTable extends AbstractTableGateway
                                                                                 ELSE 0 END)"),
                     $this->translator->translate("No. of Devices online in last 7 days") => new Expression("SUM(CASE WHEN ((icm.poc_device = 'yes' AND DATE(sample_tested_datetime) > '" . $lastSevenDay . "')) THEN 1
                                                                                 ELSE 0 END)"),
-                    // $this->translator->translate("Gender Missing") => new Expression("SUM(CASE
+                    // $this->translator->translate("Sex Missing") => new Expression("SUM(CASE
                     //                                                                 WHEN ((child_gender IS NULL OR child_gender ='' OR child_gender ='unreported' OR child_gender ='Unreported')) THEN 1
                     //                                                                 ELSE 0
                     //                                                                 END)"),

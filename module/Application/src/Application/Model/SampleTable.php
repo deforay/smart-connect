@@ -71,7 +71,7 @@ class SampleTable extends AbstractTableGateway
                                                                                 WHEN (((vl.vl_result_category is NOT NULL AND vl.vl_result_category !='') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1
                                                                                 ELSE 0
                                                                                 END)"),
-                    $this->translator->translate("Gender Missing") => new Expression("SUM(CASE
+                    $this->translator->translate("Sex Missing") => new Expression("SUM(CASE
                                                                                     WHEN ((patient_gender IS NULL OR patient_gender ='' OR patient_gender ='unreported' OR patient_gender ='Unreported')) THEN 1
                                                                                     ELSE 0
                                                                                     END)"),
@@ -1078,7 +1078,7 @@ class SampleTable extends AbstractTableGateway
         $result[$i]['field'] = 'Patient ART Number';
         $result[$j]['field'] = 'Current Regimen';
         $result[$k]['field'] = 'Patient Age in Years';
-        $result[$l]['field'] = 'Patient Gender';
+        $result[$l]['field'] = 'Patient Sex';
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -7832,7 +7832,7 @@ class SampleTable extends AbstractTableGateway
             //var_dump($rResult);die;
 
             $output = [];
-            $headings = array("Sample Code", "Patient ID (ART No.)", "Gender", "Age In Years", "Clinic Name", "Clinic Code", "Clinic Phone Number", "Clinic Address", "Clinic HUB Name", "Clinic Contact Person", "Clinic Report Mail", "Clinic Country", "Clinic Longitude", "Clinic Latitude", "Sample Type", "Sample Collection Date", "LAB Name", "Lab Code", "Lab Phone Number", "Lab Address", "Lab HUB Name", "Lab Contact Person", "Lab Report Mail", "Lab Country", "Lab Longitude", "Lab Latitude", "Lab Type", "Lab Tested Date", "Log Value", "Absolute Value", "Text Value", "Absolute Decimal Value", "Result", "Testing Reason", "Sample Status", "Sample Received Datetime", "Line Of Treatment", "Sample Rejected", "Rejection Reason Name", "Rejection Reason Status", "Pregnant", "Breast Feeding", "Regimen Initiated Date", "ARV Adherance Percentage", "Is Adherance poor", "Approved Datetime", "Current Regimen", "Sample Registered Datetime");
+            $headings = array("Sample Code", "Patient ID (ART No.)", "Sex", "Age In Years", "Clinic Name", "Clinic Code", "Clinic Phone Number", "Clinic Address", "Clinic HUB Name", "Clinic Contact Person", "Clinic Report Mail", "Clinic Country", "Clinic Longitude", "Clinic Latitude", "Sample Type", "Sample Collection Date", "LAB Name", "Lab Code", "Lab Phone Number", "Lab Address", "Lab HUB Name", "Lab Contact Person", "Lab Report Mail", "Lab Country", "Lab Longitude", "Lab Latitude", "Lab Type", "Lab Tested Date", "Log Value", "Absolute Value", "Text Value", "Absolute Decimal Value", "Result", "Testing Reason", "Sample Status", "Sample Received Datetime", "Line Of Treatment", "Sample Rejected", "Rejection Reason Name", "Rejection Reason Status", "Pregnant", "Breast Feeding", "Regimen Initiated Date", "ARV Adherance Percentage", "Is Adherance poor", "Approved Datetime", "Current Regimen", "Sample Registered Datetime");
             foreach ($rResult as $aRow) {
                 $row = [];
                 $row[] = $aRow['sample_code'];

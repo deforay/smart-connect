@@ -8,14 +8,14 @@ $(function () {
        chart: {
             type: 'column'
         },
-       
+
        title: {
             text: ''
         },
         exporting:{
             chartOptions:{
                 subtitle: {
-                    text:'<?php echo $this->translate('Overall EID Results based on Gender'); ?>',
+                    text:'<?php echo $this->translate('Overall EID Results based on Sex'); ?>',
                 }
             }
         },
@@ -48,7 +48,7 @@ $(function () {
                 //point: {
                 //    events: {
                 //        click: function (e) {
-                //            
+                //
                 //        }
                 //    }
                 //}
@@ -59,9 +59,9 @@ $(function () {
                  for($t=0;$t<count($type);$t++){
                      $typeColor = '#6e6e9e';
                      if($type[$t] == 'Positive'){
-                         $typeColor = '#60d18f';   
+                         $typeColor = '#60d18f';
                      }else if($type[$t] == 'Negative'){
-                         $typeColor = '#ff1900';   
+                         $typeColor = '#ff1900';
                      }
               ?>
               {

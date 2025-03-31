@@ -43,7 +43,7 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                     if ($statName ==  $this->translate('Total Samples')) {
                         $totalSample = $statValue;
                     }
-                    if ($statName ==  $this->translate('Gender Missing') || $statName ==  $this->translate('Age Missing')) {
+                    if ($statName ==  $this->translate('Sex Missing') || $statName ==  $this->translate('Age Missing')) {
                         $samplePercentage = ' (' . round(($statValue / $totalSample) * 100, 2) . '%)';
                     }
                     if (strpos($statName, '(<') != false) {

@@ -2241,7 +2241,7 @@ class Covid19FormTable extends AbstractTableGateway
                                                                                 WHEN (((covid19.result is NOT NULL AND covid19.result !='') OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0))) THEN 1
                                                                                 ELSE 0
                                                                                 END)"),
-                    $this->translator->translate("Gender Missing") => new Expression("SUM(CASE
+                    $this->translator->translate("Sex Missing") => new Expression("SUM(CASE
                                                                                     WHEN ((patient_gender IS NULL OR patient_gender ='' OR patient_gender ='unreported' OR patient_gender ='Unreported')) THEN 1
                                                                                     ELSE 0
                                                                                     END)"),

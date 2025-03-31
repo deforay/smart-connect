@@ -232,7 +232,7 @@ class SnapShotService
         $quickStatsQuery = implode(" UNION ALL ", $query['quickStats']);
         $sql = "SELECT SUM(t.recevied) AS 'Total Samples',
             SUM(t.tested) AS 'Samples Tested',
-            SUM(t.gender) AS 'Gender Missing',
+            SUM(t.gender) AS 'Sex Missing',
             SUM(t.age) AS 'Age Missing',
             SUM(t.less6) AS 'Results Not Available (< 6 months)',
             SUM(t.greater6) AS 'Results Not Available (> 6 months)' ";

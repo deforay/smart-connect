@@ -4,31 +4,32 @@ namespace Application;
 
 use Laminas\Mvc\MvcEvent;
 
-use Laminas\Session\Container;
 use Application\Model\Acl;
-use Application\Model\ResourcesTable;
+use Laminas\Session\Container;
 use Application\Model\RolesTable;
 use Application\Model\UsersTable;
 use Application\Model\GlobalTable;
 use Application\Model\SampleTable;
-use Application\Model\TempMailTable;
 use Application\Model\ArtCodeTable;
 use Application\Model\FacilityTable;
 use Application\Model\ProvinceTable;
+use Application\Model\TempMailTable;
+use Application\Service\RoleService;
 use Application\Service\UserService;
 use Laminas\Mvc\ModuleRouteListener;
 use Application\Model\CountriesTable;
+use Application\Model\ResourcesTable;
 use Application\Model\SampleTypeTable;
 use Application\Model\TestReasonTable;
 use Application\Service\CommonService;
 use Application\Service\ConfigService;
 use Application\Service\SampleService;
-use Application\Service\SnapShotService;
 use Laminas\Cache\Pattern\ObjectCache;
 use Application\Service\SummaryService;
 use Application\Model\FacilityTypeTable;
 use Application\Model\SampleStatusTable;
 use Application\Service\FacilityService;
+use Application\Service\SnapShotService;
 use Application\Model\EidSampleTypeTable;
 use Application\Model\OrganizationsTable;
 use Laminas\Cache\Pattern\PatternOptions;
@@ -40,35 +41,49 @@ use Application\Model\LocationDetailsTable;
 use Application\Model\UserFacilityMapTable;
 use Application\Model\HepatitisResultsTable;
 use Application\Service\OrganizationService;
-use Application\Model\Covid19SampleTypeTable;
 
+use Application\Model\Covid19SampleTypeTable;
 use Application\Model\OrganizationTypesTable;
 use Application\Model\Covid19TestReasonsTable;
 use Application\Service\ApiSyncHistoryService;
 use Application\Model\HepatitisRiskFactorTable;
 use Application\Model\HepatitisSampleTypeTable;
 use Application\Model\ImportConfigMachineTable;
+
 use Application\Model\Covid19ComorbiditiesTable;
-
 use Application\Model\DashApiReceiverStatsTable;
+
 use Application\Model\DashTrackApiRequestsTable;
-
 use Application\Model\HepatitisTestReasonsTable;
-use Application\Model\UserOrganizationsMapTable;
 
+use Application\Model\UserOrganizationsMapTable;
 use Application\Model\SampleRejectionReasonTable;
 use Application\Model\EidSampleRejectionReasonTable;
 use Application\Model\Covid19SampleRejectionReasonsTable;
 use Application\Model\HepatitisSampleRejectionReasonTable;
-use Application\Service\RoleService;
 
 class Module
 {
+
+	private function getModuleNameFromController($controllerName)
+	{
+		// Split the controller name by backslash
+		$parts = explode('\\', $controllerName);
+
+		// The first part is typically the module name
+		return $parts[0] ?? '';
+	}
 	public function onBootstrap(MvcEvent $e)
 	{
 		define("APP_VERSION", "3.1");
+
+		/**
+		 * @var \Laminas\Mvc\Application $application
+		 */
+		$application = $e->getApplication();
+
 		$languagecontainer = new Container('language');
-		$eventManager        = $e->getApplication()->getEventManager();
+		$eventManager        = $application->getEventManager();
 		$moduleRouteListener = new ModuleRouteListener();
 		$moduleRouteListener->attach($eventManager);
 		if (php_sapi_name() != 'cli') {
@@ -77,7 +92,7 @@ class Module
 			}, 100);
 			//$eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, array($this, 'dispatchError'), -999);
 		}
-		if (property_exists($languagecontainer, 'locale') && $languagecontainer->locale !== null && $languagecontainer->locale != '') {
+		if (isset($languagecontainer->locale) && $languagecontainer->locale !== null && $languagecontainer->locale != '') {
 			// Just a call to the translator, nothing special!
 			$this->initTranslator($e);
 		}
@@ -85,33 +100,47 @@ class Module
 
 	public function preSetter(MvcEvent $e)
 	{
-		$session = new Container('credo');
-		$tempName = explode('Controller', $e->getRouteMatch()->getParam('controller'));
 
+		/** @var \Laminas\Http\Request $request */
+		$request = $e->getRequest();
+
+		if ($request->isXmlHttpRequest()) {
+			return;
+		}
+
+		$session = new Container('credo');
+		$shortControllerName = explode('Controller', $e->getRouteMatch()->getParam('controller'));
+		$shortControllerName = substr($shortControllerName[1], 1);
+
+
+		/**
+		 * @var \Laminas\Mvc\Application $application
+		 */
 		$application = $e->getApplication();
 		$diContainer = $application->getServiceManager();
 		$viewModel = $application->getMvcEvent()->getViewModel();
-		
+
 		// Get the ACL service from the DI container
 		$acl = $diContainer->get('AppAcl');
-		
+
 		// Store the ACL in the session and view model
 		$viewModel->acl = $acl;
 		$session->acl = serialize($acl);
 
-		$request = $e->getRequest();
+		$controllerName = $e->getRouteMatch()->getParam('controller');
+		$moduleName = $this->getModuleNameFromController($controllerName);
 
-		if (!$request->isXmlHttpRequest() 
-			&& substr($tempName[0], 0, -1) != 'Api' 
-			&& $e->getRouteMatch()->getParam('controller') != 'Application\Controller\LoginController') {
+
+
+		if ($moduleName == 'Application' && $controllerName != Controller\LoginController::class) {
 
 			if (empty($session->userId)) {
-				$url = $e->getRouter()->assemble(array(), array('name' => 'login'));
-				/** @var \Laminas\Http\Response $response */
+				$url = $e->getRouter()->assemble([], ['name' => 'login']);
+				/** @var \Laminas\Http\PhpEnvironment\Response $response */
 				$response = $e->getResponse();
 				$response->getHeaders()->addHeaderLine('Location', $url);
 				$response->setStatusCode(302);
-				//$response->sendHeaders();
+				$response->sendHeaders();
 
 				// To avoid additional processing
 				// we can attach a listener for Event Route with a high priority
@@ -120,7 +149,7 @@ class Module
 					return $response;
 				};
 				//Attach the "break" as a listener with a high priority
-				$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+				$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
 				return $response;
 			} else {
 				// **ACL Permission Check for Controllers/Actions**:
@@ -132,7 +161,7 @@ class Module
 
 				// Check if the ACL allows access to the resource (controller/action)
 				if (!$acl->hasResource($resource) || !$acl->isAllowed($role, $resource, $privilege)) {
-					/** @var \Laminas\Http\Response $response */
+					/** @var \Laminas\Http\PhpEnvironment\Response $response */
 					$response = $e->getResponse();
 					$response->setStatusCode(403);
 
@@ -144,12 +173,12 @@ class Module
 					return $response;
 				}
 
-				if ((substr($tempName[1], 1) == 'Clinic' || substr($tempName[0], 1) == 'Hubs')  && $session->role == '2') {
-					/** @var \Laminas\Http\Response $response */
+				if (($shortControllerName == 'Clinic' || $shortControllerName == 'Hubs')  && $session->role == '2') {
+					/** @var \Laminas\Http\PhpEnvironment\Response $response */
 					$response = $e->getResponse();
 					$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
 					$response->setStatusCode(302);
-					//$response->sendHeaders();
+					$response->sendHeaders();
 					// To avoid additional processing
 					// we can attach a listener for Event Route with a high priority
 					$stopCallBack = function ($event) use ($response) {
@@ -157,14 +186,14 @@ class Module
 						return $response;
 					};
 					//Attach the "break" as a listener with a high priority
-					$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
 					return $response;
-				} elseif ((substr($tempName[1], 1) == 'Laboratory' || substr($tempName[1], 1) == 'Hubs')  && $session->role == '3') {
-					/** @var \Laminas\Http\Response $response */
+				} elseif (($shortControllerName == 'Laboratory' || $shortControllerName == 'Hubs')  && $session->role == '3') {
+					/** @var \Laminas\Http\PhpEnvironment\Response $response */
 					$response = $e->getResponse();
 					$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
 					$response->setStatusCode(302);
-					//$response->sendHeaders();
+					$response->sendHeaders();
 					// To avoid additional processing
 					// we can attach a listener for Event Route with a high priority
 					$stopCallBack = function ($event) use ($response) {
@@ -172,14 +201,14 @@ class Module
 						return $response;
 					};
 					//Attach the "break" as a listener with a high priority
-					$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
 					return $response;
-				} elseif ((substr($tempName[1], 1) == 'Laboratory' || substr($tempName[1], 1) == 'Clinic')  && $session->role == '4') {
-					/** @var \Laminas\Http\Response $response */
+				} elseif (($shortControllerName == 'Laboratory' || $shortControllerName == 'Clinic')  && $session->role == '4') {
+					/** @var \Laminas\Http\PhpEnvironment\Response $response */
 					$response = $e->getResponse();
 					$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
 					$response->setStatusCode(302);
-					//$response->sendHeaders();
+					$response->sendHeaders();
 					// To avoid additional processing
 					// we can attach a listener for Event Route with a high priority
 					$stopCallBack = function ($event) use ($response) {
@@ -187,7 +216,7 @@ class Module
 						return $response;
 					};
 					//Attach the "break" as a listener with a high priority
-					$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
 					return $response;
 				}
 
@@ -211,12 +240,12 @@ class Module
 						}
 					}*/
 
-					if (substr($tempName[1], 1) == 'Users' || substr($tempName[1], 1) == 'Config' || substr($tempName[1], 1) == 'Facility' || substr($tempName[1], 1) == 'Import') {
+					if ($shortControllerName == 'Users' || $shortControllerName == 'Config' || $shortControllerName == 'Facility' || $shortControllerName == 'Import') {
 						$redirect = true;
 					}
 					if ($redirect) {
 						//set redirect path
-						/** @var \Laminas\Http\Response $response */
+						/** @var \Laminas\Http\PhpEnvironment\Response $response */
 						$response = $e->getResponse();
 						if ($session->role == 2) {
 							$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
@@ -228,7 +257,7 @@ class Module
 							$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
 						}
 						$response->setStatusCode(302);
-						//$response->sendHeaders();
+						$response->sendHeaders();
 
 						// To avoid additional processing
 						// we can attach a listener for Event Route with a high priority
@@ -237,7 +266,7 @@ class Module
 							return $response;
 						};
 						//Attach the "break" as a listener with a high priority
-						$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+						$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
 						return $response;
 					}
 				}
@@ -261,28 +290,25 @@ class Module
 
 	public function getServiceConfig()
 	{
-		return array(
-			'factories' => array(
-				'AppAcl' => new class
-                {
-                    public function __invoke($diContainer)
-                    {
-                        $resourcesTable = $diContainer->get('ResourcesTable');
-                        $rolesTable = $diContainer->get('RolesTable');
-                        // return new Acl($resourcesTable->fetchAllResourceMap(), $rolesTable->fecthAllActiveRoles());
-                        return new Acl($resourcesTable->fetchAllResourceMap(), $rolesTable->fecthAllActiveRoles(), $rolesTable->getAllPrivilegesMap(), $rolesTable->getAllPrivileges());
-                    }
-                },
-				'ResourcesTable' => new class
-                {
-                    public function __invoke($diContainer)
-                    {
-                        $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
-                        return new ResourcesTable($dbAdapter);
-                    }
-                },
-				'UsersTable' => new class
-				{
+		return [
+			'factories' => [
+				'AppAcl' => new class {
+					public function __invoke($diContainer)
+					{
+						$resourcesTable = $diContainer->get('ResourcesTable');
+						$rolesTable = $diContainer->get('RolesTable');
+						// return new Acl($resourcesTable->fetchAllResourceMap(), $rolesTable->fecthAllActiveRoles());
+						return new Acl($resourcesTable->fetchAllResourceMap(), $rolesTable->fecthAllActiveRoles(), $rolesTable->getAllPrivilegesMap(), $rolesTable->getAllPrivileges());
+					}
+				},
+				'ResourcesTable' => new class {
+					public function __invoke($diContainer)
+					{
+						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
+						return new ResourcesTable($dbAdapter);
+					}
+				},
+				'UsersTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
@@ -290,45 +316,40 @@ class Module
 						return new UsersTable($dbAdapter, $diContainer, $commonService);
 					}
 				},
-				'OrganizationsTable' => new class
-				{
+				'OrganizationsTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new OrganizationsTable($dbAdapter);
 					}
 				},
-				'OrganizationTypesTable'  => new class
-				{
+				'OrganizationTypesTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new OrganizationTypesTable($dbAdapter);
 					}
 				},
-				'CountriesTable'  => new class
-				{
+				'CountriesTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new CountriesTable($dbAdapter);
 					}
 				},
-				'UserOrganizationsMapTable'  => new class
-				{
+				'UserOrganizationsMapTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new UserOrganizationsMapTable($dbAdapter);
 					}
 				},
-				'SampleTable' => new class
-				{
+				'SampleTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$session = new Container('credo');
-						$mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
-						$sampleTable = property_exists($session, 'sampleTable') && $session->sampleTable !== null ? $session->sampleTable :  null;
+						$mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && !empty($session->mappedFacilities)) ? $session->mappedFacilities : [];
+						$sampleTable = property_exists($session, 'sampleTable') && $session->sampleTable !== null ? $session->sampleTable : null;
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						$commonService = $diContainer->get('CommonService');
 						$tableObj = new SampleTable($dbAdapter, $diContainer, $mappedFacilities, $sampleTable, $commonService);
@@ -343,20 +364,18 @@ class Module
 						);
 					}
 				},
-				'SampleTableWithoutCache' => new class
-				{
+				'SampleTableWithoutCache' => new class {
 					public function __invoke($diContainer)
 					{
 						$session = new Container('credo');
-						$mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
-						$sampleTable = property_exists($session, 'sampleTable') && $session->sampleTable !== null ? $session->sampleTable :  null;
+						$mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && !empty($session->mappedFacilities)) ? $session->mappedFacilities : [];
+						$sampleTable = property_exists($session, 'sampleTable') && $session->sampleTable !== null ? $session->sampleTable : null;
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						$commonService = $diContainer->get('CommonService');
 						return new SampleTable($dbAdapter, $diContainer, $mappedFacilities, $sampleTable, $commonService);
 					}
 				},
-				'FacilityTable' => new class
-				{
+				'FacilityTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
@@ -372,8 +391,7 @@ class Module
 						);
 					}
 				},
-				'FacilityTableWithoutCache' => new class
-				{
+				'FacilityTableWithoutCache' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
@@ -381,48 +399,42 @@ class Module
 						return new FacilityTable($dbAdapter, $commonService, $diContainer);
 					}
 				},
-				'TempMailTable'  => new class
-				{
+				'TempMailTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new TempMailTable($dbAdapter);
 					}
 				},
-				'FacilityTypeTable'  => new class
-				{
+				'FacilityTypeTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new FacilitytypeTable($dbAdapter);
 					}
 				},
-				'TestReasonTable'  => new class
-				{
+				'TestReasonTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new TestReasonTable($dbAdapter);
 					}
 				},
-				'SampleStatusTable'  => new class
-				{
+				'SampleStatusTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new SampleStatusTable($dbAdapter);
 					}
 				},
-				'SampleTypeTable'  => new class
-				{
+				'SampleTypeTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new SampleTypeTable($dbAdapter);
 					}
 				},
-				'GlobalTable' => new class
-				{
+				'GlobalTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
@@ -430,144 +442,126 @@ class Module
 						return new GlobalTable($dbAdapter, $commonService, $diContainer);
 					}
 				},
-				'ArtCodeTable'  => new class
-				{
+				'ArtCodeTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new ArtCodeTable($dbAdapter);
 					}
 				},
-				'UserFacilityMapTable'  => new class
-				{
+				'UserFacilityMapTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new UserFacilityMapTable($dbAdapter);
 					}
 				},
-				'LocationDetailsTable'  => new class
-				{
+				'LocationDetailsTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new LocationDetailsTable($dbAdapter);
 					}
 				},
-				'RemovedSamplesTable'  => new class
-				{
+				'RemovedSamplesTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new RemovedSamplesTable($dbAdapter);
 					}
 				},
-				'GenerateBackupTable'  => new class
-				{
+				'GenerateBackupTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new GenerateBackupTable($dbAdapter);
 					}
 				},
-				'SampleRejectionReasonTable'  => new class
-				{
+				'SampleRejectionReasonTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new SampleRejectionReasonTable($dbAdapter);
 					}
 				},
-				'EidSampleRejectionReasonTable'  => new class
-				{
+				'EidSampleRejectionReasonTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new EidSampleRejectionReasonTable($dbAdapter);
 					}
 				},
-				'Covid19SampleRejectionReasonsTable'  => new class
-				{
+				'Covid19SampleRejectionReasonsTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new Covid19SampleRejectionReasonsTable($dbAdapter);
 					}
 				},
-				'EidSampleTypeTable'  => new class
-				{
+				'EidSampleTypeTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new EidSampleTypeTable($dbAdapter);
 					}
 				},
-				'Covid19SampleTypeTable'  => new class
-				{
+				'Covid19SampleTypeTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new Covid19SampleTypeTable($dbAdapter);
 					}
 				},
-				'Covid19ComorbiditiesTable'  => new class
-				{
+				'Covid19ComorbiditiesTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new Covid19ComorbiditiesTable($dbAdapter);
 					}
 				},
-				'Covid19SymptomsTable'  => new class
-				{
+				'Covid19SymptomsTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new Covid19SymptomsTable($dbAdapter);
 					}
 				},
-				'Covid19TestReasonsTable'  => new class
-				{
+				'Covid19TestReasonsTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new Covid19TestReasonsTable($dbAdapter);
 					}
 				},
-				'ProvinceTable'  => new class
-				{
+				'ProvinceTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new ProvinceTable($dbAdapter);
 					}
 				},
-				'DashApiReceiverStatsTable'  => new class
-				{
+				'DashApiReceiverStatsTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new DashApiReceiverStatsTable($dbAdapter);
 					}
 				},
-				'DashTrackApiRequestsTable'  => new class
-				{
+				'DashTrackApiRequestsTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new DashTrackApiRequestsTable($dbAdapter);
 					}
 				},
-				'ImportConfigMachineTable'  => new class
-				{
+				'ImportConfigMachineTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new ImportConfigMachineTable($dbAdapter);
 					}
 				},
-				'HepatitisSampleTypeTable'  => new class
-				{
+				'HepatitisSampleTypeTable' => new class {
 					public function __invoke($diContainer)
 					{
 
@@ -575,8 +569,7 @@ class Module
 						return new HepatitisSampleTypeTable($dbAdapter);
 					}
 				},
-				'HepatitisSampleRejectionReasonTable'  => new class
-				{
+				'HepatitisSampleRejectionReasonTable' => new class {
 					public function __invoke($diContainer)
 					{
 
@@ -584,8 +577,7 @@ class Module
 						return new HepatitisSampleRejectionReasonTable($dbAdapter);
 					}
 				},
-				'HepatitisResultsTable'  => new class
-				{
+				'HepatitisResultsTable' => new class {
 					public function __invoke($diContainer)
 					{
 
@@ -593,8 +585,7 @@ class Module
 						return new HepatitisResultsTable($dbAdapter);
 					}
 				},
-				'HepatitisRiskFactorTable'  => new class
-				{
+				'HepatitisRiskFactorTable' => new class {
 					public function __invoke($diContainer)
 					{
 
@@ -602,8 +593,7 @@ class Module
 						return new HepatitisRiskFactorTable($dbAdapter);
 					}
 				},
-				'HepatitisTestReasonsTable'  => new class
-				{
+				'HepatitisTestReasonsTable' => new class {
 					public function __invoke($diContainer)
 					{
 
@@ -611,8 +601,7 @@ class Module
 						return new HepatitisTestReasonsTable($dbAdapter);
 					}
 				},
-				'RolesTable'  => new class
-				{
+				'RolesTable' => new class {
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
@@ -621,8 +610,7 @@ class Module
 					}
 				},
 
-				'CommonService'  => new class
-				{
+				'CommonService' => new class {
 					public function __invoke($diContainer)
 					{
 						$tempMailTable = $diContainer->get('TempMailTable');
@@ -630,23 +618,20 @@ class Module
 						return new CommonService($diContainer, $cache, $tempMailTable);
 					}
 				},
-				'UserService'  => new class
-				{
+				'UserService' => new class {
 					public function __invoke($diContainer)
 					{
 						$usersTable = $diContainer->get('UsersTable');
 						return new UserService($diContainer, $usersTable);
 					}
 				},
-				'OrganizationService'  => new class
-				{
+				'OrganizationService' => new class {
 					public function __invoke($diContainer)
 					{
 						return new OrganizationService($diContainer);
 					}
 				},
-				'SampleService' => new class
-				{
+				'SampleService' => new class {
 					public function __invoke($diContainer)
 					{
 						$sampleTable = $diContainer->get('SampleTable');
@@ -657,8 +642,7 @@ class Module
 						return new SampleService($diContainer, $sampleTable, $commonService, $apiTrackerTable, $facilityTable, $dbAdapter);
 					}
 				},
-				'SnapShotService' => new class
-				{
+				'SnapShotService' => new class {
 					public function __invoke($diContainer)
 					{
 						$commonService = $diContainer->get('CommonService');
@@ -666,8 +650,7 @@ class Module
 						return new SnapShotService($diContainer, $commonService, $dbAdapter);
 					}
 				},
-				'SummaryService'  => new class
-				{
+				'SummaryService' => new class {
 					public function __invoke($diContainer)
 					{
 
@@ -677,32 +660,28 @@ class Module
 						return new SummaryService($sampleTable, $translator, $dbAdapter);
 					}
 				},
-				'ConfigService' => new class
-				{
+				'ConfigService' => new class {
 					public function __invoke($diContainer)
 					{
 
 						return new ConfigService($diContainer);
 					}
 				},
-				'FacilityService' => new class
-				{
+				'FacilityService' => new class {
 					public function __invoke($diContainer)
 					{
 
 						return new FacilityService($diContainer);
 					}
 				},
-				'ApiSyncHistoryService' => new class
-				{
+				'ApiSyncHistoryService' => new class {
 					public function __invoke($diContainer)
 					{
 
 						return new ApiSyncHistoryService($diContainer);
 					}
 				},
-				'RoleService' => new class
-				{
+				'RoleService' => new class {
 					public function __invoke($diContainer)
 					{
 
@@ -710,28 +689,26 @@ class Module
 					}
 				},
 				'translator' => 'Laminas\Mvc\I18n\TranslatorFactory',
-			),
-			'abstract_factories' => array(
+			],
+			'abstract_factories' => [
 				'Laminas\Cache\Service\StorageCacheAbstractServiceFactory',
-			),
-		);
+			],
+		];
 	}
 
 	public function getControllerConfig()
 	{
 		return array(
-			'factories' => array(
-				'Application\Controller\LoginController' => new class
-				{
+			'factories' => [
+				Controller\LoginController::class => new class {
 					public function __invoke($diContainer)
 					{
 						$configService = $diContainer->get('ConfigService');
 						$userService = $diContainer->get('UserService');
-						return new \Application\Controller\LoginController($userService, $configService);
+						return new Controller\LoginController($userService, $configService);
 					}
 				},
-				'Application\Controller\UsersController' => new class
-				{
+				'Application\Controller\UsersController' => new class {
 					public function __invoke($diContainer)
 					{
 						$commonService = $diContainer->get('CommonService');
@@ -740,56 +717,49 @@ class Module
 						return new \Application\Controller\UsersController($userService, $commonService, $orgService);
 					}
 				},
-				'Application\Controller\CronController' => new class
-				{
+				'Application\Controller\CronController' => new class {
 					public function __invoke($diContainer)
 					{
 						$sampleService = $diContainer->get('SampleService');
 						return new \Application\Controller\CronController($sampleService);
 					}
 				},
-				'Application\Controller\StatusController' => new class
-				{
+				'Application\Controller\StatusController' => new class {
 					public function __invoke($diContainer)
 					{
 						$commonService = $diContainer->get('CommonService');
 						return new \Application\Controller\StatusController($commonService);
 					}
 				},
-				'Application\Controller\SyncStatusController' => new class
-				{
+				'Application\Controller\SyncStatusController' => new class {
 					public function __invoke($diContainer)
 					{
 						$commonService = $diContainer->get('CommonService');
 						return new \Application\Controller\SyncStatusController($commonService);
 					}
 				},
-				'Application\Controller\ConfigController' => new class
-				{
+				'Application\Controller\ConfigController' => new class {
 					public function __invoke($diContainer)
 					{
 						$configService = $diContainer->get('ConfigService');
 						return new \Application\Controller\ConfigController($configService);
 					}
 				},
-				'Application\Controller\FacilityController' => new class
-				{
+				'Application\Controller\FacilityController' => new class {
 					public function __invoke($diContainer)
 					{
 						$facilityService = $diContainer->get('FacilityService');
 						return new \Application\Controller\FacilityController($facilityService);
 					}
 				},
-				'Application\Controller\ApiSyncHistoryController' => new class
-				{
+				'Application\Controller\ApiSyncHistoryController' => new class {
 					public function __invoke($diContainer)
 					{
 						$apiSyncHistoryService = $diContainer->get('ApiSyncHistoryService');
 						return new \Application\Controller\ApiSyncHistoryController($apiSyncHistoryService);
 					}
 				},
-				'Application\Controller\SummaryController' => new class
-				{
+				'Application\Controller\SummaryController' => new class {
 					public function __invoke($diContainer)
 					{
 						$sampleService = $diContainer->get('SampleService');
@@ -797,8 +767,7 @@ class Module
 						return new \Application\Controller\SummaryController($summaryService, $sampleService);
 					}
 				},
-				'Application\Controller\LaboratoryController' => new class
-				{
+				'Application\Controller\LaboratoryController' => new class {
 					public function __invoke($diContainer)
 					{
 						$sampleService = $diContainer->get('SampleService');
@@ -806,8 +775,7 @@ class Module
 						return new \Application\Controller\LaboratoryController($sampleService, $commonService);
 					}
 				},
-				'Application\Controller\ClinicController' => new class
-				{
+				'Application\Controller\ClinicController' => new class {
 					public function __invoke($diContainer)
 					{
 						$sampleService = $diContainer->get('SampleService');
@@ -815,8 +783,7 @@ class Module
 						return new \Application\Controller\ClinicController($sampleService, $configService);
 					}
 				},
-				'Application\Controller\CommonController' => new class
-				{
+				'Application\Controller\CommonController' => new class {
 					public function __invoke($diContainer)
 					{
 						$commonService = $diContainer->get('CommonService');
@@ -824,8 +791,7 @@ class Module
 						return new \Application\Controller\CommonController($commonService, $configService);
 					}
 				},
-				'Application\Controller\TimeController' => new class
-				{
+				'Application\Controller\TimeController' => new class {
 					public function __invoke($diContainer)
 					{
 						$sampleService = $diContainer->get('SampleService');
@@ -833,8 +799,7 @@ class Module
 						return new \Application\Controller\TimeController($facilityService, $sampleService);
 					}
 				},
-				'Application\Controller\OrganizationsController' => new class
-				{
+				'Application\Controller\OrganizationsController' => new class {
 					public function __invoke($diContainer)
 					{
 						$organizationService = $diContainer->get('OrganizationService');
@@ -843,8 +808,7 @@ class Module
 						return new \Application\Controller\OrganizationsController($organizationService, $commonService, $userService);
 					}
 				},
-				'Application\Controller\SnapshotController' => new class
-				{
+				'Application\Controller\SnapshotController' => new class {
 					public function __invoke($diContainer)
 					{
 						$snapshotService = $diContainer->get('SnapShotService');
@@ -852,15 +816,14 @@ class Module
 						return new \Application\Controller\SnapshotController($commonService, $snapshotService);
 					}
 				},
-				'Application\Controller\RolesController' => new class
-				{
+				'Application\Controller\RolesController' => new class {
 					public function __invoke($diContainer)
 					{
 						$roleService = $diContainer->get('RoleService');
 						return new \Application\Controller\RolesController($roleService);
 					}
 				},
-			),
+			],
 		);
 	}
 

@@ -718,7 +718,7 @@ ALTER TABLE `dash_api_receiver_stats` CHANGE `source` `source` VARCHAR(256) NULL
 ALTER TABLE `dash_api_receiver_stats` ADD `test_type` VARCHAR(256) NULL DEFAULT NULL AFTER `source`;
 
 -- Thana 25-Oct-2023
-CREATE TABLE `dash_track_api_requests` (
+CREATE TABLE IF NOT EXISTS `dash_track_api_requests` (
   `api_track_id` int NOT NULL AUTO_INCREMENT,
   `transaction_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `requested_by` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
@@ -740,7 +740,7 @@ CREATE TABLE `dash_track_api_requests` (
 ALTER TABLE `dash_form_vl` CHANGE `sample_received_at_vl_lab_datetime` `sample_received_at_lab_datetime` DATETIME NULL DEFAULT NULL;
 
 -- Thana 07-May-2024
-INSERT INTO `dash_global_config` (`name`, `display_name`, `value`, `status`) VALUES ('left_top_logo', 'Left Top Logo', 'logoz05b13.png', 'active');
+INSERT IGNORE INTO `dash_global_config` (`name`, `display_name`, `value`, `status`) VALUES ('left_top_logo', 'Left Top Logo', 'logoz05b13.png', 'active');
 
 -- Brindha 04-Oct-2024
 CREATE TABLE IF NOT EXISTS `dash_resources` (
@@ -769,69 +769,110 @@ CREATE TABLE IF NOT EXISTS `dash_roles_privileges_map` (
   KEY `privilege_id` (`privilege_id`),
   CONSTRAINT `dash_roles_privileges_map_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `dash_user_roles` (`role_id`),
   CONSTRAINT `dash_roles_privileges_map_ibfk_2` FOREIGN KEY (`privilege_id`) REFERENCES `dash_privileges` (`privilege_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7857 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `dash_resources` (`resource_id`, `display_name`) VALUES
-('Application\\Controller\\SummaryController', 'Manage Vl Summary'),
-('Application\\Controller\\LaboratoryController', 'Manage Vl Lab'),
-('Application\\Controller\\ClinicController', 'Manage Vl Clinic'),
-('Eid\\Controller\\SummaryController', 'Manage Eid Summary'),
-('Eid\\Controller\\LabsController', 'Manage Eid Lab'),
-('Eid\\Controller\\ClinicsController', 'Manage Eid Clinic'),
-('Covid19\\Controller\\SummaryController', 'Manage Covid19 Summary'),
-('Covid19\\Controller\\LabsController', 'Manage Covid19 Lab'),
-('DataManagement\\Controller\\DuplicateDataController', 'Manage Duplicate Data'),
-('Application\\Controller\\SnapshotController', 'Manage Snapshot'),
-('Application\\Controller\\ConfigController', 'Global Config'),
-('Application\\Controller\\UsersController', 'Manage Users'),
-('Application\\Controller\\FacilityController', 'Manage Facility'),
-('Application\\Controller\\SyncStatusController', 'Manage Sync Status'),
-('Application\\Controller\\ApiSyncHistoryController', 'Manage API History'),
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Application\\Controller\\SummaryController', 'Manage Vl Summary');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Application\\Controller\\LaboratoryController', 'Manage Vl Lab');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Application\\Controller\\ClinicController', 'Manage Vl Clinic');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Eid\\Controller\\SummaryController', 'Manage Eid Summary');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Eid\\Controller\\LabsController', 'Manage Eid Lab');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Eid\\Controller\\ClinicsController', 'Manage Eid Clinic');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Covid19\\Controller\\SummaryController', 'Manage Covid19 Summary');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Covid19\\Controller\\LabsController', 'Manage Covid19 Lab');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('DataManagement\\Controller\\DuplicateDataController', 'Manage Duplicate Data');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Application\\Controller\\SnapshotController', 'Manage Snapshot');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Application\\Controller\\ConfigController', 'Global Config');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Application\\Controller\\UsersController', 'Manage Users');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Application\\Controller\\FacilityController', 'Manage Facility');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Application\\Controller\\SyncStatusController', 'Manage Sync Status');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
+('Application\\Controller\\ApiSyncHistoryController', 'Manage API History');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES
 ('Application\\Controller\\RolesController', 'Manage Roles');
 
-INSERT INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
-('Application\\Controller\\SummaryController', 'dashboard', 'Access'),
-('Application\\Controller\\LaboratoryController', 'dashboard', 'Access'),
-('Application\\Controller\\ClinicController', 'dashboard', 'Access'),
-('Eid\\Controller\\SummaryController', 'dashboard', 'Access'),
-('Eid\\Controller\\LabsController', 'dashboard', 'Access'),
-('Eid\\Controller\\LabsController', 'poc-labs-dashboard', 'Poc Labs Dashboard'),
-('Eid\\Controller\\ClinicsController', 'dashboard', 'Access'),
-('Covid19\\Controller\\SummaryController', 'dashboard', 'Access'),
-('Covid19\\Controller\\LabsController', 'dashboard', 'Access'),
-('DataManagement\\Controller\\DuplicateDataController', 'index', 'Access'),
-('DataManagement\\Controller\\DuplicateDataController', 'edit', 'Edit'),
-('Application\\Controller\\SnapshotController', 'index', 'Access'),
-('Application\\Controller\\ConfigController', 'index', 'Access'),
-('Application\\Controller\\ConfigController', 'edit', 'Edit'),
-('Application\\Controller\\UsersController', 'index', 'Access'),
-('Application\\Controller\\UsersController', 'add', 'Add'),
-('Application\\Controller\\UsersController', 'edit', 'Edit'),
-('Application\\Controller\\FacilityController', 'index', 'Access'),
-('Application\\Controller\\FacilityController', 'add', 'Add'),
-('Application\\Controller\\FacilityController', 'edit', 'Edit'),
-('Application\\Controller\\SyncStatusController', 'index', 'Access'),
-('Application\\Controller\\ApiSyncHistoryController', 'index', 'Access'),
-('Application\\Controller\\ApiSyncHistoryController', 'show-params', 'Show Params'),
-('Application\\Controller\\RolesController', 'index', 'Access'),
-('Application\\Controller\\RolesController', 'add', 'Add'),
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\SummaryController', 'dashboard', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\LaboratoryController', 'dashboard', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\ClinicController', 'dashboard', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Eid\\Controller\\SummaryController', 'dashboard', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Eid\\Controller\\LabsController', 'dashboard', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Eid\\Controller\\LabsController', 'poc-labs-dashboard', 'POC Labs Dashboard');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Eid\\Controller\\ClinicsController', 'dashboard', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Covid19\\Controller\\SummaryController', 'dashboard', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Covid19\\Controller\\LabsController', 'dashboard', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('DataManagement\\Controller\\DuplicateDataController', 'index', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('DataManagement\\Controller\\DuplicateDataController', 'edit', 'Edit');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\SnapshotController', 'index', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\ConfigController', 'index', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\ConfigController', 'edit', 'Edit');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\UsersController', 'index', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\UsersController', 'add', 'Add');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\UsersController', 'edit', 'Edit');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\FacilityController', 'index', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\FacilityController', 'add', 'Add');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\FacilityController', 'edit', 'Edit');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\SyncStatusController', 'index', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\ApiSyncHistoryController', 'index', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\ApiSyncHistoryController', 'show-params', 'Show Params');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\RolesController', 'index', 'Access');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\RolesController', 'add', 'Add');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
 ('Application\\Controller\\RolesController', 'edit', 'Edit');
 
-INSERT INTO `dash_roles_privileges_map` (`role_id`, `privilege_id`)
+INSERT IGNORE INTO `dash_roles_privileges_map` (`role_id`, `privilege_id`)
 SELECT '1', `privilege_id`
 FROM `dash_privileges`;
 
 -- Brindha 16-Oct-2024
-INSERT INTO `dash_user_roles` (`role_id`, `role_name`, `role_code`, `status`) VALUES (NULL, 'Clinician', 'cli', 'active'), (NULL, 'Testing Lab Manager', 'tlm', 'active');
+INSERT IGNORE  INTO `dash_user_roles` (`role_id`, `role_name`, `role_code`, `status`) VALUES
+(NULL, 'Clinician', 'cli', 'active'), (NULL, 'Testing Lab Manager', 'tlm', 'active');
 
-INSERT INTO dash_roles_privileges_map (role_id, privilege_id)
+INSERT IGNORE INTO dash_roles_privileges_map (role_id, privilege_id)
 SELECT r.role_id, p.privilege_id
 FROM dash_user_roles r
 JOIN dash_privileges p
 ON p.resource_id in ('Application\\Controller\\SummaryController','Covid19\\Controller\\SummaryController','Eid\\Controller\\SummaryController','Application\\Controller\\ClinicController','Eid\\Controller\\ClinicsController','Application\\Controller\\SnapshotController')
 WHERE r.role_name = 'Clinician';
 
-INSERT INTO dash_roles_privileges_map (role_id, privilege_id)
+INSERT IGNORE INTO dash_roles_privileges_map (role_id, privilege_id)
 SELECT r.role_id, p.privilege_id
 FROM dash_user_roles r
 JOIN dash_privileges p
