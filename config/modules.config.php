@@ -10,7 +10,6 @@ return [
     'Laminas\Cache',
     'Laminas\Session',
     'Laminas\Mvc\Middleware',
-    'Laminas\Log',
     'Laminas\Di',
     'Laminas\Mvc\I18n',
     'Laminas\I18n',
