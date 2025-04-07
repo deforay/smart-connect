@@ -24,7 +24,7 @@ class UserService
     public function otp($params)
     {
         $dataInterfaceLogin = new Container('dataInterfaceLogin');
-        $loginParams = array('email' => $dataInterfaceLogin->email, 'password' => $dataInterfaceLogin->password);
+        $loginParams = ['email' => $dataInterfaceLogin->email, 'password' => $dataInterfaceLogin->password];
         return $this->usersTable->login($loginParams, $params['otp']);
     }
     public function fetchUsers()

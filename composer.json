@@ -86,5 +86,8 @@
             "laminas/laminas-component-installer": true,
             "laminas/laminas-skeleton-installer": true
         }
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^7.2"
     }
 }

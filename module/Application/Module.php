@@ -829,37 +829,34 @@ class Module
 
 	public function getViewHelperConfig()
 	{
-		return array(
-			'invokables' => array(
-				'humanReadableDateFormat' 		=> 'Application\View\Helper\HumanReadableDateFormat'
-			),
-			'factories' => array(
-				'GetLocaleData'  => new class
-				{
+		return [
+			'invokables' => [
+				'humanReadableDateFormat' => 'Application\View\Helper\HumanReadableDateFormat'
+			],
+			'factories' => [
+				'GetLocaleData' => new class {
 					public function __invoke($diContainer)
 					{
 						$globalTable = $diContainer->get('GlobalTable');
 						return new GetLocaleData($globalTable);
 					}
 				},
-				'GetConfigData' => new class
-				{
+				'GetConfigData' => new class {
 					public function __invoke($diContainer)
 					{
 						$globalTable = $diContainer->get('GlobalTable');
 						return new \Application\View\Helper\GetConfigData($globalTable);
 					}
 				},
-				'GetActiveModules' => new class
-				{
+				'GetActiveModules' => new class {
 					public function __invoke($diContainer)
 					{
 						$config = $diContainer->get('Config');
 						return new \Application\View\Helper\GetActiveModules($config);
 					}
 				},
-			),
-		);
+			],
+		];
 	}
 
 	public function getAutoloaderConfig()

@@ -235,11 +235,11 @@ class GlobalTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $localeQuery = $sql->select()->from(array('locale' => 'dash_locale_details'))
+        $localeQuery = $sql->select()->from('dash_locale_details')
             ->columns(array($column))
-            ->where(array('locale.locale_id' => $localeId));
+            ->where(array('locale_id' => $localeId));
         $loclaeQueryStr = $sql->buildSqlString($localeQuery);
         $localeResult = $dbAdapter->query($loclaeQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $localeResult->$column;
+        return !empty($localeResult->$column) ? $localeResult->$column : null;
     }
 }

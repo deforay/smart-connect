@@ -18,6 +18,9 @@ class UsersTable extends AbstractTableGateway
     public array $config;
     public $useCurrentSampleTable = null;
     public CommonService $commonService;
+
+    private int $passwordCost = 12;
+
     protected $adapter;
     public function __construct(Adapter $adapter, $sm = null, $commonService = null)
     {
@@ -31,31 +34,25 @@ class UsersTable extends AbstractTableGateway
     public function login($params, $otp = null)
     {
         $username = $params['email'];
-        $password = $params['password'];
 
-        //echo $username; echo $password; echo $otp; die;
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('u' => 'dash_users'))
-            ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id')
-            ->where(array('email' => $username));
+        $sQuery = $sql->select()->from(['u' => 'dash_users'])
+            ->join(['r' => 'dash_user_roles'], 'u.role=r.role_id')
+            ->where(['email' => $username]);
 
         if (isset($otp) && $otp != null && $otp != '') {
-            $sQuery = $sQuery->where(array('otp' => $otp));
+            $sQuery = $sQuery->where(['otp' => $otp]);
         }
 
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
-        $passwordValidation = false;
-        if ($rResult) {
-            $passwordValidation = password_verify($params['password'], $rResult[0]["password"]);
-        }
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
 
         $container = new Container('alert');
         $loginContainer = new Container('credo');
-        if (!empty($rResult) && $passwordValidation) {
 
+        if (!empty($rResult) && $this->passwordVerify($rResult["user_id"], $params['password'], $rResult['password'])) {
             date_default_timezone_set(isset($this->config['defaults']['time-zone']) ? $this->config['defaults']['time-zone'] : 'UTC');
             // Let us flush the file cache
             $cacheExpiryInMins = isset($this->config['defaults']['cache-expiry']) ? $this->config['defaults']['cache-expiry'] : 120;
@@ -74,9 +71,9 @@ class UsersTable extends AbstractTableGateway
             $facilities_code = [];
             $provinces = [];
             $districts = [];
-            $mapQuery = $sql->select()->from(array('u_f_map' => 'dash_user_facility_map'))
-                ->join(array('f' => 'facility_details'), 'f.facility_id=u_f_map.facility_id', array('facility_name', 'facility_code', 'facility_state', 'facility_district'))
-                ->where(array('u_f_map.user_id' => $rResult[0]["user_id"]));
+            $mapQuery = $sql->select()->from(['u_f_map' => 'dash_user_facility_map'])
+                ->join(['f' => 'facility_details'], 'f.facility_id=u_f_map.facility_id', ['facility_name', 'facility_code', 'facility_state', 'facility_district'])
+                ->where(['u_f_map.user_id' => $rResult["user_id"]]);
             $mapQueryStr = $sql->buildSqlString($mapQuery);
             $mapResult = $dbAdapter->query($mapQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if (isset($mapResult) && count($mapResult) > 0) {
@@ -101,13 +98,13 @@ class UsersTable extends AbstractTableGateway
                 $provinces = [];
                 $districts = [];
             }
-            $loginContainer->userId = $rResult[0]["user_id"];
-            $loginContainer->username = $rResult[0]["user_name"];
-            $loginContainer->mobile = $rResult[0]["mobile"];
-            $loginContainer->role = $rResult[0]["role"];
-            $loginContainer->roleCode = $rResult[0]["role_code"];
-            $loginContainer->email = $rResult[0]["email"];
-            //$loginContainer->accessType = $rResult[0]["access_type"];
+            $loginContainer->userId = $rResult["user_id"];
+            $loginContainer->username = $rResult["user_name"];
+            $loginContainer->mobile = $rResult["mobile"];
+            $loginContainer->role = $rResult["role"];
+            $loginContainer->roleCode = $rResult["role_code"];
+            $loginContainer->email = $rResult["email"];
+            //$loginContainer->accessType = $rResult["access_type"];
             $loginContainer->mappedFacilities = $facilities_id;
             $loginContainer->mappedFacilitiesName = $facilities_name;
             $loginContainer->mappedFacilitiesCode = $facilities_code;
@@ -132,8 +129,8 @@ class UsersTable extends AbstractTableGateway
                 // so we will clear the login session
                 $loginContainer->getManager()->getStorage()->clear('credo');
                 $dataInterfaceLogin = new Container('dataInterfaceLogin');
-                $dataInterfaceLogin->email = $rResult[0]["email"];
-                $dataInterfaceLogin->password = $rResult[0]["password"];
+                $dataInterfaceLogin->email = $rResult["email"];
+                $dataInterfaceLogin->password = $rResult["password"];
                 return 'login-otp';
             } elseif ($otp != null && $loginContainer->role == 7) {
                 return 'data-management-export';
@@ -144,11 +141,6 @@ class UsersTable extends AbstractTableGateway
             } else {
                 return 'summary';
             }
-            //die('home');
-
-
-
-
         } else {
             $container = new Container('alert');
             $container->alertMsg = 'Please check your login credentials';
@@ -160,8 +152,8 @@ class UsersTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('u' => 'dash_users'))
-            ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id');
+        $sQuery = $sql->select()->from(['u' => 'dash_users'])
+            ->join(['r' => 'dash_user_roles'], 'u.role=r.role_id');
         $sQueryStr = $sql->buildSqlString($sQuery);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
@@ -172,11 +164,26 @@ class UsersTable extends AbstractTableGateway
             return null;
         }
 
-        $options = [
-            'cost' => 14
-        ];
+        return password_hash($password, PASSWORD_BCRYPT, ['cost' => $this->passwordCost]);
+    }
 
-        return password_hash($password, PASSWORD_BCRYPT, $options);
+    public function passwordVerify($userId, $password, $hash)
+    {
+        if (empty($password) || empty($hash)) {
+            return false;
+        }
+
+        $verified =  password_verify($password, $hash);
+
+        if ($verified) {
+            $options = ['cost' => $this->passwordCost];
+            if (password_needs_rehash($hash, PASSWORD_BCRYPT, $options)) {
+                $newHash = $this->passwordHash($password);
+                $this->update(['password' => $newHash], ['user_id' => $userId]);
+            }
+        }
+
+        return $verified;
     }
 
     public function addUser($params)
@@ -212,14 +219,14 @@ class UsersTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('u' => 'dash_users'))
-            ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id')
+        $sQuery = $sql->select()->from(['u' => 'dash_users'])
+            ->join(['r' => 'dash_user_roles'], 'u.role=r.role_id')
             ->where("user_id= $userId");
         $sQueryStr = $sql->buildSqlString($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         if ($rResult) {
             $userFacilityMapQuery = $sql->select()->from(array('u_f_map' => 'dash_user_facility_map'))
-                ->columns(array('facility_id'))
+                ->columns(['facility_id'])
                 ->where("u_f_map.user_id= $userId");
             $userFacilityMapStr = $sql->buildSqlString($userFacilityMapQuery);
             $rResult['facilities'] = $dbAdapter->query($userFacilityMapStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -420,11 +427,9 @@ class UsersTable extends AbstractTableGateway
                 ->where(array('email' => $username, 'u.status' => 'active', 'role' => '6'));
             $sQueryStr = $sql->buildSqlString($sQuery);
             $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-            $passwordValidation = false;
-            if ($rResult) {
-                $passwordValidation = password_verify($params['password'], $rResult['password']);
-            }
-            if ($rResult != "" && $passwordValidation) {
+
+            if (!empty($rResult) && $this->passwordVerify($rResult["user_id"], $params['password'], $rResult['password'])) {
+
                 if (trim($rResult['api_token']) == '') {
                     $token = $this->generateApiToken();
                     $data = array('api_token' => $token);

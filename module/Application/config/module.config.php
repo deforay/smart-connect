@@ -4,226 +4,224 @@ namespace Application;
 
 use Application\Command\SendTempMail;
 use Application\Command\SendTempMailFactory;
-use Laminas\DevelopmentMode\Command;
 
-return array(
-    'router' => array(
-        'routes' => array(
-            'home' => array(
+return [
+    'router' => [
+        'routes' => [
+            'home' => [
                 'type' => 'Literal',
-                'options' => array(
+                'options' => [
                     'route'    => '/',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\IndexController::class,
                         'action'     => 'index',
-                    ),
-                ),
-            ),
+                    ],
+                ],
+            ],
             // The following is a route to simplify getting started creating
             // new controllers and actions without needing to create a new
             // module. Simply drop new controllers in, and you can access them
             // using the path /application/:controller/:action
-            'application' => array(
+            'application' => [
                 'type'    => 'Literal',
-                'options' => array(
+                'options' => [
                     'route'    => '/dashboard',
-                    'defaults' => array(
+                    'defaults' => [
                         '__NAMESPACE__' => 'Application\Controller',
                         'controller'    => 'Index',
                         'action'        => 'index',
-                    ),
-                ),
+                    ],
+                ],
                 'may_terminate' => true,
-                'child_routes' => array(
-                    'default' => array(
+                'child_routes' => [
+                    'default' => [
                         'type'    => 'Segment',
-                        'options' => array(
+                        'options' => [
                             'route'    => '/[:controller[/:action]]',
-                            'constraints' => array(
+                            'constraints' => [
                                 'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                 'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
-                            ),
-                            'defaults' => array(),
-                        ),
-                    ),
-                ),
-            ),
-            'organizations' => array(
+                            ],
+                            'defaults' => [],
+                        ],
+                    ],
+                ],
+            ],
+            'organizations' => [
                 'type' => 'segment',
-                'options' => array(
+                'options' => [
                     'route' => '/organizations[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\OrganizationsController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'laboratory' => array(
+                    ],
+                ],
+            ],
+            'laboratory' => [
                 'type' => 'segment',
-                'options' => array(
+                'options' => [
                     'route' => '/labs[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\LaboratoryController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'summary' => array(
+                    ],
+                ],
+            ],
+            'summary' => [
                 'type' => 'segment',
-                'options' => array(
+                'options' => [
                     'route' => '/summary[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\SummaryController::class,
                         'action' => 'dashboard',
-                    ),
-                ),
-            ),
-            'clinics' => array(
+                    ],
+                ],
+            ],
+            'clinics' => [
                 'type' => 'segment',
-                'options' => array(
+                'options' => [
                     'route' => '/clinics[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\ClinicController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'hubs' => array(
+                    ],
+                ],
+            ],
+            'hubs' => [
                 'type' => 'segment',
-                'options' => array(
+                'options' => [
                     'route' => '/hubs[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\HubsController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'login' => array(
+                    ],
+                ],
+            ],
+            'login' => [
                 'type'    => 'segment',
-                'options' => array(
+                'options' => [
                     'route'    => '/login[/:action]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\LoginController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'login-otp' => array(
+                    ],
+                ],
+            ],
+            'login-otp' => [
                 'type' => 'Literal',
-                'options' => array(
+                'options' => [
                     'route'    => '/login/otp',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\IndexController::class,
                         'action'     => 'otp',
-                    ),
-                ),
-            ),
-            'users' => array(
+                    ],
+                ],
+            ],
+            'users' => [
                 'type'    => 'segment',
-                'options' => array(
+                'options' => [
                     'route'    => '/users[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\UsersController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'common' => array(
+                    ],
+                ],
+            ],
+            'common' => [
                 'type'    => 'segment',
-                'options' => array(
+                'options' => [
                     'route'    => '/common[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\CommonController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'config' => array(
+                    ],
+                ],
+            ],
+            'config' => [
                 'type'    => 'segment',
-                'options' => array(
+                'options' => [
                     'route'    => '/config[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\ConfigController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'facility' => array(
+                    ],
+                ],
+            ],
+            'facility' => [
                 'type'    => 'segment',
-                'options' => array(
+                'options' => [
                     'route'    => '/facility[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\FacilityController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'times' => array(
+                    ],
+                ],
+            ],
+            'times' => [
                 'type' => 'segment',
-                'options' => array(
+                'options' => [
                     'route' => '/times[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\TimeController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'status' => array(
-                'type'    => 'segment',
-                'options' => array(
-                    'route'    => '/status[/][:action][/:id]',
-                    'defaults' => array(
+                    ],
+                ],
+            ],
+            'status' => [
+                'type' => 'segment',
+                'options' => [
+                    'route' => '/status[/][:action][/:id]',
+                    'defaults' => [
                         'controller' => Controller\StatusController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'sync-status' => array(
+                    ],
+                ],
+            ],
+            'sync-status' => [
                 'type'    => 'segment',
-                'options' => array(
+                'options' => [
                     'route'    => '/sync-status[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\SyncStatusController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'api-sync-history' => array(
+                    ],
+                ],
+            ],
+            'api-sync-history' => [
                 'type'    => 'segment',
-                'options' => array(
+                'options' => [
                     'route'    => '/api-sync-history[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\ApiSyncHistoryController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'snapshot' => array(
+                    ],
+                ],
+            ],
+            'snapshot' => [
                 'type'    => 'segment',
-                'options' => array(
+                'options' => [
                     'route'    => '/snapshot[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\SnapshotController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-            'roles' => array(
+                    ],
+                ],
+            ],
+            'roles' => [
                 'type'    => 'segment',
-                'options' => array(
+                'options' => [
                     'route'    => '/roles[/][:action][/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => Controller\RolesController::class,
                         'action' => 'index',
-                    ),
-                ),
-            ),
-        ),
-    ),
+                    ],
+                ],
+            ],
+        ],
+    ],
     'service_manager' => [
         'abstract_factories' => [
             'Laminas\Cache\Service\StorageCacheAbstractServiceFactory',
-            'Laminas\Log\LoggerAbstractServiceFactory'
         ],
         'factories' => [
             'translator' => 'Laminas\Mvc\I18n\TranslatorFactory',
@@ -266,4 +264,4 @@ return array(
             'send-mail' => SendTempMail::class,
         ],
     ],
-);
+];

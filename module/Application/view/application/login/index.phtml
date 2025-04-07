@@ -9,7 +9,7 @@ use Application\Service\CommonService;
 
 $languagecontainer = new Container('language');
 $config = $this->GetConfigData();
-$languagecontainer->locale = $this->GetLocaleData('locale', $config['language']);
+$languagecontainer->locale = $this->GetLocaleData('locale', $config['language'] ?? 'en_US');
 
 $csrfToken = CommonService::generateCSRF();
 

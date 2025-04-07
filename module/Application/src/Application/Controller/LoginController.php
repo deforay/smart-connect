@@ -30,6 +30,7 @@ class LoginController extends AbstractActionController
         if ($request->isPost()) {
 
             $params = $request->getPost();
+
             if ($params["CSRF_TOKEN"] != $_SESSION["CSRF_TOKEN"]) {
                 // Reset token and create a new one
                 CommonService::generateCSRF(true);
