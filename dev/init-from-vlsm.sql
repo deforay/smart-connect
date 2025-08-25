@@ -80,7 +80,10 @@ ALTER TABLE `vldashboard`.dash_form_eid ENABLE KEYS;
 COMMIT;  -- Commit the transaction
 
 
--- DROP AND CREATE: dash_api_receiver_stats
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
 CREATE TABLE IF NOT EXISTS `dash_api_receiver_stats` (
   `api_id` INT NOT NULL AUTO_INCREMENT,
   `tracking_id` VARCHAR(255),
@@ -328,6 +331,3 @@ INSERT IGNORE INTO dash_roles_privileges_map (role_id, privilege_id)
 SELECT 1, privilege_id FROM dash_privileges;
 
 
-
-
-SET FOREIGN_KEY_CHECKS = 1;

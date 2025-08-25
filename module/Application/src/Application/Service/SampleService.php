@@ -899,9 +899,6 @@ class SampleService
                                 break;
                             }
                             $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -1003,9 +1000,6 @@ class SampleService
                                 break;
                             }
                             $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -1134,9 +1128,6 @@ class SampleService
                                 break;
                             }
                             $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;

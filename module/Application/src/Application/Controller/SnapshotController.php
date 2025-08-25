@@ -2,7 +2,7 @@
 
 namespace Application\Controller;
 
-use Laminas\Json\Json;
+
 use Laminas\View\Model\ViewModel;
 use Application\Service\CommonService;
 use Application\Service\SnapShotService;
@@ -28,7 +28,7 @@ class SnapshotController extends AbstractActionController
         if ($request->isPost()) {
             $parameters = $request->getPost();
             $result = $this->commonService->getAllDashApiReceiverStatsByGrid($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
         $clinicName = $this->commonService->getAllClinicName();
         $provinceName = $this->commonService->getAllProvinceList();

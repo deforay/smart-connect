@@ -2,7 +2,7 @@
 
 namespace Application\Controller;
 
-use Laminas\Json\Json;
+
 use Laminas\View\Model\ViewModel;
 use Application\Service\SampleService;
 use Application\Service\SummaryService;
@@ -88,7 +88,7 @@ class SummaryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->summaryService->getAllSamplesReceivedByDistrict($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
     public function samplesReceivedProvinceAction()
@@ -100,7 +100,7 @@ class SummaryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->summaryService->getAllSamplesReceivedByProvince($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
@@ -113,7 +113,7 @@ class SummaryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->summaryService->getAllSamplesReceivedByFacility($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
@@ -142,7 +142,7 @@ class SummaryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->summaryService->getAllSuppressionRateByDistrict($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
     public function suppressionRateProvinceAction()
@@ -154,7 +154,7 @@ class SummaryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->summaryService->getAllSuppressionRateByProvince($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
@@ -167,7 +167,7 @@ class SummaryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->summaryService->getAllSuppressionRateByFacility($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
@@ -197,7 +197,7 @@ class SummaryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->summaryService->getAllSamplesRejectedByDistrict($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
@@ -210,7 +210,7 @@ class SummaryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->summaryService->getAllSamplesRejectedByFacility($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
     public function samplesRejectedProvinceAction()
@@ -222,7 +222,7 @@ class SummaryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->summaryService->getAllSamplesRejectedByProvince($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
@@ -252,7 +252,7 @@ class SummaryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->summaryService->getRegimenGroupSamplesDetails($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 

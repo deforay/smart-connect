@@ -2,9 +2,10 @@
 
 namespace Application\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
+
 use Laminas\View\Model\ViewModel;
-use Laminas\Json\Json;
+use Application\Service\CommonService;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class RolesController extends AbstractActionController
 {
@@ -23,15 +24,17 @@ class RolesController extends AbstractActionController
         if ($request->isPost()) {
             $params = $request->getPost();
             $result = $this->roleService->getAllRolesDetails($params);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
     public function addAction()
     {
         $this->layout()->setVariable('activeTab', 'roles');
-        if ($this->getRequest()->isPost()) {
-            $params = $this->getRequest()->getPost();
+        /** @var \Laminas\Http\Request $request */
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
             $result = $this->roleService->addRoles($params);
             return $this->redirect()->toRoute('roles');
         } else {
@@ -45,8 +48,10 @@ class RolesController extends AbstractActionController
     public function editAction()
     {
         $this->layout()->setVariable('activeTab', 'roles');
-        if ($this->getRequest()->isPost()) {
-            $params = $this->getRequest()->getPost();
+        /** @var \Laminas\Http\Request $request */
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
             $result = $this->roleService->updateRoles($params);
             return $this->redirect()->toRoute('roles');
         } else {

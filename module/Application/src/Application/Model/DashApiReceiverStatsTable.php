@@ -2,11 +2,12 @@
 
 namespace Application\Model;
 
-use Laminas\Json\Expr;
+
 use Laminas\Db\Sql\Sql;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use \Application\Service\CommonService;
+use Laminas\Db\Sql\Predicate\Expression;
 use Laminas\Db\TableGateway\AbstractTableGateway;
 
 class DashApiReceiverStatsTable extends AbstractTableGateway
@@ -27,24 +28,18 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
 
     public function fetchAllDashApiReceiverStatsByGrid($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-         */
+
 
         $aColumns = array('facility_name', 'received_on');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -56,12 +51,7 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -100,10 +90,7 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-         */
+
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(['f' => "facility_details"])
@@ -190,9 +177,8 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
                 "facility_id" => $statusId,
                 "unix_timestamp(received_on) >= now()-interval 3 month"
             ])
-            ->group([new Expr("DATE_FORMAT(received_on, '%m-%d')"), "lab_id"]);
+            ->group([new Expression("DATE_FORMAT(received_on, '%m-%d')"), "lab_id"]);
         $sQueryStr = $sql->buildSqlString($sQuery);
-        die($sQueryStr);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 

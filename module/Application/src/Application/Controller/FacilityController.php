@@ -2,9 +2,10 @@
 
 namespace Application\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
+
 use Laminas\View\Model\ViewModel;
-use Laminas\Json\Json;
+use Application\Service\CommonService;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class FacilityController extends AbstractActionController
 {
@@ -23,15 +24,17 @@ class FacilityController extends AbstractActionController
         if ($request->isPost()) {
             $params = $request->getPost();
             $result = $this->facilityService->getAllFacility($params);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
     public function addAction()
     {
         $this->layout()->setVariable('activeTab', 'facility');
-        if ($this->getRequest()->isPost()) {
-            $params = $this->getRequest()->getPost();
+        /** @var \Laminas\Http\Request $request */
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
             $result = $this->facilityService->addFacility($params);
             return $this->redirect()->toRoute('facility');
         } else {
@@ -44,8 +47,10 @@ class FacilityController extends AbstractActionController
     public function editAction()
     {
         $this->layout()->setVariable('activeTab', 'facility');
-        if ($this->getRequest()->isPost()) {
-            $params = $this->getRequest()->getPost();
+        /** @var \Laminas\Http\Request $request */
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
             $result = $this->facilityService->updateFacility($params);
             return $this->redirect()->toRoute('facility');
         } else {

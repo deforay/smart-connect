@@ -698,7 +698,7 @@ class Module
 
 	public function getControllerConfig()
 	{
-		return array(
+		return [
 			'factories' => [
 				Controller\LoginController::class => new class {
 					public function __invoke($diContainer)
@@ -824,7 +824,7 @@ class Module
 					}
 				},
 			],
-		);
+		];
 	}
 
 	public function getViewHelperConfig()

@@ -94,24 +94,18 @@ class FacilityTable extends AbstractTableGateway
 
     public function fetchAllFacility($parameters, $acl)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-         */
+
 
         $aColumns = array('facility_code', 'facility_name', 'facility_type', 'status');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -123,12 +117,7 @@ class FacilityTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -167,10 +156,7 @@ class FacilityTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-         */
+
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('f' => 'facility_details'));

@@ -2,15 +2,13 @@
 
 namespace Application\Model;
 
+use Laminas\Db\Sql\Sql;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
-use Laminas\Db\Sql\Sql;
-use Laminas\Db\Sql\Expression;
-use Laminas\Db\TableGateway\AbstractTableGateway;
 use Application\Service\CommonService;
 
 
-class UsersTable extends AbstractTableGateway
+class UsersTable extends BaseTableGateway
 {
 
     protected $table = 'dash_users';
@@ -51,7 +49,6 @@ class UsersTable extends AbstractTableGateway
 
         $container = new Container('alert');
         $loginContainer = new Container('credo');
-
         if (!empty($rResult) && $this->passwordVerify($rResult["user_id"], $params['password'], $rResult['password'])) {
             date_default_timezone_set(isset($this->config['defaults']['time-zone']) ? $this->config['defaults']['time-zone'] : 'UTC');
             // Let us flush the file cache
@@ -281,24 +278,18 @@ class UsersTable extends AbstractTableGateway
     public function fetchAllUsers($parameters, $acl)
     {
 
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-         */
 
-        $aColumns = array('user_name', 'role_name', 'email', 'mobile');
 
-        /*
-         * Paging
-         */
+        $aColumns = ['user_name', 'role_name', 'email', 'mobile'];
+
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -310,12 +301,7 @@ class UsersTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -331,9 +317,9 @@ class UsersTable extends AbstractTableGateway
 
                 for ($i = 0; $i < $colSize; $i++) {
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . $search . "%' OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . $search . "%' ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -354,14 +340,11 @@ class UsersTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-         */
+
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('u' => 'dash_users'))
-            ->join(array('r' => 'dash_user_roles'), "u.role=r.role_id", array('role_name'));
+        $sQuery = $sql->select()->from(['u' => 'dash_users'])
+            ->join(['r' => 'dash_user_roles'], "u.role=r.role_id", ['role_name']);
 
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -389,12 +372,12 @@ class UsersTable extends AbstractTableGateway
 
         /* Total data set length */
         $iTotal = $this->select()->count();
-        $output = array(
+        $output = [
             "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
-            "aaData" => array()
-        );
+            "aaData" => []
+        ];
 
         $buttText = $this->commonService->translate('Edit');
         $loginContainer = new Container('credo');
@@ -422,9 +405,9 @@ class UsersTable extends AbstractTableGateway
             $dbAdapter = $this->adapter;
             $sql = new Sql($dbAdapter);
 
-            $sQuery = $sql->select()->from(array('u' => 'dash_users'))
-                ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id', array('role_code'))
-                ->where(array('email' => $username, 'u.status' => 'active', 'role' => '6'));
+            $sQuery = $sql->select()->from(['u' => 'dash_users'])
+                ->join(['r' => 'dash_user_roles'], 'u.role=r.role_id', ['role_code'])
+                ->where(['email' => $username, 'u.status' => 'active', 'role' => '6']);
             $sQueryStr = $sql->buildSqlString($sQuery);
             $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
 
@@ -433,11 +416,11 @@ class UsersTable extends AbstractTableGateway
                 if (trim($rResult['api_token']) == '') {
                     $token = $this->generateApiToken();
                     $data = array('api_token' => $token);
-                    $this->update($data, array('user_id' => $rResult['user_id']));
+                    $this->update($data, ['user_id' => $rResult['user_id']]);
                 }
-                $query = $sql->select()->from(array('u' => 'dash_users'))
-                    ->columns(array('api_token'))
-                    ->where(array('user_id' => $rResult['user_id']));
+                $query = $sql->select()->from(['u' => 'dash_users'])
+                    ->columns(['api_token'])
+                    ->where(['user_id' => $rResult['user_id']]);
                 $queryStr = $sql->buildSqlString($query);
                 $dResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 if ($dResult != "") {
@@ -466,8 +449,8 @@ class UsersTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('u' => 'dash_users'))
-            ->where(array('api_token' => $token));
+        $sQuery = $sql->select()->from(['u' => 'dash_users'])
+            ->where(['api_token' => $token]);
         $sQueryStr = $sql->buildSqlString($sQuery);
         $result = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         if ($result != "") {
@@ -479,7 +462,7 @@ class UsersTable extends AbstractTableGateway
 
     public function checkExistUser($name)
     {
-        $userInfo = $this->select(array('user_name LIKE "' . $name . '%"'))->current();
+        $userInfo = $this->selectOne(['user_name LIKE "' . $name . '%"']);
         if ($userInfo) {
             return $userInfo['user_id'];
         } else {

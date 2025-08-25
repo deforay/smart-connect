@@ -7,7 +7,7 @@ use Application\Service\FacilityService;
 use Eid\Service\EidSampleService;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
-use Laminas\Json\Json;
+
 use Laminas\Mvc\Application;
 use Zend\Debug\Debug;
 
@@ -344,7 +344,7 @@ class LabsController extends AbstractActionController
                     'results'    => $result,
                     'daterange'  => $params['sampleCollectionDate'],
                     'labs'       => (count($labs) > 0) ? implode(',', $labs) : '',
-                    'facilities' => $facilities,
+                    'facilities' => $params['facilities'] ?? [],
                     'category'   => $params['category'],
                     'place'      => $place
                 )
@@ -534,7 +534,7 @@ class LabsController extends AbstractActionController
             $parameters = $request->getPost();
 
             $result = $this->sampleService->getFilterSampleResultAwaitedDetails($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
@@ -618,7 +618,7 @@ class LabsController extends AbstractActionController
         if ($request->isPost()) {
             $parameters = $request->getPost();
             $result = $this->sampleService->getFilterSampleDetails($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
@@ -629,7 +629,7 @@ class LabsController extends AbstractActionController
         if ($request->isPost()) {
             $parameters = $request->getPost();
             $result = $this->sampleService->getLabFilterSampleDetails($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 

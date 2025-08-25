@@ -4,7 +4,7 @@ namespace Application\Controller;
 
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
-use Laminas\Json\Json;
+
 
 class UsersController extends AbstractActionController
 {
@@ -29,7 +29,7 @@ class UsersController extends AbstractActionController
             $params = $request->getPost();
 
             $result = $this->userService->getAllUsers($params);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 

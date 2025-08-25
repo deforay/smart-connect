@@ -2,9 +2,10 @@
 
 namespace Covid19\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
+
 use Laminas\View\Model\ViewModel;
-use Laminas\Json\Json;
+use Application\Service\CommonService;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class LabsController extends AbstractActionController
 {
@@ -205,14 +206,14 @@ class LabsController extends AbstractActionController
             }
             $viewModel = new ViewModel();
             $viewModel->setVariables(
-                array(
-                    'results'    => $result,
-                    'daterange'  => $params['sampleCollectionDate'],
-                    'labs'       => (count($labs) > 0) ? implode(',', $labs) : '',
-                    'facilities' => $facilities,
-                    'category'   => $params['category'],
-                    'place'      => $place
-                )
+                [
+                    'results' => $result,
+                    'daterange' => $params['sampleCollectionDate'],
+                    'labs' => (count($labs) > 0) ? implode(',', $labs) : '',
+                    'facilities' => $params['facilities'] ?? [],
+                    'category' => $params['category'],
+                    'place' => $place
+                ]
             )
                 ->setTerminal(true);
             return $viewModel;
@@ -396,7 +397,7 @@ class LabsController extends AbstractActionController
             $parameters = $request->getPost();
 
             $result = $this->sampleService->getFilterSampleResultAwaitedDetails($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
@@ -478,7 +479,7 @@ class LabsController extends AbstractActionController
         if ($request->isPost()) {
             $parameters = $request->getPost();
             $result = $this->sampleService->getFilterSampleDetails($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
@@ -489,7 +490,7 @@ class LabsController extends AbstractActionController
         if ($request->isPost()) {
             $parameters = $request->getPost();
             $result = $this->sampleService->getLabFilterSampleDetails($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 

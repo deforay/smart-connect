@@ -4,7 +4,7 @@ namespace Application\Controller;
 
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
-use Laminas\Json\Json;
+
 
 class SyncStatusController extends AbstractActionController
 {
@@ -24,7 +24,7 @@ class SyncStatusController extends AbstractActionController
         if ($request->isPost()) {
             $params = $request->getPost();
             $result = $this->commonService->getLabSyncStatus($params);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 

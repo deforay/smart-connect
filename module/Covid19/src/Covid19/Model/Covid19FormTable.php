@@ -2,13 +2,13 @@
 
 namespace Covid19\Model;
 
+use Laminas\Db\Sql\Sql;
+use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
-use Laminas\Db\Sql\Sql;
-use Laminas\Db\TableGateway\AbstractTableGateway;
-use Laminas\Db\Sql\Expression;
 use \Application\Service\CommonService;
-use Zend\Debug\Debug;
+use Laminas\Db\TableGateway\AbstractTableGateway;
+use Laminas\Db\Sql\Predicate\Expression as WhereExpression;
 
 /**
  * Description of Countries
@@ -23,7 +23,9 @@ class Covid19FormTable extends AbstractTableGateway
     public $sm = null;
     public array $config;
     protected $translator = null;
-    protected \Application\Service\CommonService $commonService;
+    protected CommonService $commonService;
+    protected $adapter = null;
+
     protected $mappedFacilities = null;
 
     public function __construct(Adapter $adapter, $sm = null, $mappedFacilities = null, $table = null, $commonService = null)
@@ -127,24 +129,18 @@ class Covid19FormTable extends AbstractTableGateway
 
 
 
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name');
         $orderColumns = array('facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'initial_pcr_percentage', 'second_third_pcr_percentage');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -156,12 +152,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -202,10 +193,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -314,24 +302,18 @@ class Covid19FormTable extends AbstractTableGateway
     {
 
 
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'initial_pcr_percentage', 'second_third_pcr_percentage');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -343,12 +325,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -389,10 +366,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -495,24 +469,18 @@ class Covid19FormTable extends AbstractTableGateway
     {
 
 
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'initial_pcr_percentage', 'second_third_pcr_percentage');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -524,12 +492,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -570,10 +533,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -733,24 +693,18 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchAllPositiveRateByProvince($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'total_samples_valid', 'total_positive_samples', 'total_negative_samples', 'total_samples_rejected', 'positive_rate');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -762,12 +716,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -808,10 +757,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -915,24 +861,18 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchAllPositiveRateByDistrict($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'total_samples_valid', 'total_positive_samples', 'total_negative_samples', 'total_samples_rejected', 'positive_rate');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -944,12 +884,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -990,10 +925,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -1095,27 +1027,21 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchAllPositiveRateByFacility($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
 
         $queryContainer = new Container('query');
 
         $aColumns = array('facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name', 'total_samples_valid', 'total_positive_samples', 'total_negative_samples', 'total_samples_rejected', 'positive_rate');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -1127,12 +1053,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -1173,10 +1094,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -1378,24 +1296,18 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchAllSamplesRejectedByDistrict($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -1407,12 +1319,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -1453,10 +1360,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -1548,24 +1452,18 @@ class Covid19FormTable extends AbstractTableGateway
     }
     public function fecthAllSamplesRejectedByProvince($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -1577,12 +1475,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -1623,10 +1516,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -1719,24 +1609,18 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fecthAllSamplesRejectedByFacility($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f.facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_dp.geo_name', 'f_d_l_d.geo_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -1748,12 +1632,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -1794,10 +1673,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -2409,106 +2285,84 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = [];
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
-        $facilityIdList = null;
+        $skipDays = $this->config['defaults']['tat-skipdays'] ?? 365;
+        $facilityIdList = [];
 
-        // FILTER :: Checking if the facility filter is set
-        // else if the user is mapped to one or more facilities
-
-        if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-            $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
-                ->where('f.facility_type = 2 AND f.status="active"');
-            $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
-            $fQueryStr = $sql->buildSqlString($fQuery);
-            $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        // --- Facility Filter ---
+        if (!empty($params['facilityId'])) {
+            $fQuery = $sql->select()
+                ->from(['f' => 'facility_details'])
+                ->columns(['facility_id'])
+                ->where([
+                    'f.facility_type' => 2,
+                    'f.status' => 'active',
+                    new WhereExpression('f.facility_id IN (' . $params['facilityId'] . ')')
+                ]);
+            $facilityResult = $dbAdapter->query($sql->buildSqlString($fQuery), $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
         } elseif (!empty($this->mappedFacilities)) {
-            $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
-                //->where('f.facility_type = 2 AND f.status="active"')
-                ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
-            $fQueryStr = $sql->buildSqlString($fQuery);
-            $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $fQuery = $sql->select()
+                ->from(['f' => 'facility_details'])
+                ->columns(['facility_id'])
+                ->where(new WhereExpression('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")'));
+            $facilityResult = $dbAdapter->query($sql->buildSqlString($fQuery), $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
         }
 
-        // FILTER :: Checking if the date range filter is set (which should be always set)
+        // --- Date Filter ---
+        if (!empty($params['fromDate']) && !empty($params['toDate'])) {
+            $today = date("Y-m-d");
+            $startMonth = date("Y-m-01", strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date("Y-m-t", strtotime(str_replace(' ', '-', $params['toDate'])));
 
-        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $monthyear = date("Y-m");
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
-
-            if (strtotime($startMonth) >= strtotime($monthyear)) {
+            if (strtotime($startMonth) >= strtotime($today)) {
                 $startMonth = $endMonth = date("Y-m-01", strtotime("-2 months"));
-            } elseif (strtotime($endMonth) >= strtotime($monthyear)) {
+            } elseif (strtotime($endMonth) >= strtotime($today)) {
                 $endMonth = date("Y-m-t", strtotime("-2 months"));
             }
 
-            $query = $sql->select()->from(array('covid19' => $this->table))
-                ->columns(
-                    array(
-                        // "month" => new Expression("MONTH(result_approved_datetime)"),
-                        // "year" => new Expression("YEAR(result_approved_datetime)"),
-                        // "AvgDiff" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                        // "monthDate" => new Expression("DATE_FORMAT(DATE(result_approved_datetime), '%b-%Y')"),
-                        // "total_samples_collected" => new Expression('COUNT(*)'),
-                        // "total_samples_pending" => new Expression("(SUM(CASE WHEN ((covid19.result IS NULL OR covid19.result like '' OR covid19.result like 'NULL') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))")
+            $query = $sql->select()
+                ->from(['covid19' => $this->table])
+                ->columns([
+                    "totalSamples"         => new Expression('COUNT(*)'),
+                    "monthDate"            => new Expression("DATE_FORMAT(DATE(covid19.sample_tested_datetime), '%b-%Y')"),
+                    "AvgCollectedTested"   => new Expression('ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, covid19.sample_collection_date, covid19.sample_tested_datetime), 0)), 2)'),
+                    "AvgCollectedReceived" => new Expression('ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, covid19.sample_collection_date, covid19.sample_received_at_lab_datetime), 0)), 2)'),
+                    "AvgReceivedTested"    => new Expression('ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, covid19.sample_received_at_lab_datetime, covid19.sample_tested_datetime), 0)), 2)')
+                ]);
 
-                        "totalSamples" => new Expression('COUNT(*)'),
-                        "monthDate" => new Expression("DATE_FORMAT(DATE(covid19.sample_tested_datetime), '%b-%Y')"),
-                        "daydiff" => new Expression('ABS(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))'),
-                        "AvgCollectedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,covid19.sample_tested_datetime,covid19.sample_collection_date))) AS DECIMAL (10,2))'),
-                        "AvgCollectedReceived" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,covid19.sample_received_at_lab_datetime,covid19.sample_collection_date))) AS DECIMAL (10,2))'),
-                        "AvgReceivedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,covid19.sample_tested_datetime,covid19.sample_received_at_lab_datetime))) AS DECIMAL (10,2))'),
-                    )
-                );
-            $query = $query->where("
-                    (covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '' AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')
-                    AND (covid19.result_approved_datetime is not null AND covid19.result_approved_datetime not like '' AND DATE(covid19.result_approved_datetime) !='1970-01-01' AND DATE(covid19.result_approved_datetime) !='0000-00-00')");
-            $query = $query->where("
-                        DATE(covid19.result_approved_datetime) >= '" . $startMonth . "'
-                        AND DATE(covid19.result_approved_datetime) <= '" . $endMonth . "' ");
+            // --- Predicates ---
+            $query->where->addPredicate(new WhereExpression("covid19.sample_collection_date IS NOT NULL AND covid19.sample_collection_date != '' AND covid19.sample_collection_date NOT IN ('1970-01-01', '0000-00-00')"));
+            $query->where->addPredicate(new WhereExpression("covid19.result_approved_datetime IS NOT NULL AND covid19.result_approved_datetime != '' AND covid19.result_approved_datetime NOT IN ('1970-01-01', '0000-00-00')"));
+            $query->where->addPredicate(new WhereExpression("DATE(covid19.result_approved_datetime) BETWEEN '$startMonth' AND '$endMonth'"));
+            $query->where->addPredicate(new WhereExpression("DATEDIFF(covid19.result_approved_datetime, covid19.sample_collection_date) BETWEEN 0 AND $skipDays"));
 
-
-            $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 365;
-            $query = $query->where('
-                (DATEDIFF(result_approved_datetime,sample_collection_date) < ' . $skipDays . ' AND
-                DATEDIFF(result_approved_datetime,sample_collection_date) >= 0)');
-
-            if ($facilityIdList != null) {
-                $query = $query->where('covid19.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+            if (!empty($facilityIdList)) {
+                $query->where->addPredicate(new WhereExpression('covid19.lab_id IN ("' . implode('", "', $facilityIdList) . '")'));
             }
-            $query = $query->group('monthDate');
-            // $query = $query->group(array(new Expression('YEAR(covid19.result_approved_datetime)')));
-            // $query = $query->group(array(new Expression('MONTH(covid19.result_approved_datetime)')));
-            // $query = $query->order(array(new Expression('DATE(covid19.result_approved_datetime) ASC')));
-            $query = $query->order('covid19.sample_tested_datetime ASC');
-            $queryStr = $sql->buildSqlString($query);
-            // echo $queryStr;die;
-            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
-            $j = 0;
-            foreach ($sampleResult as $key => $sRow) {
-                /* $result['all'][$key] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] != NULL && $sRow["AvgDiff"] > 0) ? round($sRow["AvgDiff"], 2) : null;
-                //$result['lab'][$key] = (isset($labsubQueryResult[0]["labCount"]) && $labsubQueryResult[0]["labCount"] != NULL && $labsubQueryResult[0]["labCount"] > 0) ? round($labsubQueryResult[0]["labCount"],2) : 0;
-                $result['data']['Samples Collected'][$key] = (isset($sRow['total_samples_collected']) && $sRow['total_samples_collected'] != NULL) ? $sRow['total_samples_collected'] : null;
-                $result['data']['Results Not Available'][$key] = (isset($sRow['total_samples_pending']) && $sRow['total_samples_pending'] != NULL) ? $sRow['total_samples_pending'] : null;
-                $result['dates'][$key] = $sRow["monthDate"]; */
 
-                if ($sRow["monthDate"] == null) {
+            $query = $query->group('monthDate')->order('covid19.sample_tested_datetime ASC');
+
+            $queryStr = $sql->buildSqlString($query);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
+
+            foreach ($sampleResult as $index => $sRow) {
+                if (empty($sRow["monthDate"])) {
                     continue;
                 }
 
-                $result['totalSamples'][$j] = (isset($sRow["totalSamples"]) && $sRow["totalSamples"] > 0 && $sRow["totalSamples"] != null) ? $sRow["totalSamples"] : 'null';
-                $result['tatCollectedTested'][$j] = (isset($sRow["AvgCollectedTested"]) && $sRow["AvgCollectedTested"] > 0 && $sRow["AvgCollectedTested"] != null) ? round($sRow["AvgCollectedTested"], 2) : 'null';
-                $result['tatCollectedReceived'][$j] = (isset($sRow["AvgCollectedReceived"]) && $sRow["AvgCollectedReceived"] > 0 && $sRow["AvgCollectedReceived"] != null) ? round($sRow["AvgCollectedReceived"], 2) : 'null';
-                $result['tatReceivedTested'][$j] = (isset($sRow["AvgReceivedTested"]) && $sRow["AvgReceivedTested"] > 0 && $sRow["AvgReceivedTested"] != null) ? round($sRow["AvgReceivedTested"], 2) : 'null';
-                $result['date'][$j] = $sRow["monthDate"];
-                $j++;
+                $result['totalSamples'][$index]         = $sRow["totalSamples"] ?? 'null';
+                $result['tatCollectedTested'][$index]   = $sRow["AvgCollectedTested"] ?? 'null';
+                $result['tatCollectedReceived'][$index] = $sRow["AvgCollectedReceived"] ?? 'null';
+                $result['tatReceivedTested'][$index]    = $sRow["AvgReceivedTested"] ?? 'null';
+                $result['date'][$index]                 = $sRow["monthDate"];
             }
         }
+
         return $result;
     }
+
+
 
     public function fetchLabPerformance($params)
     {
@@ -2632,7 +2486,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         if ($facilityIdList != null) {
-            $queryStr = $queryStr->where('covid19.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where('covid19.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
         }
 
         $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
@@ -3274,23 +3128,17 @@ class Covid19FormTable extends AbstractTableGateway
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('sample_code', "DATE_FORMAT(sample_collection_date,'%d-%b-%Y')", 'f.facility_code', 'f.facility_name', 'specimen_type', 'l.facility_code', 'l.facility_name', "DATE_FORMAT(sample_received_at_lab_datetime,'%d-%b-%Y')");
         $orderColumns = array('sample_code', 'sample_collection_date', 'f.facility_code', 'specimen_type', 'l.facility_name', 'sample_received_at_lab_datetime');
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -3302,12 +3150,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -3346,10 +3189,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
         if (isset($parameters['daterange']) && trim($parameters['daterange']) != '') {
             $splitDate = explode('to', $parameters['daterange']);
         }
@@ -3808,24 +3648,18 @@ class Covid19FormTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
 
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('DATE_FORMAT(sample_collection_date,"%d-%b-%Y")', 'specimen_type', 'facility_name');
         $orderColumns = array('sample_collection_date', 'sample_code', 'sample_code', 'sample_code', 'sample_code', 'sample_code', 'sample_code', 'specimen_type', 'facility_name');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -3837,12 +3671,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -3881,10 +3710,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
@@ -3922,7 +3748,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery = $sQuery->where('l.facility_district IN (' . $parameters['districts'] . ')');
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
-            $sQuery = $sQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+            $sQuery = $sQuery->where('covid19.facility_id IN (' . $parameters['clinicId'] . ')');
         }
 
 
@@ -4037,22 +3863,16 @@ class Covid19FormTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
 
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('facility_name', 'sample_code', 'sample_code', 'sample_code', 'sample_code', 'sample_code', 'sample_code');
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -4064,12 +3884,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -4108,10 +3923,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {

@@ -2,7 +2,7 @@
 
 namespace Application\Controller;
 
-use Laminas\Json\Json;
+
 
 use Application\Service\CommonService;
 use Application\Service\SampleService;
@@ -403,7 +403,7 @@ class LaboratoryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->sampleService->getLabFilterSampleDetails($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
@@ -415,7 +415,7 @@ class LaboratoryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->sampleService->getFilterSampleDetails($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
@@ -667,7 +667,7 @@ class LaboratoryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->sampleService->getFilterSampleTatDetails($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 
@@ -822,7 +822,7 @@ class LaboratoryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->sampleService->getFilterSampleResultAwaitedDetails($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 

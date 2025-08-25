@@ -18,25 +18,25 @@
         "laminas/laminas-serializer": "^2.17",
         "laminas/laminas-i18n": "^2.24",
         "laminas/laminas-session": "^2.17",
-        "laminas/laminas-db": "^2.18",
+        "laminas/laminas-db": "^2.20",
         "laminas/laminas-cli": "^1.11",
         "laminas/laminas-mvc-middleware": "^2.4",
         "laminas/laminas-mvc-i18n": "^1.8",
         "laminas/laminas-di": "^3.13",
         "laminas/laminas-validator": "^2.44",
         "laminas/laminas-router": "^3.12",
-        "phpoffice/phpspreadsheet": "^4.1",
-        "halaxa/json-machine": "^1.1",
-        "ramsey/uuid": "^4.7",
+        "phpoffice/phpspreadsheet": "^5.0",
+        "halaxa/json-machine": "^1.2",
+        "ramsey/uuid": "^4.9",
         "spatie/once": "^3.1",
-        "symfony/mailer": "^7.2",
-        "tecnickcom/tcpdf": "^6.9",
+        "symfony/mailer": "^7.3",
+        "tecnickcom/tcpdf": "^6.10",
         "setasign/fpdi": "^2.6",
-        "laminas/laminas-permissions-acl": "^2.16"
+        "laminas/laminas-permissions-acl": "^2.17"
     },
     "autoload": {
         "psr-4": {
-            "Application\\": "module/Application/src/"
+            "Application\\": "module/Application/src/Application/"
         }
     },
     "scripts": {

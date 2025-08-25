@@ -4,7 +4,7 @@ namespace DataManagement\Controller;
 
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
-use Laminas\Json\Json;
+
 
 class DuplicateDataController extends AbstractActionController
 {
@@ -24,7 +24,7 @@ class DuplicateDataController extends AbstractActionController
     if ($request->isPost()) {
       $parameters = $request->getPost();
       $result = $this->sampleService->getAllSamples($parameters);
-      return $this->getResponse()->setContent(Json::encode($result));
+      return $this->getResponse()->setContent(CommonService::jsonEncode($result));
     }
   }
 

@@ -4,7 +4,7 @@ namespace Covid19\Controller;
 
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
-use Laminas\Json\Json;
+
 
 class SummaryController extends AbstractActionController
 {
@@ -68,7 +68,7 @@ class SummaryController extends AbstractActionController
 		if ($request->isPost()) {
 			$parameters = $request->getPost();
 			$result = $this->summaryService->getAllSamplesReceivedByFacility($parameters);
-			return $this->getResponse()->setContent(Json::encode($result));
+			return $this->getResponse()->setContent(CommonService::jsonEncode($result));
 		}
 	}
 
@@ -79,7 +79,7 @@ class SummaryController extends AbstractActionController
 		if ($request->isPost()) {
 			$parameters = $request->getPost();
 			$result = $this->summaryService->getAllSamplesReceivedByProvince($parameters);
-			return $this->getResponse()->setContent(Json::encode($result));
+			return $this->getResponse()->setContent(CommonService::jsonEncode($result));
 		}
 	}
 
@@ -90,7 +90,7 @@ class SummaryController extends AbstractActionController
 		if ($request->isPost()) {
 			$parameters = $request->getPost();
 			$result = $this->summaryService->getAllSamplesReceivedByDistrict($parameters);
-			return $this->getResponse()->setContent(Json::encode($result));
+			return $this->getResponse()->setContent(CommonService::jsonEncode($result));
 		}
 	}
 
@@ -116,7 +116,7 @@ class SummaryController extends AbstractActionController
 		if ($request->isPost()) {
 			$parameters = $request->getPost();
 			$result = $this->summaryService->getAllPositiveRateByDistrict($parameters);
-			return $this->getResponse()->setContent(Json::encode($result));
+			return $this->getResponse()->setContent(CommonService::jsonEncode($result));
 		}
 	}
 	public function positiveRateProvinceAction()
@@ -126,7 +126,7 @@ class SummaryController extends AbstractActionController
 		if ($request->isPost()) {
 			$parameters = $request->getPost();
 			$result = $this->summaryService->getAllPositiveRateByProvince($parameters);
-			return $this->getResponse()->setContent(Json::encode($result));
+			return $this->getResponse()->setContent(CommonService::jsonEncode($result));
 		}
 	}
 
@@ -137,7 +137,7 @@ class SummaryController extends AbstractActionController
 		if ($request->isPost()) {
 			$parameters = $request->getPost();
 			$result = $this->summaryService->getAllPositiveRateByFacility($parameters);
-			return $this->getResponse()->setContent(Json::encode($result));
+			return $this->getResponse()->setContent(CommonService::jsonEncode($result));
 		}
 	}
 
@@ -163,7 +163,7 @@ class SummaryController extends AbstractActionController
 		if ($request->isPost()) {
 			$parameters = $request->getPost();
 			$result = $this->summaryService->getAllSamplesRejectedByDistrict($parameters);
-			return $this->getResponse()->setContent(Json::encode($result));
+			return $this->getResponse()->setContent(CommonService::jsonEncode($result));
 		}
 	}
 
@@ -174,7 +174,7 @@ class SummaryController extends AbstractActionController
 		if ($request->isPost()) {
 			$parameters = $request->getPost();
 			$result = $this->summaryService->getAllSamplesRejectedByFacility($parameters);
-			return $this->getResponse()->setContent(Json::encode($result));
+			return $this->getResponse()->setContent(CommonService::jsonEncode($result));
 		}
 	}
 	public function samplesRejectedProvinceAction()
@@ -184,7 +184,7 @@ class SummaryController extends AbstractActionController
 		if ($request->isPost()) {
 			$parameters = $request->getPost();
 			$result = $this->summaryService->getAllSamplesRejectedByProvince($parameters);
-			return $this->getResponse()->setContent(Json::encode($result));
+			return $this->getResponse()->setContent(CommonService::jsonEncode($result));
 		}
 	}
 

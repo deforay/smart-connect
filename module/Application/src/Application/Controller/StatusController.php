@@ -2,9 +2,10 @@
 
 namespace Application\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
+
 use Laminas\View\Model\ViewModel;
-use Laminas\Json\Json;
+use Application\Service\CommonService;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class StatusController extends AbstractActionController
 {
@@ -24,7 +25,7 @@ class StatusController extends AbstractActionController
         if ($request->isPost()) {
             $parameters = $request->getPost();
             $result = $this->commonService->getAllDashApiReceiverStatsByGrid($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 

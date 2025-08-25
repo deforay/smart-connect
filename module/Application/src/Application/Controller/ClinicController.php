@@ -2,9 +2,10 @@
 
 namespace Application\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
+
 use Laminas\View\Model\ViewModel;
-use Laminas\Json\Json;
+use Application\Service\CommonService;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class ClinicController extends AbstractActionController
 {
@@ -116,7 +117,7 @@ class ClinicController extends AbstractActionController
             $parameters = $request->getPost();
 
             $result = $this->sampleService->getAllTestResults($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 

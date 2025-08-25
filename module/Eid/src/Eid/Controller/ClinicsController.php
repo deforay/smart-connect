@@ -2,9 +2,10 @@
 
 namespace Eid\Controller;
 
-use Laminas\Json\Json;
+
 use Eid\Service\EidSampleService;
 use Laminas\View\Model\ViewModel;
+use Application\Service\CommonService;
 use Application\Service\ConfigService;
 use Laminas\Mvc\Controller\AbstractActionController;
 
@@ -115,7 +116,7 @@ class ClinicsController extends AbstractActionController
             $parameters = $request->getPost();
 
             $result = $this->sampleService->getAllTestResults($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }
     }
 

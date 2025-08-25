@@ -2,10 +2,11 @@
 
 namespace Eid\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\View\Model\ViewModel;
-use Laminas\Json\Json;
 use Zend\Debug\Debug;
+
+use Laminas\View\Model\ViewModel;
+use Application\Service\CommonService;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class SummaryController extends AbstractActionController
 {
@@ -31,8 +32,8 @@ class SummaryController extends AbstractActionController
     }
     $this->layout()->setVariable('activeTab', 'eid-summary');
     $summaryTabResult = $this->summaryService->fetchSummaryTabDetails($params);
-    
-    /* District, Province and Facility */      
+
+    /* District, Province and Facility */
     $clinicName = $this->commonService->getAllClinicName();
     $provinceName = $this->commonService->getAllProvinceList();
     $districtName = $this->commonService->getAllDistrictList();
@@ -82,9 +83,9 @@ class SummaryController extends AbstractActionController
         $request = $this->getRequest();
     if ($request->isPost()) {
       $parameters = $request->getPost();
-      
+
       $result = $this->summaryService->getAllSamplesReceivedByDistrict($parameters);
-      return $this->getResponse()->setContent(Json::encode($result));
+      return $this->getResponse()->setContent(CommonService::jsonEncode($result));
     }
   }
   public function samplesReceivedProvinceAction()
@@ -93,9 +94,9 @@ class SummaryController extends AbstractActionController
         $request = $this->getRequest();
     if ($request->isPost()) {
       $parameters = $request->getPost();
-      
+
       $result = $this->summaryService->getAllSamplesReceivedByProvince($parameters);
-      return $this->getResponse()->setContent(Json::encode($result));
+      return $this->getResponse()->setContent(CommonService::jsonEncode($result));
     }
   }
 
@@ -105,9 +106,9 @@ class SummaryController extends AbstractActionController
         $request = $this->getRequest();
     if ($request->isPost()) {
       $parameters = $request->getPost();
-      
+
       $result = $this->summaryService->getAllSamplesReceivedByFacility($parameters);
-      return $this->getResponse()->setContent(Json::encode($result));
+      return $this->getResponse()->setContent(CommonService::jsonEncode($result));
     }
   }
 
@@ -119,7 +120,7 @@ class SummaryController extends AbstractActionController
     if ($request->isPost()) {
       $parameters = $request->getPost();
       $result = $this->summaryService->getAllPositiveRateByDistrict($parameters);
-      return $this->getResponse()->setContent(Json::encode($result));
+      return $this->getResponse()->setContent(CommonService::jsonEncode($result));
     }
   }
   public function positiveRateProvinceAction()
@@ -129,7 +130,7 @@ class SummaryController extends AbstractActionController
     if ($request->isPost()) {
       $parameters = $request->getPost();
       $result = $this->summaryService->getAllPositiveRateByProvince($parameters);
-      return $this->getResponse()->setContent(Json::encode($result));
+      return $this->getResponse()->setContent(CommonService::jsonEncode($result));
     }
   }
 
@@ -140,7 +141,7 @@ class SummaryController extends AbstractActionController
     if ($request->isPost()) {
       $parameters = $request->getPost();
       $result = $this->summaryService->getAllPositiveRateByFacility($parameters);
-      return $this->getResponse()->setContent(Json::encode($result));
+      return $this->getResponse()->setContent(CommonService::jsonEncode($result));
     }
   }
 
@@ -151,7 +152,7 @@ class SummaryController extends AbstractActionController
         $request = $this->getRequest();
     if ($request->isPost()) {
       $params = $request->getPost();
-      
+
       $result = $this->summaryService->getSamplesRejectedBarChartDetails($params);
       $viewModel = new ViewModel();
       $viewModel->setVariables(array(
@@ -167,9 +168,9 @@ class SummaryController extends AbstractActionController
         $request = $this->getRequest();
     if ($request->isPost()) {
       $parameters = $request->getPost();
-      
+
       $result = $this->summaryService->getAllSamplesRejectedByDistrict($parameters);
-      return $this->getResponse()->setContent(Json::encode($result));
+      return $this->getResponse()->setContent(CommonService::jsonEncode($result));
     }
   }
 
@@ -179,9 +180,9 @@ class SummaryController extends AbstractActionController
         $request = $this->getRequest();
     if ($request->isPost()) {
       $parameters = $request->getPost();
-      
+
       $result = $this->summaryService->getAllSamplesRejectedByFacility($parameters);
-      return $this->getResponse()->setContent(Json::encode($result));
+      return $this->getResponse()->setContent(CommonService::jsonEncode($result));
     }
   }
   public function samplesRejectedProvinceAction()
@@ -190,9 +191,9 @@ class SummaryController extends AbstractActionController
         $request = $this->getRequest();
     if ($request->isPost()) {
       $parameters = $request->getPost();
-      
+
       $result = $this->summaryService->getAllSamplesRejectedByProvince($parameters);
-      return $this->getResponse()->setContent(Json::encode($result));
+      return $this->getResponse()->setContent(CommonService::jsonEncode($result));
     }
   }
 
@@ -203,7 +204,7 @@ class SummaryController extends AbstractActionController
         $request = $this->getRequest();
     if ($request->isPost()) {
       $params = $request->getPost();
-      
+
       $keySummaryIndicatorsResult = $this->summaryService->getKeySummaryIndicatorsDetails($params);
       $viewModel = new ViewModel();
       $viewModel->setVariables(array(
@@ -212,7 +213,7 @@ class SummaryController extends AbstractActionController
       return $viewModel;
     }
   }
-  
+
   public function getEidOutcomesAction()
   {
     /** @var \Laminas\Http\Request $request */
@@ -228,7 +229,7 @@ class SummaryController extends AbstractActionController
       return $viewModel;
     }
   }
-  
+
   public function getEidOutcomesByAgeAction()
   {
     /** @var \Laminas\Http\Request $request */
@@ -243,7 +244,7 @@ class SummaryController extends AbstractActionController
       return $viewModel;
     }
   }
-  
+
   public function getEidOutcomesByProvinceAction()
   {
     /** @var \Laminas\Http\Request $request */
@@ -258,7 +259,7 @@ class SummaryController extends AbstractActionController
       return $viewModel;
     }
   }
-  
+
   public function getTatAction()
   {
     /** @var \Laminas\Http\Request $request */
@@ -280,7 +281,7 @@ class SummaryController extends AbstractActionController
         $request = $this->getRequest();
     if ($request->isPost()) {
       $params = $request->getPost();
-      
+
       $file = $this->summaryService->exportIndicatorResultExcel($params);
       $viewModel = new ViewModel();
       $viewModel->setVariables(array('file' => $file))

@@ -33,7 +33,7 @@ class RolesTable extends AbstractTableGateway
                 'role_code' => $params['roleCode'],
                 'status' => $params['status'],
             );
-            
+
             $this->insert($rolesdata);
             return $this->lastInsertValue;
         }
@@ -81,24 +81,18 @@ class RolesTable extends AbstractTableGateway
 
     public function fetchAllRoleDetails($parameters, $acl)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-         */
+
 
         $aColumns = array('role_name', 'role_code', 'status');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -110,12 +104,7 @@ class RolesTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -154,10 +143,7 @@ class RolesTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-         */
+
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('r' => 'dash_user_roles'));
@@ -223,12 +209,12 @@ class RolesTable extends AbstractTableGateway
 
     public function mapRolesPrivileges($params)
     {
-        try {           
+        try {
             $roleCode = $params['roleCode'];
             $sql = new Sql($this->adapter);
             $dbAdapter = $this->adapter;
 
-            // Get or insert role    
+            // Get or insert role
             $query = $sql->select()->from('dash_user_roles')->where(array('role_code' => $roleCode));
             $roleQueryStr = $sql->buildSqlString($query); // Get the string of the Sql, instead of the Select-instance
             $role = $dbAdapter->query($roleQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -246,7 +232,7 @@ class RolesTable extends AbstractTableGateway
                 $statement = $sql->prepareStatementForSqlObject($delete);
                 $statement->execute();
             }
-            
+
             foreach ($params['resource'] as $resourceName => $privileges) {
                 foreach ($privileges as $key => $privilege) {
                     if ($privilege === 'allow') {
@@ -256,7 +242,7 @@ class RolesTable extends AbstractTableGateway
                         $privilegeId = $privilegeRes[0]['privilege_id'];
 
                         $sql = new Sql($dbAdapter);
-                       
+
                         $insert = $sql->insert('dash_roles_privileges_map');
                         $data = array(
                             'role_id' => $roleId,
@@ -269,7 +255,7 @@ class RolesTable extends AbstractTableGateway
                 }
             }
         } catch (\Exception $exc) {
-      
+
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
         }

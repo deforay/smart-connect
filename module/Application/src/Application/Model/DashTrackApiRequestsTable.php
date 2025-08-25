@@ -3,14 +3,13 @@
 namespace Application\Model;
 
 use Exception;
-use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
-use Laminas\Db\TableGateway\AbstractTableGateway;
-use \Application\Service\CommonService;
-use Laminas\Json\Expr;
 use Laminas\Session\Container;
+use Laminas\Db\Adapter\Adapter;
+use \Application\Service\CommonService;
+use \Application\Model\BaseTableGateway;
 
-class DashTrackApiRequestsTable extends AbstractTableGateway
+class DashTrackApiRequestsTable extends BaseTableGateway
 {
 
     public $table = 'dash_track_api_requests';
@@ -21,35 +20,29 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
         $this->adapter = $adapter;
     }
 
-    public function fetchSyncHistoryType(){
+    public function fetchSyncHistoryType()
+    {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('a' => "dash_track_api_requests"))->columns(array('request_type'))->group('request_type');
         $sQueryStr = $sql->buildSqlString($sQuery);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-
     }
     public function fetchAllDashTrackApiRequestsByGrid($parameters, $acl)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-         */
 
-         $aColumns = array('transaction_id', 'number_of_records', 'request_type', 'test_type', "api_url", "DATE_FORMAT(requested_on,'%d-%b-%Y')");
-         $orderColumns = array('transaction_id', 'number_of_records', 'request_type', 'test_type', 'api_url', 'requested_on');
 
-        /*
-         * Paging
-         */
+        $aColumns = array('transaction_id', 'number_of_records', 'request_type', 'test_type', "api_url", "DATE_FORMAT(requested_on,'%d-%b-%Y')");
+        $orderColumns = array('transaction_id', 'number_of_records', 'request_type', 'test_type', 'api_url', 'requested_on');
+
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -61,12 +54,7 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -105,10 +93,7 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-         */
+
         $common = new CommonService();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -138,7 +123,7 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
             $sQuery->limit($sLimit);
             $sQuery->offset($sOffset);
         }
-        
+
         // Get the string of the Sql, instead of the Select-instance
         $sQueryStr = $sql->buildSqlString($sQuery);
         // echo $sQueryStr;die;
@@ -223,7 +208,8 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
         }
     }
 
-    public function fetchSyncHistoryById($id){
-        return $this->select(array('api_track_id' => $id))->current();
+    public function fetchSyncHistoryById($id)
+    {
+        return $this->selectOne(array('api_track_id' => $id));
     }
 }

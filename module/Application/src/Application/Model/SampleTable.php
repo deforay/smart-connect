@@ -523,97 +523,90 @@ class SampleTable extends AbstractTableGateway
     // TAT FUNCTION
     public function fetchLabTurnAroundTime($params)
     {
-
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = [];
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
+        $skipDays = $this->config['defaults']['tat-skipdays'] ?? 365;
 
+        $facilityIdList = [];
 
-        $facilityIdList = null;
+        // --- Facility Filter ---
+        if (!empty($params['facilityId'])) {
+            $fQuery = $sql->select()
+                ->from(['f' => 'facility_details'])
+                ->columns(['facility_id'])
+                ->where([
+                    'f.facility_type' => 2,
+                    'f.status' => 'active',
+                    new Expression('f.facility_id IN (' . $params['facilityId'] . ')')
+                ]);
 
-        // FILTER :: Checking if the facility filter is set
-        // else if the user is mapped to one or more facilities
-
-        if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-            $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
-                ->where('f.facility_type = 2 AND f.status="active"');
-            $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
-            $fQueryStr = $sql->buildSqlString($fQuery);
-            $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $facilityResult = $dbAdapter->query($sql->buildSqlString($fQuery), $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
         } elseif (!empty($this->mappedFacilities)) {
-            $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
-                //->where('f.facility_type = 2 AND f.status="active"')
-                ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
-            $fQueryStr = $sql->buildSqlString($fQuery);
-            $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $fQuery = $sql->select()
+                ->from(['f' => 'facility_details'])
+                ->columns(['facility_id'])
+                ->where(new Expression('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")'));
+
+            $facilityResult = $dbAdapter->query($sql->buildSqlString($fQuery), $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
         }
 
-        // FILTER :: Checking if the date range filter is set (which should be always set)
+        // --- Date Filter ---
+        if (!empty($params['fromDate']) && !empty($params['toDate'])) {
+            $today = date("Y-m-d");
+            $startMonth = date("Y-m-01", strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date("Y-m-t", strtotime(str_replace(' ', '-', $params['toDate'])));
 
-        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $monthyear = date("Y-m-d");
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
-            if (strtotime($startMonth) >= strtotime($monthyear)) {
+            // Prevent future dates
+            if (strtotime($startMonth) >= strtotime($today)) {
                 $startMonth = $endMonth = date("Y-m-01", strtotime("-2 months"));
-            } elseif (strtotime($endMonth) >= strtotime($monthyear)) {
-                //$endMonth = date("Y-m-t", strtotime("-2 months"));
             }
-
-
-            // $startMonth = date("Y-m", strtotime(trim($startMonth))) . "-01";
-            // $endMonth = date("Y-m", strtotime(trim($endMonth))) . "-31";
 
             $query = $sql->select()->from(['vl' => $this->table])
-                ->columns(
-                    [
-                        "totalSamples" => new Expression('COUNT(vl_sample_id)'),
-                        "monthDate" => new Expression("DATE_FORMAT(DATE(vl.sample_tested_datetime), '%b-%Y')"),
-                        "AvgCollectedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
-                        "AvgCollectedReceived" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_received_at_lab_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
-                        "AvgReceivedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_received_at_lab_datetime))) AS DECIMAL (10,2))'),
-                        "AvgCollectedPrinted" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.result_printed_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))')
-                    ]
-                );
+                ->columns([
+                    "totalSamples"         => new Expression('COUNT(vl_sample_id)'),
+                    "monthDate"            => new Expression("DATE_FORMAT(DATE(vl.sample_tested_datetime), '%b-%Y')"),
+                    "AvgCollectedTested"   => new Expression('ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, vl.sample_collection_date, vl.sample_tested_datetime), 0)), 2)'),
+                    "AvgCollectedReceived" => new Expression('ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, vl.sample_collection_date, vl.sample_received_at_lab_datetime), 0)), 2)'),
+                    "AvgReceivedTested"    => new Expression('ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, vl.sample_received_at_lab_datetime, vl.sample_tested_datetime), 0)), 2)'),
+                    "AvgCollectedPrinted"  => new Expression('ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, vl.sample_collection_date, vl.result_printed_datetime), 0)), 2)')
+                ]);
 
-            $query = $query->where("DATE(vl.sample_tested_datetime) BETWEEN '$startMonth' AND '$endMonth'");
-            $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 365;
-            $query = $query->where("
-                                (DATEDIFF(sample_tested_datetime,sample_collection_date) < '$skipDays' AND
-                                DATEDIFF(sample_tested_datetime,sample_collection_date) >= 0)");
+            // Add conditions one at a time
+            $query->where->addPredicate(new WhereExpression("DATE(vl.sample_tested_datetime) BETWEEN '$startMonth' AND '$endMonth'"));
 
+            $skipDays = ($skipDays > 0) ? $skipDays : 365;
+            $query->where->addPredicate(new WhereExpression("DATEDIFF(sample_tested_datetime, sample_collection_date) BETWEEN 0 AND $skipDays"));
 
-            if ($facilityIdList != null) {
-                $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+            if (!empty($facilityIdList)) {
+                $query->where->addPredicate(new WhereExpression('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")'));
             }
-            $query = $query->group('monthDate');
 
+            $query = $query->group('monthDate');
             $query = $query->order('sample_tested_datetime ASC');
             $queryStr = $sql->buildSqlString($query);
 
             $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
-            $j = 0;
 
-            foreach ($sampleResult as $sRow) {
-
-                if ($sRow["monthDate"] == null) {
+            foreach ($sampleResult as $index => $sRow) {
+                if (empty($sRow["monthDate"])) {
                     continue;
                 }
 
-                $result['totalSamples'][$j] = (isset($sRow["totalSamples"]) && $sRow["totalSamples"] > 0 && $sRow["totalSamples"] != null) ? $sRow["totalSamples"] : 'null';
-                $result['tatCollectedTested'][$j] = (isset($sRow["AvgCollectedTested"]) && $sRow["AvgCollectedTested"] > 0 && $sRow["AvgCollectedTested"] != null) ? round($sRow["AvgCollectedTested"], 2) : 'null';
-                $result['tatCollectedReceived'][$j] = (isset($sRow["AvgCollectedReceived"]) && $sRow["AvgCollectedReceived"] > 0 && $sRow["AvgCollectedReceived"] != null) ? round($sRow["AvgCollectedReceived"], 2) : 'null';
-                $result['tatReceivedTested'][$j] = (isset($sRow["AvgReceivedTested"]) && $sRow["AvgReceivedTested"] > 0 && $sRow["AvgReceivedTested"] != null) ? round($sRow["AvgReceivedTested"], 2) : 'null';
-                $result['tatCollectedPrinted'][$j] = (isset($sRow["AvgCollectedPrinted"]) && $sRow["AvgCollectedPrinted"] > 0 && $sRow["AvgCollectedPrinted"] != null) ? round($sRow["AvgCollectedPrinted"], 2) : 'null';
-                $result['date'][$j] = $sRow["monthDate"];
-                $j++;
+                $result['totalSamples'][$index]       = $sRow["totalSamples"] ?? 'null';
+                $result['tatCollectedTested'][$index] = $sRow["AvgCollectedTested"] ?? 'null';
+                $result['tatCollectedReceived'][$index] = $sRow["AvgCollectedReceived"] ?? 'null';
+                $result['tatReceivedTested'][$index]  = $sRow["AvgReceivedTested"] ?? 'null';
+                $result['tatCollectedPrinted'][$index] = $sRow["AvgCollectedPrinted"] ?? 'null';
+                $result['date'][$index]               = $sRow["monthDate"];
             }
         }
+
         return $result;
     }
+
 
     public function fetchSampleTestedResultAgeGroupDetails($params)
     {
@@ -2136,24 +2129,18 @@ class SampleTable extends AbstractTableGateway
     {
         $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('sample_code', 'facility_name', 'DATE_FORMAT(sample_collection_date,"%d-%b-%Y")', 'rejection_reason_name', 'DATE_FORMAT(sample_tested_datetime,"%d-%b-%Y")', 'result');
         $orderColumns = array('sample_code', 'facility_name', 'sample_collection_date', 'rejection_reason_name', 'sample_tested_datetime', 'result');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -2165,12 +2152,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -2209,10 +2191,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
         $startDate = '';
         $endDate = '';
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
@@ -3153,24 +3132,18 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
 
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('DATE_FORMAT(sample_collection_date,"%d-%b-%Y")', 'sample_name', 'facility_name');
         $orderColumns = array('sample_collection_date', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'sample_name', 'facility_name');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -3182,12 +3155,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -3226,10 +3194,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
@@ -3410,22 +3375,16 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
 
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('facility_name', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id');
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -3437,12 +3396,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -3481,10 +3435,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -3661,23 +3612,17 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
 
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array("DATE_FORMAT(sample_collection_date,'%b-%Y')");
         $orderColumns = array('sample_collection_date', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id');
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -3689,12 +3634,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -3733,10 +3673,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -4334,23 +4271,17 @@ class SampleTable extends AbstractTableGateway
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('sample_code', "DATE_FORMAT(sample_collection_date,'%d-%b-%Y')", 'f.facility_code', 'f.facility_name', 'sample_name', 'l.facility_code', 'l.facility_name', "DATE_FORMAT(sample_received_at_lab_datetime,'%d-%b-%Y')");
         $orderColumns = array('sample_code', 'sample_collection_date', 'f.facility_code', 'sample_name', 'l.facility_name', 'sample_received_at_lab_datetime');
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -4362,12 +4293,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -4406,10 +4332,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
         if (isset($parameters['daterange']) && trim($parameters['daterange']) != '') {
             $splitDate = explode('to', $parameters['daterange']);
         }
@@ -4660,24 +4583,18 @@ class SampleTable extends AbstractTableGateway
     public function fetchAllSamples($parameters, $acl)
     {
         $queryContainer = new Container('query');
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('sample_code', 'DATE_FORMAT(sample_collection_date,"%d-%b-%Y")', 'batch_code', 'patient_art_no', 'patient_first_name', 'patient_last_name', 'facility_name', 'f_p_l_d.geo_name', 'f_d_l_d.geo_name', 'sample_name', 'result', 'status_name');
         $orderColumns = array('vl_sample_id', 'sample_code', 'sample_collection_date', 'batch_code', 'patient_art_no', 'patient_first_name', 'facility_name', 'f_p_l_d.geo_name', 'f_d_l_d.geo_name', 'sample_name', 'result', 'status_name');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -4689,12 +4606,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -4733,10 +4645,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
         $startDate = '';
         $endDate = '';
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
@@ -4961,24 +4870,18 @@ class SampleTable extends AbstractTableGateway
     {
 
 
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'total_dbs_percentage', 'total_plasma_percentage', 'total_others_percentage');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -4990,12 +4893,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -5036,10 +4934,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -5149,24 +5044,18 @@ class SampleTable extends AbstractTableGateway
     {
 
 
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'total_dbs_percentage', 'total_plasma_percentage', 'total_others_percentage');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -5178,12 +5067,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -5224,10 +5108,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -5338,24 +5219,18 @@ class SampleTable extends AbstractTableGateway
 
 
 
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name');
         $orderColumns = array('facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'total_dbs_percentage', 'total_plasma_percentage', 'total_others_percentage');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -5367,12 +5242,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -5413,10 +5283,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -5586,24 +5453,18 @@ class SampleTable extends AbstractTableGateway
 
     public function fetchAllSuppressionRateByProvince($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'total_samples_valid', 'total_suppressed_samples', 'total_not_suppressed_samples', 'total_samples_rejected', 'suppression_rate');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -5615,12 +5476,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -5661,10 +5517,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -5767,24 +5620,18 @@ class SampleTable extends AbstractTableGateway
     }
     public function fetchAllSuppressionRateByDistrict($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'total_samples_valid', 'total_suppressed_samples', 'total_not_suppressed_samples', 'total_samples_rejected', 'suppression_rate');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -5796,12 +5643,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -5842,10 +5684,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -5947,27 +5786,21 @@ class SampleTable extends AbstractTableGateway
 
     public function fetchAllSuppressionRateByFacility($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
 
         $queryContainer = new Container('query');
 
         $aColumns = array('facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name', 'total_samples_valid', 'total_suppressed_samples', 'total_not_suppressed_samples', 'total_samples_rejected', 'suppression_rate');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -5979,12 +5812,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -6025,10 +5853,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -6230,24 +6055,18 @@ class SampleTable extends AbstractTableGateway
 
     public function fetchAllSamplesRejectedByDistrict($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -6259,12 +6078,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -6305,10 +6119,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -6400,24 +6211,18 @@ class SampleTable extends AbstractTableGateway
     }
     public function fecthAllSamplesRejectedByProvince($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -6429,12 +6234,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -6475,10 +6275,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -6571,24 +6368,18 @@ class SampleTable extends AbstractTableGateway
 
     public function fecthAllSamplesRejectedByFacility($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('f.facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name');
         $orderColumns = array('f_d_l_dp.geo_name', 'f_d_l_d.geo_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -6600,12 +6391,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -6646,10 +6432,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -6823,24 +6606,18 @@ class SampleTable extends AbstractTableGateway
 
     public function fetchRegimenGroupSamplesDetails($parameters)
     {
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
+
         $aColumns = array('current_regimen');
         $orderColumns = array('current_regimen', 'total_samples_received', 'total_samples_tested', 'total_samples_valid', 'total_suppressed_samples', 'suppression_rate', 'percentage_of_samples');
 
-        /*
-         * Paging
-         */
+
         $sLimit = "";
         if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
             $sOffset = $parameters['iDisplayStart'];
             $sLimit = $parameters['iDisplayLength'];
         }
 
-        /*
-         * Ordering
-         */
+
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
@@ -6852,12 +6629,7 @@ class SampleTable extends AbstractTableGateway
             $sOrder = substr_replace($sOrder, "", -1);
         }
 
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
+
 
         $sWhere = "";
         if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
@@ -6898,10 +6670,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-        */
+
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -7533,161 +7302,152 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
-        $squery = $sql->select()->from(array('vl' => $this->table))
-            ->columns(
-                array(
-                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
-                    "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
-                )
-            )
-            ->join('facility_details', 'facility_details.facility_id = vl.facility_id', array())
-            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')
-            ->where(
-                array(
-                    "(sample_tested_datetime BETWEEN '$startDate' AND '$endDate')",
-                    "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')",
-                    //"facility_details.facility_state = '$provinceID'",
-                )
-            );
+        $skipDays = $this->config['defaults']['tat-skipdays'] ?? 365;
 
-        // $squery = $squery->where("
-        //                 (vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
-        //                 AND (vl.sample_registered_at_lab is not null AND vl.sample_registered_at_lab not like '' AND DATE(vl.sample_registered_at_lab) !='1970-01-01' AND DATE(vl.sample_registered_at_lab) !='0000-00-00')
-        //                 AND (vl.sample_received_at_lab_datetime is not null AND vl.sample_received_at_lab_datetime not like '' AND DATE(vl.sample_received_at_lab_datetime) !='1970-01-01' AND DATE(vl.sample_received_at_lab_datetime) !='0000-00-00')
-        //                 AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime not like '' AND DATE(vl.result_approved_datetime) !='1970-01-01' AND DATE(vl.result_approved_datetime) !='0000-00-00')"
-        //             );
+        $squery = $sql->select()
+            ->from(['vl' => $this->table])
+            ->columns([
+                "Collection_Receive"   => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, sample_received_at_lab_datetime), 0)), 2)"),
+                "Receive_Register"     => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_received_at_lab_datetime, sample_registered_at_lab), 0)), 2)"),
+                "Register_Analysis"    => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_registered_at_lab, sample_tested_datetime), 0)), 2)"),
+                "Analysis_Authorise"   => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_tested_datetime, result_approved_datetime), 0)), 2)"),
+                "total"                => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, result_approved_datetime), 0)), 2)")
+            ])
+            ->join('facility_details', 'facility_details.facility_id = vl.facility_id', [])
+            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id', [])
+            ->where([
+                new Expression("sample_tested_datetime BETWEEN '$startDate' AND '$endDate'"),
+                new Expression("vl.sample_collection_date IS NOT NULL AND vl.sample_collection_date != '' AND vl.sample_collection_date NOT IN ('1970-01-01', '0000-00-00')")
+            ]);
+
         if ($skipDays > 0) {
-            $squery = $squery->where('DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < ' . $skipDays . ' AND
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) >= 0 AND
-
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) < ' . $skipDays . ' AND
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) >= 0 AND
-
-                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime) < ' . $skipDays . ' AND
-                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
-
-                DATEDIFF(result_approved_datetime,sample_tested_datetime) < ' . $skipDays . ' AND
-                DATEDIFF(result_approved_datetime,sample_tested_datetime) >= 0');
+            $squery->where([
+                new Expression("DATEDIFF(sample_received_at_lab_datetime, sample_collection_date) BETWEEN 0 AND $skipDays"),
+                new Expression("DATEDIFF(sample_registered_at_lab, sample_received_at_lab_datetime) BETWEEN 0 AND $skipDays"),
+                new Expression("DATEDIFF(sample_tested_datetime, sample_registered_at_lab) BETWEEN 0 AND $skipDays"),
+                new Expression("DATEDIFF(result_approved_datetime, sample_tested_datetime) BETWEEN 0 AND $skipDays")
+            ]);
         }
 
-        if (isset($labs) && !empty($labs)) {
-            $squery = $squery->where('vl.lab_id IN (' . implode(',', $labs) . ')');
+        if (!empty($labs)) {
+            $labList = implode(',', array_map('intval', $labs));
+            $squery->where(new Expression("vl.lab_id IN ($labList)"));
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-            $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            if (!empty($mappedFacilities)) {
+                $quoted = implode('", "', array_map('addslashes', $mappedFacilities));
+                $squery->where(new Expression('vl.lab_id IN ("' . $quoted . '")'));
+            }
         }
-        $squery = $squery->group(array('geo_id'));
+
+        $squery->group('geo_id');
+
         $sQueryStr = $sql->buildSqlString($squery);
-        //echo $sQueryStr;die;
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
         return $sResult;
     }
+
 
     public function getTATbyDistrict($labs, $startDate, $endDate)
     {
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
-        $squery = $sql->select()->from(array('vl' => $this->table))
-            ->columns(
-                array(
-                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
-                    "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
-                )
-            )
-            ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
-            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')
-            ->where(
-                array(
-                    "(sample_tested_datetime BETWEEN '$startDate' AND '$endDate')",
-                    "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')",
-                    // "facility_details.facility_district = '$districtID'"
-                )
-            );
+        $skipDays = $this->config['defaults']['tat-skipdays'] ?? 365;
+
+        $squery = $sql->select()
+            ->from(['vl' => $this->table])
+            ->columns([
+                "Collection_Receive"  => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, sample_received_at_lab_datetime), 0)), 2)"),
+                "Receive_Register"    => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_received_at_lab_datetime, sample_registered_at_lab), 0)), 2)"),
+                "Register_Analysis"   => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_registered_at_lab, sample_tested_datetime), 0)), 2)"),
+                "Analysis_Authorise"  => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_tested_datetime, result_approved_datetime), 0)), 2)"),
+                "total"               => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, result_approved_datetime), 0)), 2)")
+            ])
+            ->join('facility_details', 'facility_details.facility_id = vl.facility_id', [])
+            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id', [])
+            ->where([
+                new Expression("sample_tested_datetime BETWEEN '$startDate' AND '$endDate'"),
+                new Expression("vl.sample_collection_date IS NOT NULL AND vl.sample_collection_date != '' AND vl.sample_collection_date NOT IN ('1970-01-01', '0000-00-00')")
+            ]);
+
         if ($skipDays > 0) {
-            $squery = $squery->where("
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < $skipDays AND
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)>=0 AND
-
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) < $skipDays AND
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)>=0 AND
-
-                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime) < $skipDays AND
-                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
-
-                DATEDIFF(result_approved_datetime,sample_tested_datetime) < $skipDays AND
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0");
+            $squery->where([
+                new Expression("DATEDIFF(sample_received_at_lab_datetime, sample_collection_date) BETWEEN 0 AND $skipDays"),
+                new Expression("DATEDIFF(sample_registered_at_lab, sample_received_at_lab_datetime) BETWEEN 0 AND $skipDays"),
+                new Expression("DATEDIFF(sample_tested_datetime, sample_registered_at_lab) BETWEEN 0 AND $skipDays"),
+                new Expression("DATEDIFF(result_approved_datetime, sample_tested_datetime) BETWEEN 0 AND $skipDays")
+            ]);
         }
 
-        if (isset($labs) && !empty($labs)) {
-            $squery = $squery->where('vl.lab_id IN (' . implode(',', $labs) . ')');
+        if (!empty($labs)) {
+            $labList = implode(',', array_map('intval', $labs));
+            $squery->where(new Expression("vl.lab_id IN ($labList)"));
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-            $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            if (!empty($mappedFacilities)) {
+                $quoted = implode('", "', array_map('addslashes', $mappedFacilities));
+                $squery->where(new Expression('vl.lab_id IN ("' . $quoted . '")'));
+            }
         }
-        $squery = $squery->group(array('geo_id'));
+
+        $squery->group('facility_details.facility_district');
+
         $sQueryStr = $sql->buildSqlString($squery);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
+
 
     public function getTATbyClinic($labs, $startDate, $endDate)
     {
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
-        $squery = $sql->select()->from(array('vl' => $this->table))
-            ->columns(
-                array(
-                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
-                    "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
-                )
-            )
-            ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
-            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')
-            ->where(
-                array(
-                    "(sample_tested_datetime BETWEEN '$startDate' AND '$endDate')",
-                    "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')",
-                    // "vl.facility_id = '$clinicID'"
-                )
-            );
+        $skipDays = $this->config['defaults']['tat-skipdays'] ?? 365;
+
+        $squery = $sql->select()
+            ->from(['vl' => $this->table])
+            ->columns([
+                "Collection_Receive"  => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, sample_received_at_lab_datetime), 0)), 2)"),
+                "Receive_Register"    => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_received_at_lab_datetime, sample_registered_at_lab), 0)), 2)"),
+                "Register_Analysis"   => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_registered_at_lab, sample_tested_datetime), 0)), 2)"),
+                "Analysis_Authorise"  => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_tested_datetime, result_approved_datetime), 0)), 2)"),
+                "total"               => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, result_approved_datetime), 0)), 2)")
+            ])
+            ->join('facility_details', 'facility_details.facility_id = vl.facility_id', [])
+            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id', [])
+            ->where([
+                new Expression("sample_tested_datetime BETWEEN '$startDate' AND '$endDate'"),
+                new Expression("vl.sample_collection_date IS NOT NULL AND vl.sample_collection_date != '' AND vl.sample_collection_date NOT IN ('1970-01-01', '0000-00-00')")
+            ]);
+
         if ($skipDays > 0) {
-            $squery = $squery->where("
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < $skipDays AND
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) >= 0 AND
-
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) < $skipDays AND
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)>=0 AND
-
-                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime) < $skipDays AND
-                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
-
-                DATEDIFF(result_approved_datetime,sample_tested_datetime) < $skipDays AND
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)>= 0");
+            $squery->where([
+                new Expression("DATEDIFF(sample_received_at_lab_datetime, sample_collection_date) BETWEEN 0 AND $skipDays"),
+                new Expression("DATEDIFF(sample_registered_at_lab, sample_received_at_lab_datetime) BETWEEN 0 AND $skipDays"),
+                new Expression("DATEDIFF(sample_tested_datetime, sample_registered_at_lab) BETWEEN 0 AND $skipDays"),
+                new Expression("DATEDIFF(result_approved_datetime, sample_tested_datetime) BETWEEN 0 AND $skipDays")
+            ]);
         }
 
-        if (isset($labs) && !empty($labs)) {
-            $squery = $squery->where('vl.lab_id IN (' . implode(',', $labs) . ')');
+        if (!empty($labs)) {
+            $labList = implode(',', array_map('intval', $labs));
+            $squery->where(new Expression("vl.lab_id IN ($labList)"));
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-            $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            if (!empty($mappedFacilities)) {
+                $quoted = implode('", "', array_map('addslashes', $mappedFacilities));
+                $squery->where(new Expression('vl.lab_id IN ("' . $quoted . '")'));
+            }
         }
-        $squery = $squery->group(array('geo_id'));
+
+        $squery->group('vl.facility_id');
+
         $sQueryStr = $sql->buildSqlString($squery);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
+
 
     /////////////////////////////////////////////
     /////////*** Turnaround Time Page ***////////
