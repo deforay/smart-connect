@@ -3,10 +3,11 @@
 namespace Api\Controller;
 
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\View\Model\JsonModel;
 
 class FacilityController extends AbstractRestfulController
 {
+    use JsonResponseTrait;
+
     private $facilityService = null;
 
     public function __construct($facilityService)
@@ -21,6 +22,6 @@ class FacilityController extends AbstractRestfulController
     public function create($params)
     {
         $response = $this->facilityService->getAllFacilitiesInApi($params);
-        return new JsonModel($response);
+        return $this->jsonResponse($response);
     }
 }

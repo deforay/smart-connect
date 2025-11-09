@@ -2,12 +2,12 @@
 
 namespace Api\Controller;
 
-use Laminas\View\Model\JsonModel;
 use Application\Service\CommonService;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 
 class VlsmMetadataController extends AbstractRestfulController
 {
+    use JsonResponseTrait;
 
     private CommonService $commonService;
 
@@ -26,6 +26,6 @@ class VlsmMetadataController extends AbstractRestfulController
         CommonService::parseMultipartFormData(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference");
 
         $response = $this->commonService->saveVlsmMetadataFromAPI($params);
-        return new JsonModel($response);
+        return $this->jsonResponse($response);
     }
 }

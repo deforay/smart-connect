@@ -26,3 +26,4 @@ rector.php
 .gitignore
 config/autoload/custom.global.php
 config/development.config.php
+snyk_rules.instructions.md

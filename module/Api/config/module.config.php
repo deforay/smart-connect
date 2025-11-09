@@ -3,6 +3,15 @@
 return array(
     'router' => array(
         'routes' => array(
+            'api-health' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/api/health',
+                    'defaults' => array(
+                        'controller' => 'Api\Controller\Health',
+                    ),
+                ),
+            ),
             'api-import-viral-load' => array(
                 'type'    => 'segment',
                 'options' => array(

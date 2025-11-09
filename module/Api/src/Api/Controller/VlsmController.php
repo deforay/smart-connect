@@ -3,12 +3,12 @@
 namespace Api\Controller;
 
 use Application\Service\CommonService;
-use Laminas\View\Model\JsonModel;
 use Application\Service\SampleService;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 
 class VlsmController extends AbstractRestfulController
 {
+    use JsonResponseTrait;
 
     public SampleService $sampleService;
 
@@ -27,15 +27,8 @@ class VlsmController extends AbstractRestfulController
         // Ensure to parse raw input data if $_POST and $_FILES are empty
         CommonService::parseMultipartFormData(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl");
 
-        if (!isset($params['api-version'])) {
-            $params['api-version'] = 'v1';
-        }
-        if ($params['api-version'] == 'v1') {
-            $response = $this->sampleService->saveFileFromVlsmAPIV1();
-        } elseif ($params['api-version'] == 'v2') {
-            $response = $this->sampleService->saveFileFromVlsmAPIV2();
-        }
+        $response = $this->sampleService->saveFileFromVlsmAPIV2();
 
-        return new JsonModel($response);
+        return $this->jsonResponse($response);
     }
 }

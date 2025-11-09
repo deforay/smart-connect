@@ -2,11 +2,12 @@
 
 namespace Api\Controller;
 
+use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\View\Model\JsonModel;
 
 class ReceiveEidDataController extends AbstractRestfulController
 {
+    use JsonResponseTrait;
 
     private $sampleService = null;
 
@@ -17,16 +18,16 @@ class ReceiveEidDataController extends AbstractRestfulController
 
     public function getList()
     {
-        return array(
+        return $this->jsonResponse(array(
             'status'    => 'fail',
             'message'   => 'Invalid Request',
-        );
+        ), Response::STATUS_CODE_400);
     }
     public function create($params)
     {
         // \Zend\Debug\Debug::dump($params);die;
         $params = file_get_contents('php://input');
         $response = $this->sampleService->saveEidDataFromAPI($params);
-        return new JsonModel($response);
+        return $this->jsonResponse($response);
     }
 }

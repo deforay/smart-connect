@@ -2,12 +2,13 @@
 
 namespace Api\Controller;
 
-use Laminas\View\Model\JsonModel;
 use Application\Service\CommonService;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 
 class VlsmEidController extends AbstractRestfulController
 {
+    use JsonResponseTrait;
+
     public \Eid\Service\EidSampleService $eidSampleService;
 
     public function __construct($eidSampleService)
@@ -35,6 +36,6 @@ class VlsmEidController extends AbstractRestfulController
         }
 
 
-        return new JsonModel($response);
+        return $this->jsonResponse($response);
     }
 }

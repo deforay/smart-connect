@@ -3,10 +3,10 @@
 namespace Api\Controller;
 
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\View\Model\JsonModel;
 
 class UserController extends AbstractRestfulController
 {
+    use JsonResponseTrait;
     private $userService = null;
 
     public function __construct($userService)
@@ -31,6 +31,6 @@ class UserController extends AbstractRestfulController
             $response['message'] = 'Invalid or Missing Query Params';
         }
 
-        return new JsonModel($response);
+        return $this->jsonResponse($response);
     }
 }

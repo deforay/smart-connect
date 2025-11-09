@@ -2,12 +2,13 @@
 
 namespace Api\Controller;
 
-use Laminas\View\Model\JsonModel;
 use Application\Service\CommonService;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 
 class VlsmCovid19Controller extends AbstractRestfulController
 {
+    use JsonResponseTrait;
+
     private $covid19SampleService = null;
 
     public function __construct($covid19SampleService)
@@ -33,6 +34,6 @@ class VlsmCovid19Controller extends AbstractRestfulController
         }
 
 
-        return new JsonModel($response);
+        return $this->jsonResponse($response);
     }
 }

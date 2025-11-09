@@ -3,14 +3,12 @@
 namespace Api\Controller;
 
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\View\Model\JsonModel;
 
 class ImportViralLoadController extends AbstractRestfulController
 {
+	use JsonResponseTrait;
 
-	public function __construct()
-	{
-	}
+	public function __construct() {}
 
 	public function getList()
 	{
@@ -24,10 +22,11 @@ class ImportViralLoadController extends AbstractRestfulController
 			if (!file_exists($fileName) && !is_dir($fileName)) {
 				mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "not-import-vl");
 			}
-			if (move_uploaded_file($_FILES["vlFile"]["tmp_name"], $fileName . DIRECTORY_SEPARATOR . $_FILES["vlFile"]["name"])) {
+			$sanitizedFileName = basename($_FILES["vlFile"]["name"]);
+			if (move_uploaded_file($_FILES["vlFile"]["tmp_name"], $fileName . DIRECTORY_SEPARATOR . $sanitizedFileName)) {
 				$response['status'] = 'success';
 			}
 		}
-		return new JsonModel($response);
+		return $this->jsonResponse($response);
 	}
 }

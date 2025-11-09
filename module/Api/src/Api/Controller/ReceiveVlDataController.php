@@ -2,11 +2,12 @@
 
 namespace Api\Controller;
 
+use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\View\Model\JsonModel;
 
 class ReceiveVlDataController extends AbstractRestfulController
 {
+    use JsonResponseTrait;
 
     private $sampleService = null;
 
@@ -17,10 +18,10 @@ class ReceiveVlDataController extends AbstractRestfulController
 
     public function getList()
     {
-        return array(
+        return $this->jsonResponse(array(
             'status'    => 'fail',
             'message'   => 'Invalid Request',
-        );
+        ), Response::STATUS_CODE_400);
     }
     public function create($params)
     {
@@ -28,6 +29,6 @@ class ReceiveVlDataController extends AbstractRestfulController
         // \Zend\Debug\Debug::dump("hi");die;
         $params = file_get_contents('php://input');
         $response = $this->sampleService->saveVLDataFromAPI($params);
-        return new JsonModel($response);
+        return $this->jsonResponse($response);
     }
 }

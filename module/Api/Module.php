@@ -23,6 +23,13 @@ class Module
     {
         return array(
             'factories' => array(
+                'Api\Controller\Health' => new class
+                {
+                    public function __invoke($diContainer)
+                    {
+                        return new \Api\Controller\HealthController();
+                    }
+                },
                 'Api\Controller\VlsmMetadata' => new class
                 {
                     public function __invoke($diContainer)

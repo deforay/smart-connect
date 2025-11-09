@@ -2,11 +2,12 @@
 
 namespace Api\Controller;
 
+use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractRestfulController;
-use Laminas\View\Model\JsonModel;
 
 class ReceiveCovid19DataController extends AbstractRestfulController
 {
+    use JsonResponseTrait;
 
     private $covid19FormService = null;
 
@@ -17,16 +18,16 @@ class ReceiveCovid19DataController extends AbstractRestfulController
 
     public function getList()
     {
-        return array(
+        return $this->jsonResponse(array(
             'status'    => 'fail',
             'message'   => 'Invalid Request',
-        );
+        ), Response::STATUS_CODE_400);
     }
     public function create($params)
     {
         // \Zend\Debug\Debug::dump("hi");die;
         $params = file_get_contents('php://input');
         $response = $this->covid19FormService->saveCovid19DataFromAPI($params);
-        return new JsonModel($response);
+        return $this->jsonResponse($response);
     }
 }
