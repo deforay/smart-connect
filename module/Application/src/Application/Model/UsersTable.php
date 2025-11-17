@@ -6,6 +6,7 @@ use Laminas\Db\Sql\Sql;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use Application\Service\CommonService;
+use Application\Model\BaseTableGateway;
 
 
 class UsersTable extends BaseTableGateway
@@ -170,7 +171,7 @@ class UsersTable extends BaseTableGateway
             return false;
         }
 
-        $verified =  password_verify($password, $hash);
+        $verified = password_verify($password, $hash);
 
         if ($verified) {
             $options = ['cost' => $this->passwordCost];
@@ -468,8 +469,8 @@ class UsersTable extends BaseTableGateway
         } else {
             $this->insert(array(
                 'user_name' => $name,
-                'role'      => 9999,
-                'status'    => 'inactive'
+                'role' => 9999,
+                'status' => 'inactive'
             ));
             return $this->lastInsertValue;
         }

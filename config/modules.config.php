@@ -6,15 +6,8 @@
  * This should be an array of module namespaces used in the application.
  */
 return [
+    'Laminas\Serializer',
     'Laminas\Cache',
-    'Laminas\Mvc\Plugin\FilePrg',
-    'Laminas\Mvc\Plugin\FlashMessenger',
-    'Laminas\Mvc\Plugin\Identity',
-    'Laminas\Mvc\Plugin\Prg',
-    'Laminas\Form',
-    'Laminas\Hydrator',
-    'Laminas\InputFilter',
-    'Laminas\Filter',
     'Laminas\Session',
     'Laminas\Di',
     'Laminas\Mvc\I18n',
@@ -22,7 +15,6 @@ return [
     'Laminas\Db',
     'Laminas\Router',
     'Laminas\Validator',
-    'Laminas\Diactoros',
     'Laminas\Cache\Storage\Adapter\Filesystem',
     'Application',
     'Api',

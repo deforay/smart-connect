@@ -129,10 +129,10 @@ class SampleTable extends AbstractTableGateway
         }
 
         //get received data
-        $receivedQuery = $sql->select()->from(array('vl' => $this->table))
-            ->columns(array('total' => new Expression('COUNT(*)'), 'receivedDate' => new Expression('DATE(sample_collection_date)')))
+        $receivedQuery = $sql->select()->from(['vl' => $this->table])
+            ->columns(['total' => new Expression('COUNT(*)'), 'receivedDate' => new Expression('DATE(sample_collection_date)')])
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
-            ->group(array("receivedDate"));
+            ->group(["receivedDate"]);
         if ($loginContainer->role != 1) {
             $receivedQuery = $receivedQuery->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
@@ -929,7 +929,7 @@ class SampleTable extends AbstractTableGateway
                     $cQueryStr = $sql->buildSqlString($countQuery);
                     $countResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     $result[$i][0] = $countResult['total'] ?? 0;
-                    $result[$i][1] = ucwords($facility['facility_name']);
+                    $result[$i][1] = ($facility['facility_name']);
                     $result[$i][2] = $facility['facility_code'];
                     $i++;
                 }
@@ -1204,7 +1204,7 @@ class SampleTable extends AbstractTableGateway
             foreach ($barResult as $data) {
                 $result['form']['Complete'][$j] = $data['complete'];
                 $result['form']['Incomplete'][$j] = $data['incomplete'];
-                $result['lab'][$j] = ucwords($data['facility_name']);
+                $result['lab'][$j] = ($data['facility_name']);
                 $j++;
             }
         }
@@ -2359,9 +2359,9 @@ class SampleTable extends AbstractTableGateway
             }
             $pdfButtCss = ($aRow['result'] == null || trim($aRow['result']) == "") ? 'display:none' : '';
             $row[] = $aRow['sample_code'];
-            $row[] = ucwords($aRow['facility_name']);
+            $row[] = ($aRow['facility_name']);
             $row[] = $sampleCollectionDate;
-            $row[] = (isset($aRow['rejection_reason_name'])) ? ucwords($aRow['rejection_reason_name']) : '';
+            $row[] = (isset($aRow['rejection_reason_name'])) ? ($aRow['rejection_reason_name']) : '';
             $row[] = $sampleTestedDate;
             $row[] = $aRow['result'];
             $row[] = '<a href="/clinics/test-result-view/' . base64_encode($aRow['vl_sample_id']) . '" class="btn btn-primary btn-xs" target="_blank">' . $viewText . '</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="' . $pdfButtCss . '" onclick="generateResultPDF(' . $aRow['vl_sample_id'] . ');">' . $pdfText . '</a>';
@@ -2641,7 +2641,7 @@ class SampleTable extends AbstractTableGateway
                 $i = 0;
                 foreach ($countResult as $data) {
                     $result[$i][0] = $data['total'];
-                    $result[$i][1] = ucwords($data['facility_name']);
+                    $result[$i][1] = ($data['facility_name']);
                     $result[$i][2] = $data['facility_code'];
                     $i++;
                 }
@@ -2784,7 +2784,7 @@ class SampleTable extends AbstractTableGateway
                     $result['sample']['Suppressed'][$j] = $data['suppressed'];
                     $result['sample']['Not Suppressed'][$j] = $data['not_suppressed'];
                     $result['sample']['Rejected'][$j] = $data['rejected'];
-                    $result['lab'][$j] = ucwords($data['facility_name']);
+                    $result['lab'][$j] = ($data['facility_name']);
                     $j++;
                 }
             }
@@ -3363,8 +3363,8 @@ class SampleTable extends AbstractTableGateway
             $row[] = $aRow['suppressed_samples'];
             $row[] = $aRow['not_suppressed_samples'];
             $row[] = $aRow['rejected_samples'];
-            $row[] = ucwords($aRow['sample_name']);
-            $row[] = ucwords($aRow['facility_name']);
+            $row[] = ($aRow['sample_name']);
+            $row[] = ($aRow['facility_name']);
             $output['aaData'][] = $row;
         }
         return $output;
@@ -3595,7 +3595,7 @@ class SampleTable extends AbstractTableGateway
         //print_r($parameters);die;
         foreach ($rResult as $aRow) {
             $row = [];
-            $row[] = ucwords($aRow['facility_name']);
+            $row[] = ($aRow['facility_name']);
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_tested'];
             $row[] = $aRow['total_samples_pending'];
@@ -4140,7 +4140,7 @@ class SampleTable extends AbstractTableGateway
         $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
         foreach ($countResult as $lab) {
-            $result['lab'][$l] = ucwords($lab['lab_name']);
+            $result['lab'][$l] = ($lab['lab_name']);
             $result['sample']['Results Not Available'][$l] = (isset($lab['total'])) ? $lab['total'] : 0;
             $l++;
         }
@@ -4254,7 +4254,7 @@ class SampleTable extends AbstractTableGateway
         $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
         foreach ($countResult as $facility) {
-            $result['clinic'][$l] = ucwords($facility['clinic_name']);
+            $result['clinic'][$l] = ($facility['clinic_name']);
             $result['sample']['Results Not Available'][$l] = (isset($facility['total'])) ? $facility['total'] : null;
             $l++;
         }
@@ -4472,9 +4472,9 @@ class SampleTable extends AbstractTableGateway
             $row = [];
             $row[] = $aRow['sample_code'];
             $row[] = $displayCollectionDate;
-            $row[] = $aRow['facilityCode'] . ' - ' . ucwords($aRow['facilityName']);
-            $row[] = (isset($aRow['sample_name'])) ? ucwords($aRow['sample_name']) : '';
-            $row[] = (isset($aRow['labName'])) ? ucwords($aRow['labName']) : '';
+            $row[] = $aRow['facilityCode'] . ' - ' . ($aRow['facilityName']);
+            $row[] = (isset($aRow['sample_name'])) ? ($aRow['sample_name']) : '';
+            $row[] = (isset($aRow['labName'])) ? ($aRow['labName']) : '';
             $row[] = $displayReceivedDate;
             $output['aaData'][] = $row;
         }
@@ -4735,13 +4735,13 @@ class SampleTable extends AbstractTableGateway
             $row[] = $sampleCollectionDate;
             $row[] = (isset($aRow['batch_code'])) ? $aRow['batch_code'] : '';
             $row[] = $aRow['patient_art_no'];
-            $row[] = ucwords($aRow['patient_first_name'] . ' ' . $aRow['patient_last_name']);
-            $row[] = (isset($aRow['facility_name'])) ? ucwords($aRow['facility_name']) : '';
-            $row[] = (isset($aRow['province'])) ? ucwords($aRow['province']) : '';
-            $row[] = (isset($aRow['district'])) ? ucwords($aRow['district']) : '';
-            $row[] = (isset($aRow['sample_name'])) ? ucwords($aRow['sample_name']) : '';
+            $row[] = ($aRow['patient_first_name'] . ' ' . $aRow['patient_last_name']);
+            $row[] = (isset($aRow['facility_name'])) ? ($aRow['facility_name']) : '';
+            $row[] = (isset($aRow['province'])) ? ($aRow['province']) : '';
+            $row[] = (isset($aRow['district'])) ? ($aRow['district']) : '';
+            $row[] = (isset($aRow['sample_name'])) ? ($aRow['sample_name']) : '';
             $row[] = $aRow['result'];
-            $row[] = ucwords($aRow['status_name']);
+            $row[] = ($aRow['status_name']);
             if ($update) {
                 $row[] = '<a href="/data-management/duplicate-data/edit/' . base64_encode($aRow['vl_sample_id']) . '" class="btn green" title="Edit">' . $buttText . '</a>';
             }
@@ -5379,9 +5379,9 @@ class SampleTable extends AbstractTableGateway
 
         foreach ($rResult as $aRow) {
             $row = [];
-            $row[] = "<span style='white-space:nowrap !important;' >" . ucwords($aRow['facility_name']) . "</span>";
-            $row[] = ucwords($aRow['province']);
-            $row[] = ucwords($aRow['district']);
+            $row[] = "<span style='white-space:nowrap !important;' >" . ($aRow['facility_name']) . "</span>";
+            $row[] = ($aRow['province']);
+            $row[] = ($aRow['district']);
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_tested'];
             $row[] = $aRow['total_samples_pending'];
@@ -5607,7 +5607,7 @@ class SampleTable extends AbstractTableGateway
         );
         foreach ($rResult as $aRow) {
             $row = [];
-            $row[] = ucwords($aRow['province']);
+            $row[] = ($aRow['province']);
             $row[] = $aRow['total_samples_valid'];
             $row[] = $aRow['total_suppressed_samples'];
             $row[] = $aRow['total_not_suppressed_samples'];
@@ -5772,7 +5772,7 @@ class SampleTable extends AbstractTableGateway
         );
         foreach ($rResult as $aRow) {
             $row = [];
-            $row[] = ucwords($aRow['district']);
+            $row[] = ($aRow['district']);
             $row[] = $aRow['total_samples_valid'];
             $row[] = $aRow['total_suppressed_samples'];
             $row[] = $aRow['total_not_suppressed_samples'];
@@ -5946,9 +5946,9 @@ class SampleTable extends AbstractTableGateway
         );
         foreach ($rResult as $aRow) {
             $row = [];
-            $row[] = "<span style='white-space:nowrap !important;' >" . ucwords($aRow['facility_name']) . "</span>";
-            $row[] = ucwords($aRow['province']);
-            $row[] = ucwords($aRow['district']);
+            $row[] = "<span style='white-space:nowrap !important;' >" . ($aRow['facility_name']) . "</span>";
+            $row[] = ($aRow['province']);
+            $row[] = ($aRow['district']);
             $row[] = $aRow['total_samples_valid'];
             $row[] = $aRow['total_suppressed_samples'];
             $row[] = $aRow['total_not_suppressed_samples'];
@@ -6043,7 +6043,7 @@ class SampleTable extends AbstractTableGateway
                 }
                 $rejectionQueryStr = $sql->buildSqlString($rejectionQuery);
                 $rejectionResult = $this->commonService->cacheQuery($rejectionQueryStr, $dbAdapter);
-                $rejectionReasonName = ($mostRejectionReasons[$m] == 0) ? 'Others' : ucwords($rejectionResult[0]['rejection_reason_name']);
+                $rejectionReasonName = ($mostRejectionReasons[$m] == 0) ? 'Others' : ($rejectionResult[0]['rejection_reason_name']);
                 $result['rejection'][$rejectionReasonName][$j] = (isset($rejectionResult[0]['rejections'])) ? $rejectionResult[0]['rejections'] : 0;
                 $result['date'][$j] = $monthYearFormat;
             }
@@ -6201,7 +6201,7 @@ class SampleTable extends AbstractTableGateway
 
         foreach ($rResult as $aRow) {
             $row = [];
-            $row[] = ucwords($aRow['district']);
+            $row[] = ($aRow['district']);
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_rejected'];
             $row[] = ($aRow['rejection_rate']);
@@ -6357,7 +6357,7 @@ class SampleTable extends AbstractTableGateway
 
         foreach ($rResult as $aRow) {
             $row = [];
-            $row[] = ucwords($aRow['province']);
+            $row[] = ($aRow['province']);
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_rejected'];
             $row[] = ($aRow['rejection_rate']);
@@ -6516,9 +6516,9 @@ class SampleTable extends AbstractTableGateway
 
         foreach ($rResult as $aRow) {
             $row = [];
-            $row[] = "<span style='white-space:nowrap !important;' >" . ucwords($aRow['facility_name']) . "</span>";
-            $row[] = ucwords($aRow['province']);
-            $row[] = ucwords($aRow['district']);
+            $row[] = "<span style='white-space:nowrap !important;' >" . ($aRow['facility_name']) . "</span>";
+            $row[] = ($aRow['province']);
+            $row[] = ($aRow['district']);
             $row[] = $aRow['total_samples_received'];
             $row[] = ($aRow['rejection_rate']);
             $output['aaData'][] = $row;

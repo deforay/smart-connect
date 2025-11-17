@@ -4,6 +4,8 @@ namespace Application;
 
 use Application\Command\SendTempMail;
 use Application\Command\SendTempMailFactory;
+use Application\Command\SeedAdmin;
+use Application\Command\SeedAdminFactory;
 
 return [
     'router' => [
@@ -226,6 +228,7 @@ return [
         'factories' => [
             'translator' => 'Laminas\Mvc\I18n\TranslatorFactory',
             SendTempMail::class => SendTempMailFactory::class,
+            SeedAdmin::class => SeedAdminFactory::class,
         ],
     ],
     'translator' => [
@@ -262,6 +265,7 @@ return [
     'laminas-cli' => [
         'commands' => [
             'send-mail' => SendTempMail::class,
+            'seed-admin' => SeedAdmin::class,
         ],
     ],
 ];

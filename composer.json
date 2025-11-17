@@ -9,15 +9,14 @@
         "dashboard"
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.2 || ^8.3 || ^8.4",
         "laminas/laminas-component-installer": "^3.7",
         "laminas/laminas-mvc": "^3.8",
         "laminas/laminas-db": "^2.20",
         "laminas/laminas-mvc-i18n": "^1.9",
-        "laminas/laminas-mvc-plugins": "^1.0.1",
-        "laminas/laminas-psr7bridge": "^1.2.0",
         "laminas/laminas-session": "^2.25",
         "laminas/laminas-di": "^3.15",
+        "laminas/laminas-cli": "^1.13",
         "phpoffice/phpspreadsheet": "^5.2",
         "halaxa/json-machine": "^1.2",
         "ramsey/uuid": "^4.9",
@@ -26,9 +25,11 @@
         "tecnickcom/tcpdf": "^6.10",
         "setasign/fpdi": "^2.6",
         "laminas/laminas-permissions-acl": "^2.17",
-        "laminas/laminas-cache": "^3.12",
+        "laminas/laminas-cache": "^3.13",
         "psr/simple-cache": "^1.0",
-        "laminas/laminas-cache-storage-adapter-filesystem": "^2.5"
+        "laminas/laminas-cache-storage-adapter-filesystem": "^2.5",
+        "symfony/console": "^7.3",
+        "laminas/laminas-serializer": "^2.18"
     },
     "autoload": {
         "psr-4": {
@@ -81,6 +82,9 @@
         "allow-plugins": {
             "laminas/laminas-component-installer": true,
             "laminas/laminas-skeleton-installer": true
+        },
+        "platform": {
+            "php": "8.3"
         }
     },
     "require-dev": {

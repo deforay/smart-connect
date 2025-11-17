@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `dash_form_tb`;
 
 CREATE TABLE `dash_form_vl` SELECT * FROM vlsm.form_vl WHERE 1=0;
 CREATE TABLE `dash_form_eid` SELECT * FROM vlsm.form_eid WHERE 1=0;
-CREATE TABLE `covid19_tests` SELECT * FROM vlsm.covid19_tests WHERE 1=0;
+CREATE TABLE IF NOT EXISTS `covid19_tests` SELECT * FROM vlsm.covid19_tests WHERE 1=0;
 CREATE TABLE `dash_form_covid19` SELECT * FROM vlsm.form_covid19 WHERE 1=0;
 CREATE TABLE `dash_form_hepatitis` SELECT * FROM vlsm.form_hepatitis WHERE 1=0;
 CREATE TABLE `dash_form_tb` SELECT * FROM vlsm.form_tb WHERE 1=0;

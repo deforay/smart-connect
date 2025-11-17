@@ -4,6 +4,7 @@ namespace Application\Controller;
 
 
 use Laminas\View\Model\ViewModel;
+use Application\Service\CommonService;
 use Application\Service\SampleService;
 use Application\Service\SummaryService;
 use Application\Controller\AbstractAppController;
@@ -35,8 +36,8 @@ class SummaryController extends AbstractAppController
             $params['fromDate'] = $this->params()->fromQuery('f');
             $params['toDate'] = $this->params()->fromQuery('t');
         } else {
-            $params['fromDate']  = date('Y-m', strtotime('+1 month', strtotime('-12 month')));
-            $params['toDate']  = date('Y-m');
+            $params['fromDate'] = date('Y-m', strtotime('+1 month', strtotime('-12 month')));
+            $params['toDate'] = date('Y-m');
         }
         $this->layout()->setVariable('activeTab', 'summary');
 

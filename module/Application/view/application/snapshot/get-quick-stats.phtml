@@ -24,10 +24,12 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
 ?>
 <style>
     @media only screen and (max-width: 600px) {
-        .qucikstats{padding-top: 20px !important;}
+        .qucikstats {
+            padding-top: 20px !important;
+        }
     }
 </style>
-<!-- <pre><?php print_r($result['srResult']);?></pre> -->
+<!-- <pre><?php print_r($result['srResult']); ?></pre> -->
 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
     <div class="dashboard-stat2" style="cursor:pointer;">
         <div class="display">
@@ -46,10 +48,11 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                 $totalSample = 0;
                 $samplePercentage = '';
                 foreach ($quickStats as $statName => $statValue) {
-                    if ($statName ==  $this->translate('Total Samples')) {
+                    $statValue ??= 0;
+                    if ($statName == $this->translate('Total Samples')) {
                         $totalSample = $statValue;
                     }
-                    if ($statName !=  $this->translate('Total Samples')) {
+                    if ($statName != $this->translate('Total Samples')) {
                         $samplePercentage = ($totalSample > 0) ? ' (' . round(($statValue / $totalSample) * 100, 2) . '%)' : 0;
                     }
                     if (strpos($statName, '(<') != false) {
@@ -62,14 +65,19 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                         $statName = ($statName);
                         $statValue = number_format($statValue);
                     }
-                ?>
+                    ?>
                     <tr>
                         <th style="font-size:14px !important;padding:4px;"><?php echo $statName; ?></th>
-                        <td style="font-size:14px !important;padding:4px;"><?php echo $statValue . $samplePercentage; ?></td>
+                        <td style="font-size:14px !important;padding:4px;"><?php echo $statValue . $samplePercentage; ?>
+                        </td>
                     </tr>
                 <?php } ?>
-                <tr><td colspan="2"></td></tr>
-                <tr><td colspan="2" class="qucikstats"></td></tr>
+                <tr>
+                    <td colspan="2"></td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="qucikstats"></td>
+                </tr>
             </table>
         </div>
     </div>
@@ -79,13 +87,14 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
         <div class="display">
             <div class="number">
                 <h3 class="font-green-sharp">
-                    <span data-counter="counterup" data-value="<?php echo $receivedTotal; ?>"><?php echo $receivedTotal; ?></span>
+                    <span data-counter="counterup"
+                        data-value="<?php echo $receivedTotal; ?>"><?php echo $receivedTotal; ?></span>
                 </h3>
                 <small class="font-green-sharp"><?php echo $this->translate('SAMPLES REGISTERED'); ?></small><br>
                 <!--<small class="font-blue-sharp"><?php echo $receivedDate; ?></small>-->
                 <?php
-                if (trim($params['daterange']) == '') {
-                ?>
+                if (trim($params['daterange'] ?? '') == '') {
+                    ?>
                     <!-- <small class="font-green-sharp"><?php echo $this->translate('Last 28 days'); ?></small> -->
                 <?php } ?>
             </div>
@@ -102,13 +111,14 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
         <div class="display">
             <div class="number">
                 <h3 class="font-blue-sharp">
-                    <span data-counter="counterup" data-value="<?php echo $testedTotal; ?>"><?php echo $testedTotal; ?></span>
+                    <span data-counter="counterup"
+                        data-value="<?php echo $testedTotal; ?>"><?php echo $testedTotal; ?></span>
                 </h3>
                 <small class="font-blue-sharp"><?php echo $this->translate('SAMPLES TESTED'); ?></small><br>
                 <!--<small class="font-blue-sharp"><?php echo $testedDate; ?></small>-->
                 <?php
-                if (trim($params['daterange']) == '') {
-                ?>
+                if (trim($params['daterange'] ?? '') == '') {
+                    ?>
                     <!-- <small class="font-blue-sharp"><?php echo $this->translate('Last 28 days'); ?></small> -->
                 <?php } ?>
             </div>
@@ -124,13 +134,14 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
         <div class="display">
             <div class="number">
                 <h3 class="font-red-haze">
-                    <span data-counter="counterup" data-value="<?php echo $rejectedTotal; ?>"><?php echo $rejectedTotal; ?></span>
+                    <span data-counter="counterup"
+                        data-value="<?php echo $rejectedTotal; ?>"><?php echo $rejectedTotal; ?></span>
                 </h3>
                 <small class="font-red-haze"><?php echo $this->translate('SAMPLES REJECTED'); ?></small><br>
                 <!--<small class="font-red-haze"><?php echo $rejectedDate; ?></small>-->
                 <?php
-                if (trim($params['daterange']) == '') {
-                ?>
+                if (trim($params['daterange'] ?? '') == '') {
+                    ?>
                     <!-- <small class="font-red-haze"><?php echo $this->translate('Last 28 days'); ?></small> -->
                 <?php } ?>
             </div>
@@ -179,7 +190,7 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                         text: ''
                     },
                     labels: {
-                        formatter: function() {
+                        formatter: function () {
                             return this.value;
                         }
                     },
@@ -202,10 +213,10 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                     showInLegend: false,
                     name: '<?php echo $this->translate('Samples'); ?>',
                     data: [<?php
-                            foreach ($result['scResult'] as $total) {
-                                echo ucwords($total[0]['total']) . ",";
-                            }
-                            ?>]
+                    foreach ($result['scResult'] as $total) {
+                        echo ucwords($total[0]['total']) . ",";
+                    }
+                    ?>]
 
                 }],
                 colors: ['#2ab4c0']
@@ -232,10 +243,10 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                 },
                 xAxis: {
                     categories: [<?php
-                                    foreach ($result['stResult'] as $total) {
-                                        echo "'" . ucwords($total['date']) . "',";
-                                    }
-                                    ?>],
+                    foreach ($result['stResult'] as $total) {
+                        echo "'" . ucwords($total['date']) . "',";
+                    }
+                    ?>],
                     crosshair: true
                 },
                 yAxis: {
@@ -244,7 +255,7 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                         text: ''
                     },
                     labels: {
-                        formatter: function() {
+                        formatter: function () {
                             return this.value;
                         }
                     },
@@ -267,10 +278,10 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                     showInLegend: false,
                     name: '<?php echo $this->translate('Samples'); ?>',
                     data: [<?php
-                            foreach ($result['stResult'] as $total) {
-                                echo ucwords($total[0]['total']) . ",";
-                            }
-                            ?>]
+                    foreach ($result['stResult'] as $total) {
+                        echo ucwords($total[0]['total']) . ",";
+                    }
+                    ?>]
 
                 }],
                 colors: ['#f36a5a']
@@ -297,10 +308,10 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                 },
                 xAxis: {
                     categories: [<?php
-                                    foreach ($result['srResult'] as $total) {
-                                        echo "'" . $total['date'] . "',";
-                                    }
-                                    ?>],
+                    foreach ($result['srResult'] as $total) {
+                        echo "'" . $total['date'] . "',";
+                    }
+                    ?>],
                     crosshair: true
                 },
                 yAxis: {
@@ -327,14 +338,14 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                     showInLegend: false,
                     name: '<?php echo $this->translate('Samples'); ?>',
                     data: [<?php
-                            foreach ($result['srResult'] as $total) {
-                                echo ucwords($total[0]['total']) . ",";
-                            }
-                            ?>]
+                    foreach ($result['srResult'] as $total) {
+                        echo ucwords($total[0]['total']) . ",";
+                    }
+                    ?>]
 
                 }],
                 colors: ['#5C9BD1']
             });
-    <?php }
+        <?php }
     } ?>
 </script>
