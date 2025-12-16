@@ -1,26 +1,15 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 namespace Application\Model;
 
-use Laminas\Config\Factory;
 use Laminas\Permissions\Acl\Acl as LaminasAcl;
 use Laminas\Permissions\Acl\Resource\GenericResource;
 use Laminas\Permissions\Acl\Role\GenericRole;
-use Laminas\Db\Adapter\Adapter;
-use Laminas\Db\Sql\Sql;
 
-/**
- * Description of Acl
- */
 class Acl extends LaminasAcl
 {
-   
+
     public function __construct($resourceList, $rolesList, $rolePrivileges, $privileges)
     {
         foreach ($resourceList as $res) {
@@ -34,7 +23,7 @@ class Acl extends LaminasAcl
                 $this->addRole(new GenericRole($rol['role_code']));
             }
         }
-     
+
         // Map privileges to resource and privilege names
         $privilegeMap = [];
         foreach ($privileges as $priv) {
@@ -97,7 +86,7 @@ class Acl extends LaminasAcl
                 }
             }
         }
-      
+
         if (!$this->hasRole('daemon')) {
             $this->addRole('daemon');
         }

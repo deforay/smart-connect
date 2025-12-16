@@ -3,7 +3,6 @@
 namespace Application\Controller;
 
 use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\View\Model\ViewModel;
 
 class CronController extends AbstractActionController
 {
@@ -26,7 +25,7 @@ class CronController extends AbstractActionController
 
     public function generateBackupAction()
     {
-        
+
         $this->sampleService->generateBackup();
     }
 }

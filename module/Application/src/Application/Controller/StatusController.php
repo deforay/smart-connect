@@ -10,7 +10,7 @@ use Laminas\Mvc\Controller\AbstractActionController;
 class StatusController extends AbstractActionController
 {
 
-    private \Application\Service\CommonService $commonService;
+    private CommonService $commonService;
 
     public function __construct($commonService)
     {

@@ -2,16 +2,17 @@
 
 namespace Application\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
-use Laminas\Session\Container;
+use Application\Service\UserService;
+use Application\Service\CommonService;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class OrganizationsController extends AbstractActionController
 {
 
     public \Application\Service\OrganizationService $organizationService;
-    public \Application\Service\CommonService $commonService;
-    public \Application\Service\UserService $userService;
+    public CommonService $commonService;
+    public UserService $userService;
 
     public function __construct($organizationService, $commonService, $userService)
     {
@@ -88,7 +89,7 @@ class OrganizationsController extends AbstractActionController
                 return $this->redirect()->toRoute('organizations');
             } else {
                 $users = $this->userService->fetchUsers();
-                $map  = $this->organizationService->fetchOrganizationMap($orgId);
+                $map = $this->organizationService->fetchOrganizationMap($orgId);
                 return new ViewModel(array('users' => $users, 'org' => $org, 'map' => $map));
             }
         }

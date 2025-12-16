@@ -2,8 +2,9 @@
 
 namespace Application\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
+use Application\Service\CommonService;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 
 class SyncStatusController extends AbstractActionController

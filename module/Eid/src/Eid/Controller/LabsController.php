@@ -2,11 +2,11 @@
 
 namespace Eid\Controller;
 
+use Eid\Service\EidSampleService;
+use Laminas\View\Model\ViewModel;
 use Application\Service\CommonService;
 use Application\Service\FacilityService;
-use Eid\Service\EidSampleService;
 use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\View\Model\ViewModel;
 
 
 class LabsController extends AbstractActionController

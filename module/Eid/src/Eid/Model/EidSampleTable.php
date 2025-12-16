@@ -700,7 +700,7 @@ class EidSampleTable extends AbstractTableGateway
         $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         $j = 0;
         foreach ($sampleResult as $row) {
-            $result['valid_results'][$j]  = $valid = (empty($row["total_samples_tested"])) ? 0 : $row["total_samples_tested"] - $row["total_samples_rejected"];
+            $result['valid_results'][$j] = $valid = (empty($row["total_samples_tested"])) ? 0 : $row["total_samples_tested"] - $row["total_samples_rejected"];
             $result['positive_rate'][$j] = ($row["total_positive_samples"] > 0 && $valid > 0) ? round((($row["total_positive_samples"] / $valid) * 100), 2) : null;
             $result['date'][$j] = $row['monthyear'];
             $j++;
@@ -1837,7 +1837,8 @@ class EidSampleTable extends AbstractTableGateway
             $summaryResult['sample'][$this->translator->translate('Samples Received')]['month'][$j] = (isset($row["total_samples_received"])) ? $row["total_samples_received"] : 0;
             $summaryResult['sample'][$this->translator->translate('Samples Tested')]['month'][$j] = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] : 0;
             $summaryResult['sample'][$this->translator->translate('Samples Rejected')]['month'][$j] = (isset($row["total_samples_rejected"])) ? $row["total_samples_rejected"] : 0;
-            $summaryResult['sample'][$this->translator->translate('Valid Tested')]['month'][$j]  = $valid = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] - $row["total_samples_rejected"] : 0;;
+            $summaryResult['sample'][$this->translator->translate('Valid Tested')]['month'][$j] = $valid = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] - $row["total_samples_rejected"] : 0;
+            ;
             $summaryResult['sample'][$this->translator->translate('No. of Positive')]['month'][$j] = (isset($row["total_positive_samples"])) ? $row["total_positive_samples"] : 0;
             //$summaryResult['sample'][$this->translator->translate('No. of Negative')]['month'][$j] = (isset($row["total_negative_samples"])) ? $row["total_negative_samples"] : 0;
             $summaryResult['sample'][$this->translator->translate('Positive %')]['month'][$j] = ($valid > 0) ? round((($row["total_positive_samples"] / $valid) * 100), 2) . ' %' : '0';
@@ -1893,7 +1894,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' =>  $this->table))
+            ->from(array('eid' => $this->table))
             ->columns(
                 array(
                     'noDatan' => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result = 'Negative' ) AND (eid.child_dob IS NULL OR eid.child_dob = '0000-00-00'))THEN 1 ELSE 0 END)"),
@@ -1952,7 +1953,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' =>  $this->table))
+            ->from(array('eid' => $this->table))
             ->columns(
                 array(
                     "total_samples" => new Expression("SUM(CASE WHEN ((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL')) THEN 1 ELSE 0 END)"),
@@ -1984,7 +1985,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' =>  $this->table))
+            ->from(array('eid' => $this->table))
             ->columns(
                 array(
                     'sec1' => new Expression("AVG(DATEDIFF(sample_received_at_lab_datetime, sample_collection_date))"),
@@ -2602,13 +2603,13 @@ class EidSampleTable extends AbstractTableGateway
 
             $query = $sql->select()->from(['vl' => $this->table])
                 ->columns([
-                    "totalSamples"         => new Expression('COUNT(eid_id)'),
-                    "monthDate"            => new Expression("DATE_FORMAT(DATE(vl.sample_tested_datetime), '%b-%Y')"),
-                    "daydiff"              => new Expression('ABS(TIMESTAMPDIFF(DAY, sample_tested_datetime, sample_collection_date))'),
-                    "AvgCollectedTested"   => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY, vl.sample_tested_datetime, vl.sample_collection_date))) AS DECIMAL (10,2))'),
+                    "totalSamples" => new Expression('COUNT(eid_id)'),
+                    "monthDate" => new Expression("DATE_FORMAT(DATE(vl.sample_tested_datetime), '%b-%Y')"),
+                    "daydiff" => new Expression('ABS(TIMESTAMPDIFF(DAY, sample_tested_datetime, sample_collection_date))'),
+                    "AvgCollectedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY, vl.sample_tested_datetime, vl.sample_collection_date))) AS DECIMAL (10,2))'),
                     "AvgCollectedReceived" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY, vl.sample_received_at_lab_datetime, vl.sample_collection_date))) AS DECIMAL (10,2))'),
-                    "AvgReceivedTested"    => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY, vl.sample_tested_datetime, vl.sample_received_at_lab_datetime))) AS DECIMAL (10,2))'),
-                    "AvgCollectedPrinted"  => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY, vl.result_printed_datetime, vl.sample_collection_date))) AS DECIMAL (10,2))'),
+                    "AvgReceivedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY, vl.sample_tested_datetime, vl.sample_received_at_lab_datetime))) AS DECIMAL (10,2))'),
+                    "AvgCollectedPrinted" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY, vl.result_printed_datetime, vl.sample_collection_date))) AS DECIMAL (10,2))'),
                 ]);
 
             $query->where->addPredicate(new WhereExpression(
@@ -2640,12 +2641,12 @@ class EidSampleTable extends AbstractTableGateway
                     continue;
                 }
 
-                $result['totalSamples'][$j]         = $sRow["totalSamples"] ?? 'null';
-                $result['tatCollectedTested'][$j]   = $sRow["AvgCollectedTested"] ?? 'null';
+                $result['totalSamples'][$j] = $sRow["totalSamples"] ?? 'null';
+                $result['tatCollectedTested'][$j] = $sRow["AvgCollectedTested"] ?? 'null';
                 $result['tatCollectedReceived'][$j] = $sRow["AvgCollectedReceived"] ?? 'null';
-                $result['tatReceivedTested'][$j]    = $sRow["AvgReceivedTested"] ?? 'null';
-                $result['tatCollectedPrinted'][$j]  = $sRow["AvgCollectedPrinted"] ?? 'null';
-                $result['date'][$j]                 = $sRow["monthDate"];
+                $result['tatReceivedTested'][$j] = $sRow["AvgReceivedTested"] ?? 'null';
+                $result['tatCollectedPrinted'][$j] = $sRow["AvgCollectedPrinted"] ?? 'null';
+                $result['date'][$j] = $sRow["monthDate"];
                 $j++;
             }
         }
@@ -2800,11 +2801,11 @@ class EidSampleTable extends AbstractTableGateway
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
-                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
-                    "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
+                    "Collection_Receive" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                    "Receive_Register" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
+                    "Register_Analysis" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
+                    "Analysis_Authorise" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
+                    "total" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
                 )
             )
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
@@ -2853,11 +2854,11 @@ class EidSampleTable extends AbstractTableGateway
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 [
-                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
-                    "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
+                    "Collection_Receive" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                    "Receive_Register" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
+                    "Register_Analysis" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
+                    "Analysis_Authorise" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
+                    "total" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
                 ]
             )
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
@@ -2907,11 +2908,11 @@ class EidSampleTable extends AbstractTableGateway
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 [
-                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
-                    "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
+                    "Collection_Receive" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                    "Receive_Register" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
+                    "Register_Analysis" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
+                    "Analysis_Authorise" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
+                    "total" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
                 ]
             )
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
@@ -2973,10 +2974,12 @@ class EidSampleTable extends AbstractTableGateway
 
         $countQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
-                array("total" => new Expression("SUM(CASE WHEN (((vl.is_sample_rejected is NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'no')
+                array(
+                    "total" => new Expression("SUM(CASE WHEN (((vl.is_sample_rejected is NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'no')
                                                     AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
                                                             ELSE 0
-                                                        END)"))
+                                                        END)")
+                )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array())
             ->join(array('p' => 'geographical_divisions'), 'p.geo_id=f.facility_state_id', array('province_name' => 'geo_name', 'geo_id'), 'left')
@@ -3049,7 +3052,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         $countQueryStr = $sql->buildSqlString($countQuery);
         // echo $countQueryStr;die;
-        $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+        $countResult = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
         foreach ($countResult as $row) {
             $result['province'][$p] = ($row['province_name'] != null && trim($row['province_name']) != '') ? ($row['province_name']) : 'Not Specified';
@@ -3075,10 +3078,12 @@ class EidSampleTable extends AbstractTableGateway
 
         $countQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
-                array("total" => new Expression("SUM(CASE WHEN (((vl.is_sample_rejected is NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'no')
+                array(
+                    "total" => new Expression("SUM(CASE WHEN (((vl.is_sample_rejected is NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'no')
                                                     AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
                                                             ELSE 0
-                                                        END)"))
+                                                        END)")
+                )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array())
             ->join(array('d' => 'geographical_divisions'), 'd.geo_id=f.facility_district_id', array('district_name' => 'geo_name', 'geo_id'), 'left')
@@ -3150,7 +3155,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         $countQueryStr = $sql->buildSqlString($countQuery);
         // echo $countQueryStr;die;
-        $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+        $countResult = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
         foreach ($countResult as $row) {
             $result['district'][$p] = ($row['district_name'] != null && trim($row['district_name']) != '') ? ($row['district_name']) : 'Not Specified';
@@ -3177,9 +3182,11 @@ class EidSampleTable extends AbstractTableGateway
 
         $countQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
-                array("total" => new Expression("SUM(CASE WHEN (((vl.is_sample_rejected is NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'no') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
+                array(
+                    "total" => new Expression("SUM(CASE WHEN (((vl.is_sample_rejected is NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'no') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
                                                                                  ELSE 0
-                                                                                 END)"))
+                                                                                 END)")
+                )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array('lab_name' => 'facility_name'))
             ->order('total DESC')
@@ -3251,7 +3258,7 @@ class EidSampleTable extends AbstractTableGateway
 
         $countQueryStr = $sql->buildSqlString($countQuery);
         // echo $countQueryStr;die;
-        $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+        $countResult = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
         foreach ($countResult as $lab) {
             $result['lab'][$l] = ucwords($lab['lab_name']);
@@ -3279,9 +3286,11 @@ class EidSampleTable extends AbstractTableGateway
 
         $countQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
-                array("total" => new Expression("SUM(CASE WHEN (((vl.is_sample_rejected is NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'no') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
+                array(
+                    "total" => new Expression("SUM(CASE WHEN (((vl.is_sample_rejected is NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'no') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
                                                                                  ELSE 0
-                                                                                 END)"))
+                                                                                 END)")
+                )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('clinic_name' => 'facility_name'))
             ->order('total DESC')
@@ -3353,7 +3362,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         $countQueryStr = $sql->buildSqlString($countQuery);
         // echo $countQueryStr;die;
-        $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+        $countResult = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
         foreach ($countResult as $facility) {
             $result['clinic'][$l] = ucwords($facility['clinic_name']);
@@ -4507,7 +4516,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' =>  $this->table))
+            ->from(array('eid' => $this->table))
             ->columns(
                 array(
                     'noDatan' => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result = 'Negative' ) AND (eid.child_dob IS NULL OR eid.child_dob = '0000-00-00'))THEN 1 ELSE 0 END)"),
@@ -4598,7 +4607,7 @@ class EidSampleTable extends AbstractTableGateway
             /* foreach($monthList as $key=>$list){
                 $searchVal[$key] =  new Expression("AVG(CASE WHEN (eid.result like 'positive%' AND eid.result not like '' AND sample_collection_date LIKE '%".$list."%') THEN 1 ELSE 0 END)");
             } */
-            $sQuery = $sql->select()->from(array('eid' =>  $this->table))->columns(array(
+            $sQuery = $sql->select()->from(array('eid' => $this->table))->columns(array(
                 'monthYear' => new Expression("DATE_FORMAT(sample_collection_date, '%b-%Y')"),
                 'positive_rate' => new Expression("ROUND(((SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' )) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
             ))

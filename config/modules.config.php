@@ -16,6 +16,7 @@ return [
     'Laminas\Router',
     'Laminas\Validator',
     'Laminas\Cache\Storage\Adapter\Filesystem',
+    'Laminas\DeveloperTools',
     'Application',
     'Api',
     'Eid',
