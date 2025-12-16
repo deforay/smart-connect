@@ -1,12 +1,14 @@
 {
-    "name": "deforay/vldashboard",
-    "description": "National Dashboard",
+    "name": "deforay/smart-connect",
+    "description": "National Dashboard for Priory Diseases (Viral Load, EID, Covid-19)",
     "type": "project",
     "keywords": [
         "viral load",
         "eid",
         "covid-19",
-        "dashboard"
+        "dashboard",
+        "hiv vl",
+        "intelis"
     ],
     "require": {
         "php": "^8.2 || ^8.3 || ^8.4",
@@ -43,12 +45,6 @@
         "development-disable": "laminas-development-mode disable",
         "development-enable": "laminas-development-mode enable",
         "development-status": "laminas-development-mode status",
-        "post-create-project-cmd": [
-            "@development-enable",
-            "php bin/update-gitignore.php",
-            "php -r 'if (file_exists(\"bin/remove-package-artifacts.php\")) include \"bin/remove-package-artifacts.php\";'",
-            "php -r 'if (file_exists(\"CHANGELOG.md\")) unlink(\"CHANGELOG.md\");'"
-        ],
         "post-install-cmd": "@clear-config-cache",
         "post-update-cmd": "@clear-config-cache",
         "serve": [
@@ -65,29 +61,23 @@
             "development-status": "Detail whether or not the application is in development mode.",
             "serve": "Start the built-in PHP web server and serve the application.",
             "test": "Run unit tests."
-        },
-        "config": {
-            "allow-plugins": {
-                "composer/package-versions-deprecated": true,
-                "laminas/laminas-component-installer": true,
-                "laminas/laminas-skeleton-installer": true
-            }
-        },
-        "require-dev": {
-            "laminas/laminas-developer-tools": "^2.5",
-            "symfony/var-dumper": "^5.4"
         }
     },
     "config": {
         "allow-plugins": {
+            "composer/package-versions-deprecated": true,
             "laminas/laminas-component-installer": true,
             "laminas/laminas-skeleton-installer": true
         },
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "secure-http": true,
         "platform": {
             "php": "8.3"
         }
     },
     "require-dev": {
+        "laminas/laminas-developer-tools": "^2.5",
         "symfony/var-dumper": "^7.2"
     }
 }

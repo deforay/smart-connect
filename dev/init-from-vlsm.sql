@@ -194,15 +194,6 @@ CREATE TABLE IF NOT EXISTS `dash_user_roles` (
   PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Foreign Keys
-ALTER TABLE `dash_roles_privileges_map`
-  ADD CONSTRAINT `fk_drp_role` FOREIGN KEY (`role_id`) REFERENCES `dash_user_roles` (`role_id`),
-  ADD CONSTRAINT `fk_drp_privilege` FOREIGN KEY (`privilege_id`) REFERENCES `dash_privileges` (`privilege_id`);
-
-ALTER TABLE `dash_user_facility_map`
-  ADD CONSTRAINT `fk_dufm_user` FOREIGN KEY (`user_id`) REFERENCES `dash_users` (`user_id`),
-  ADD CONSTRAINT `fk_dufm_facility` FOREIGN KEY (`facility_id`) REFERENCES `facility_details` (`facility_id`);
-
 
 INSERT IGNORE INTO dash_user_roles (role_id, role_name, role_code, status) VALUES
 (1, 'admin', 'ad', 'active');
