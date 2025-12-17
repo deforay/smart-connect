@@ -42,6 +42,7 @@ class UsersController extends AbstractActionController
         if ($this->getRequest()->isPost()) {
             $params = $this->getRequest()->getPost();
             $result = $this->userService->addUser($params);
+            
             return $this->redirect()->toRoute('users');
         }
 
