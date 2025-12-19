@@ -108,6 +108,14 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\\Controller\\ConfigContro
                         </a>
                    </li>';
 }
+
+if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\RolesController', 'index')) {
+    $adminMenu .= '<li class="nav-item end ' . (($activeTab == 'roles') ? " active open" : "") . '">
+                        <a href="' . $this->url('roles', array('action' => 'index')) .'" class="nav-link ">
+                            <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Roles') . '</span>
+                        </a>
+                    </li>';
+}
 if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\UsersController', 'index')) {
     $adminMenu .= '<li class="nav-item end ' . (($activeTab == 'users') ? 'active open' : '') . '">
                         <a href="' . $this->url('users', array('action' => 'index')) . '" class="nav-link ">
@@ -136,13 +144,7 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
                         </a>
                     </li>';
 }
-if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\RolesController', 'index')) {
-    $adminMenu .= '<li class="nav-item end ' . (($activeTab == 'roles') ? " active open" : "") . '">
-                        <a href="' . $this->url('roles', array('action' => 'index')) .'" class="nav-link ">
-                            <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Roles') . '</span>
-                        </a>
-                    </li>';
-}
+
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->

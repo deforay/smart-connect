@@ -243,6 +243,8 @@ INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_
 ('Application\\Controller\\RolesController', 'add', 'Add');
 INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
 ('Application\\Controller\\RolesController', 'edit', 'Edit');
+INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
+('Application\\Controller\\LaboratoryController', 'index', 'Access');
 
 
 CREATE TABLE IF NOT EXISTS `dash_roles_privileges_map` (
