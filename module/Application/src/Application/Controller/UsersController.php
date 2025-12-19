@@ -38,11 +38,19 @@ class UsersController extends AbstractActionController
     {
         $this->layout()->setVariable('activeTab', 'users');
 
+<<<<<<< HEAD
+        /** @var \Laminas\Http\Request $request */
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $this->userService->addUser($params);
+=======
 
         if ($this->getRequest()->isPost()) {
             $params = $this->getRequest()->getPost();
             $result = $this->userService->addUser($params);
             
+>>>>>>> 3c6c04a63dcd1b6fe7b6ec332570cfdbd804f1d7
             return $this->redirect()->toRoute('users');
         }
 
@@ -55,9 +63,11 @@ class UsersController extends AbstractActionController
         $this->layout()->setVariable('activeTab', 'users');
 
 
-        if ($this->getRequest()->isPost()) {
-            $params = $this->getRequest()->getPost();
-            $result = $this->userService->updateUser($params);
+        /** @var \Laminas\Http\Request $request */
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $this->userService->updateUser($params);
             return $this->redirect()->toRoute('users');
         } else {
             $userId = base64_decode($this->params()->fromRoute('id'));
@@ -81,12 +91,11 @@ class UsersController extends AbstractActionController
         $this->layout()->setVariable('activeTab', 'admin');
         $this->layout()->setVariable('activeMenu', 'users');
 
-
-
-
-        if ($this->getRequest()->isPost()) {
-            $params = $this->getRequest()->getPost();
-            $result = $this->userService->mapUserOrganizations($params);
+        /** @var \Laminas\Http\Request $request */
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $this->userService->mapUserOrganizations($params);
             return $this->redirect()->toRoute('users');
         } else {
             $userId = ($this->params()->fromRoute('id'));
