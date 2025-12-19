@@ -30,11 +30,17 @@ class ConfigService
     public function updateConfig($params)
     {
         $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter')->getDriver()->getConnection();
+        $eventLogDb = $this->sm->get('ActivityLogTable');       
         $adapter->beginTransaction();
         try {
             $db = $this->sm->get('GlobalTable');
             $result = $db->updateConfigDetails($params);
             $adapter->commit();
+            $eventType = 'config-update';
+            $action = 'updated global config ';
+            $resourceName = 'global config';
+            $eventLogDb->addActivityLog($eventType, $action, $resourceName);
+
             $alertContainer = new Container('alert');
             $alertContainer->alertMsg = 'Config details updated successfully';
         } catch (Exception $exc) {

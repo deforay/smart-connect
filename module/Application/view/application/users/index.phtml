@@ -3,10 +3,14 @@ use Laminas\Session\Container;
 $sessionLogin = new Container('credo');
 $role = $sessionLogin->roleCode;
 $acl=$this->layout()->acl;
+$historyBtn = "";
 if ($acl->isAllowed($role, 'Application\Controller\UsersController', 'edit')) {
     $editAction = '{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center","bSortable":false}';
 }else{
     $editAction = '{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"}';
+}
+if($role == 'ad'){
+    $historyBtn = "<a href='/user-login-history' class='btn btn-primary' name='userLoginHistory'>User Login History</a>";
 }
 ?>
            <!-- BEGIN PAGE HEADER-->
@@ -45,7 +49,9 @@ if ($acl->isAllowed($role, 'Application\Controller\UsersController', 'edit')) {
                                                 <?php if ($acl->isAllowed($role, 'Application\Controller\UsersController', 'add')) { ?>
                                                     <a href="/users/add" class="btn sbold green"> <?php echo $this->translate('Add New'); ?>  <i class="fa fa-plus"></i>
                                                     </a>
-                                                <?php } ?>
+                                                <?php } 
+                                                echo $historyBtn;
+                                                ?>
                                                 </div>
                                             </div>
                                         </div>
@@ -100,5 +106,7 @@ if ($acl->isAllowed($role, 'Application\Controller\UsersController', 'edit')) {
     } );
 
 } );
+
+
        
 </script>

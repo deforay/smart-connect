@@ -18,8 +18,11 @@ use Application\Model\ArtCodeTable;
 use Application\Model\FacilityTable;
 use Application\Model\ProvinceTable;
 use Application\Model\TempMailTable;
+use Application\Model\ActivityLogTable;
+use Application\Model\UserLoginHistoryTable;
 use Application\Service\RoleService;
 use Application\Service\UserService;
+use Application\Service\UserLoginHistoryService;
 use Laminas\Mvc\ModuleRouteListener;
 use Application\Model\CountriesTable;
 use Application\Model\ResourcesTable;
@@ -378,6 +381,20 @@ class Module
 				return new UsersTable($dbAdapter, $diContainer, $commonService);
 			}
 				},
+				'ActivityLogTable' => new class {
+			public function __invoke($diContainer)
+			{
+				$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
+				return new ActivityLogTable($dbAdapter);
+			}
+				},
+					'UserLoginHistoryTable' => new class {
+			public function __invoke($diContainer)
+			{
+				$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
+				return new UserLoginHistoryTable($dbAdapter);
+			}
+				},
 				'OrganizationsTable' => new class {
 			public function __invoke($diContainer)
 			{
@@ -729,6 +746,12 @@ class Module
 				return new ConfigService($diContainer);
 			}
 				},
+				'UserLoginHistoryService' => new class {
+			public function __invoke($diContainer)
+			{
+				return new UserLoginHistoryService($diContainer);
+			}
+				},
 				'FacilityService' => new class {
 			public function __invoke($diContainer)
 			{
@@ -777,6 +800,13 @@ class Module
 				$orgService = $diContainer->get('OrganizationService');
 				$userService = $diContainer->get('UserService');
 				return new \Application\Controller\UsersController($userService, $commonService, $orgService);
+			}
+				},
+				'Application\Controller\UserLoginHistoryController' => new class {
+			public function __invoke($diContainer)
+			{
+				$userLoginHistoryService = $diContainer->get('UserLoginHistoryService');
+				return new \Application\Controller\UserLoginHistoryController($userLoginHistoryService);			
 			}
 				},
 				'Application\Controller\CronController' => new class {

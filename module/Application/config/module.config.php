@@ -199,6 +199,16 @@ return [
                     ],
                 ],
             ],
+            'user-login-history' => [
+                'type'    => 'segment',
+                'options' => [
+                    'route'    => '/user-login-history[/][:action][/:id]',
+                    'defaults' => [
+                        'controller' => Controller\UserLoginHistoryController::class,
+                        'action' => 'index',
+                    ],
+                ],
+            ],
             'snapshot' => [
                 'type'    => 'segment',
                 'options' => [

@@ -52,11 +52,16 @@ class UserService
     public function addUser($params)
     {
         $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter')->getDriver()->getConnection();
+        $eventLogDb = $this->sm->get('ActivityLogTable');       
         $adapter->beginTransaction();
         try {
             $result = $this->usersTable->addUser($params);
             if ($result > 0) {
                 $adapter->commit();
+                $eventType = 'user-add';
+                $action = 'updated a new user ' . $params['userName'];
+                $resourceName = 'users';
+                $eventLogDb->addActivityLog($eventType, $action, $resourceName);
                 $alertContainer = new Container('alert');
                 $alertContainer->alertMsg = 'User details added successfully';
             }
@@ -70,11 +75,16 @@ class UserService
     public function updateUser($params)
     {
         $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter')->getDriver()->getConnection();
+        $eventLogDb = $this->sm->get('ActivityLogTable');
         $adapter->beginTransaction();
         try {
             $result = $this->usersTable->updateUser($params);
             if ($result > 0) {
                 $adapter->commit();
+                $eventType = 'user-update';
+                $action = 'updated a user ' . $params['userName'];
+                $resourceName = 'users';
+                $eventLogDb->addActivityLog($eventType, $action, $resourceName);
                 $alertContainer = new Container('alert');
                 $alertContainer->alertMsg = 'User details updated successfully';
             }

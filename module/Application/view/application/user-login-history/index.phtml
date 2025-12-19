@@ -1,0 +1,152 @@
+<?php
+
+use Laminas\Session\Container;
+
+$sessionLogin = new Container('credo');
+$role = $sessionLogin->roleCode;
+
+?>
+<div class="am-content">
+    <div class="page-head">
+        <div class="row">
+            <div class="col-sm-8">
+                <h2><?= $this->translate('User Login History List'); ?></h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="widget widget-fullwidth widget-small" style="padding:5px;">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <form role="form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="date" class="col-sm-2 control-label"><?= $this->translate('Date Range'); ?></label>
+                                    <div class="col-lg-4">
+                                        <input type="text" placeholder="<?= $this->translate('Select Date Range'); ?>" class="form-control" id="date" readonly>
+                                    </div>
+                                    <label for="auditRndNo" class="col-sm-2 control-label"><?= $this->translate('User Name'); ?></label>
+                                    <div class="col-lg-4">
+                                        <input type="text" placeholder="<?= $this->translate('Select User Name'); ?>" class="form-control" name="userName" id="userName">
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="text-align:center;">
+                                    <button type="button" onclick="search();" class="btn btn-space btn-primary"><?= $this->translate('Search'); ?></button>&nbsp;
+                                    <button type="button" onclick="document.location.href = document.location" class="btn btn-space btn-default"><?= $this->translate('Cancel'); ?></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered table-condensed" id="roleDataTable">
+                <thead>
+                    <tr>
+                        <th><?= $this->translate('Login Name'); ?></th>
+                        <th><?= $this->translate('Attempted Date Time'); ?></th>
+                        <th><?= $this->translate('IP Address'); ?></th>
+                        <th><?= $this->translate('Browser'); ?></th>
+                        <th><?= $this->translate('Operating System'); ?></th>
+                        <th><?= $this->translate('Status'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" class="dataTables_empty"><?= $this->translate('Loading data from server'); ?></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    var oTable = null;
+
+    $(document).ready(function() {
+        oTable = $('#roleDataTable').DataTable({
+            "bScrollCollapse": true,
+            "bRetrieve": true,
+            "aaSorting": [
+                [0, "desc"]
+            ],
+            "bProcessing": true,
+            "bServerSide": true,
+            "sAjaxSource": "<?php echo $this->url('user-login-history', ['action' => 'index']); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "dateRange",
+                    "value": $("#date").val()
+                });
+                aoData.push({
+                    "name": "userName",
+                    "value": $("#userName").val()
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+
+      $('#date').daterangepicker({
+			"ranges": {
+				'Today': [moment(), moment()],
+				'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+				'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+				'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+				'This Month': [moment().startOf('month'), moment().endOf('month')],
+				'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+			},
+			"locale": {
+				"format": "DD-MMM-YYYY",
+				"separator": " to ",
+				"applyLabel": "Apply",
+				"cancelLabel": "Cancel",
+				"fromLabel": "From",
+				"toLabel": "To",
+				"customRangeLabel": "Custom",
+				"daysOfWeek": [
+					"Su",
+					"Mo",
+					"Tu",
+					"We",
+					"Th",
+					"Fr",
+					"Sa"
+				],
+				"monthNames": [
+					"January",
+					"February",
+					"March",
+					"April",
+					"May",
+					"June",
+					"July",
+					"August",
+					"September",
+					"October",
+					"November",
+					"December"
+				],
+				"firstDay": 1
+			},
+			//"startDate": "11/08/2015",
+			//"endDate": "11/14/2015",
+			opens: "left",
+		}, function(start, end, label) {
+			$('#daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+		});
+});
+    function search() {
+        oTable.draw();
+    }
+</script>

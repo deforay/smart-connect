@@ -30,6 +30,7 @@ class RoleService
     public function addRoles($params)
     {
         $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter')->getDriver()->getConnection();
+        $eventLogDb = $this->sm->get('ActivityLogTable');
         $adapter->beginTransaction();
         try {
             $db = $this->sm->get('RolesTable');
@@ -37,6 +38,10 @@ class RoleService
             if ($result > 0) {
                 $db->mapRolesPrivileges($params);
                 $adapter->commit();
+                $eventType = 'role-add';
+                $action = 'added a new role ' . $params['roleName'];
+                $resourceName = 'roles';
+                $eventLogDb->addActivityLog($eventType, $action, $resourceName);
                 $alertContainer = new Container('alert');
                 $alertContainer->alertMsg = 'Role details added successfully';
             }
@@ -50,6 +55,7 @@ class RoleService
     public function updateRoles($params)
     {
         $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter')->getDriver()->getConnection();
+        $eventLogDb = $this->sm->get('ActivityLogTable');
         $adapter->beginTransaction();
         try {
             $db = $this->sm->get('RolesTable');
@@ -57,6 +63,10 @@ class RoleService
             if ($result > 0) {
                 $db->mapRolesPrivileges($params);
                 $adapter->commit();
+                $eventType = 'role-update';
+                $action = 'updated a role ' . $params['roleName'];
+                $resourceName = 'roles';
+                $eventLogDb->addActivityLog($eventType, $action, $resourceName);
                 $alertContainer = new Container('alert');
                 $alertContainer->alertMsg = 'Role details updated successfully';
             }

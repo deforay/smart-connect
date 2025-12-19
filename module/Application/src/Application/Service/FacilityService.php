@@ -23,6 +23,10 @@ class FacilityService
             $result = $db->addFacility($params);
             if ($result > 0) {
                 $adapter->commit();
+                $eventType = 'facility-add';
+                $action = 'added a new facility ' . $params['facilityName'];
+                $resourceName = 'facility';
+                $eventLogDb->addActivityLog($eventType, $action, $resourceName);
                 $alertContainer = new Container('alert');
                 $alertContainer->alertMsg = 'Facility details added successfully';
             }
@@ -36,12 +40,17 @@ class FacilityService
     public function updateFacility($params)
     {
         $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter')->getDriver()->getConnection();
+        $eventLogDb = $this->sm->get('ActivityLogTable');       
         $adapter->beginTransaction();
         try {
             $db = $this->sm->get('FacilityTable');
             $result = $db->updateFacility($params);
             if ($result > 0) {
                 $adapter->commit();
+                $eventType = 'facility-update';
+                $action = 'updated a facility ' . $params['facilityName'];
+                $resourceName = 'facility';
+                $eventLogDb->addActivityLog($eventType, $action, $resourceName);
                 $alertContainer = new Container('alert');
                 $alertContainer->alertMsg = 'Facility details updated successfully';
             }

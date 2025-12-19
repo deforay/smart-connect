@@ -276,3 +276,7 @@ FROM dash_user_roles r
 JOIN dash_privileges p
 ON p.resource_id in ('Application\\Controller\\SummaryController','Covid19\\Controller\\SummaryController','Eid\\Controller\\SummaryController','Application\\Controller\\LaboratoryController','Eid\\Controller\\LabsController','Covid19\\Controller\\LabsController','Application\\Controller\\SnapshotController')
 WHERE r.role_name = 'Testing Lab Manager';
+
+
+INSERT INTO `dash_resources` (`resource_id`, `display_name`) VALUES ('Application\\Controller\\UserLoginHistoryController', 'Manage User Login History');
+INSERT INTO `dash_privileges` (`privilege_id`, `resource_id`, `privilege_name`, `display_name`) VALUES ('', 'Application\\\\Controller\\\\UserLoginHistoryController', 'index', 'Access'), ('', 'Application\\\\Controller\\\\UserLoginHistoryController', 'show-params', 'Show Params');

@@ -33,8 +33,9 @@ class UsersTable extends BaseTableGateway
     public function login($params, $otp = null)
     {
         $username = $params['email'];
-
         $dbAdapter = $this->adapter;
+        $userHistoryTable = new UserLoginHistoryTable($dbAdapter);
+
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(['u' => 'dash_users'])
             ->join(['r' => 'dash_user_roles'], 'u.role=r.role_id')
@@ -108,6 +109,13 @@ class UsersTable extends BaseTableGateway
             $loginContainer->mappedFacilitiesCode = $facilities_code;
             $loginContainer->provinces = $provinces;
             $loginContainer->districts = $districts;
+            $eventLogDb = $this->sm->get('ActivityLogTable');
+            $eventType = 'login in';
+            $action =  $rResult["user_name"] . ' logged in';
+            $resourceName = 'login in';
+            $eventLogDb->addActivityLog($eventType, $action, $resourceName);
+            $userHistoryTable->userHistoryLog($rResult["user_name"], $loginStatus = 'successful');
+
             $container->alertMsg = '';
             if ($this->useCurrentSampleTable == true) {
                 $loginContainer->showCurrentTablesToggle = true;
