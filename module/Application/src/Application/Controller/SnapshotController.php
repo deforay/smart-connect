@@ -34,15 +34,12 @@ class SnapshotController extends AbstractActionController
         $provinceName = $this->commonService->getAllProvinceList();
         $districtName = $this->commonService->getAllDistrictList();
         $lapName = $this->commonService->getAllLabName();
-        $totalSamplesCount = $this->snapshotService->getCardInfo();
-        //echo "<pre>"; print_r($totalSamplesCount); die;
         return new ViewModel(array(
             'flag' => $this->params()->fromRoute('id') ?? '',
             'clinicName' => $clinicName,
             'provinceName' => $provinceName,
             'districtName' => $districtName,
-            'lapName' => $lapName,
-            'totalSamplesCount' => $totalSamplesCount
+            'lapName' => $lapName
         ));
     }
     public function getSnapshotDataAction()
