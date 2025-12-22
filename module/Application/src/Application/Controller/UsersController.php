@@ -38,19 +38,11 @@ class UsersController extends AbstractActionController
     {
         $this->layout()->setVariable('activeTab', 'users');
 
-<<<<<<< HEAD
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $this->userService->addUser($params);
-=======
-
-        if ($this->getRequest()->isPost()) {
-            $params = $this->getRequest()->getPost();
-            $result = $this->userService->addUser($params);
-            
->>>>>>> 3c6c04a63dcd1b6fe7b6ec332570cfdbd804f1d7
             return $this->redirect()->toRoute('users');
         }
 
