@@ -142,7 +142,7 @@ $testTypeValue = "for " . implode(",", $testType);
                     <?php
                     if (isset($result) && !empty($result)) {
                         foreach ($result as $val) { ?> {
-                                name: 'N: <?php echo $val[$key]; ?>',
+                                name: ' <?php echo $val[$key]; ?>',
                                 y: <?php echo $val[$key]; ?>,
                                 number: <?php echo $val[$key]; ?>,
                                 myData: '<?php echo htmlspecialchars($val['clinicName']); ?>'
@@ -174,9 +174,9 @@ $testTypeValue = "for " . implode(",", $testType);
         },
         xAxis: {
             categories: ['<?php echo $this->translate('Samples Registered'); ?>',
-                '<?php echo $this->translate('Sample Tested'); ?>',
-                '<?php echo $this->translate('Sample Pending'); ?>',
-                '<?php echo $this->translate('Sample Rejected'); ?>',
+                '<?php echo $this->translate('Samples Tested'); ?>',
+                '<?php echo $this->translate('Samples Pending'); ?>',
+                '<?php echo $this->translate('Samples Rejected'); ?>',
             ]
         },
 

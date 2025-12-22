@@ -254,4 +254,36 @@ class SnapShotService
         }
         return ['quickStats' => $finalResult['quickStats'] ?? null, 'scResult' => $finalResult['received'] ?? null, 'stResult' => $finalResult['tested'] ?? null, 'srResult' => $finalResult['rejected'] ?? null];
     }
+
+    public function getCardInfo()
+    {
+
+        $sql = "SELECT
+            COUNT(*) AS total_received,
+            SUM(sample_tested_datetime IS NOT NULL) AS total_tested,
+            SUM(is_sample_rejected = 'yes') AS total_rejected,
+            SUM(result_approved_datetime IS NOT NULL) AS total_approved,
+            (COUNT(*) - SUM(sample_tested_datetime IS NOT NULL)) AS total_pending
+
+        FROM (
+            SELECT sample_tested_datetime, is_sample_rejected, result_approved_datetime
+            FROM dash_form_vl
+
+            UNION ALL
+
+            SELECT sample_tested_datetime, is_sample_rejected, result_approved_datetime
+            FROM dash_form_eid
+
+            UNION ALL
+
+            SELECT sample_tested_datetime, is_sample_rejected, result_approved_datetime
+            FROM dash_form_covid19
+        ) AS u;
+        ";
+
+
+        $result = $this->adapter->query($sql, Adapter::QUERY_MODE_EXECUTE)->toArray();
+        return $result;
+
+    }
 }

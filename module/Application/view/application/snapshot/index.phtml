@@ -7,7 +7,33 @@ if (isset($requestType) && !empty($requestType)) {
     }
 }
 ?>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
+    .stat-card {
+        border-radius: 12px;
+        padding: 20px;
+        color: #fff;
+        transition: all .4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        cursor: pointer;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-6px) scale(1.03);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .stat-title {
+        font-size: 18px;
+        font-weight: 600;
+        opacity: .9;
+    }
+
+    .stat-value {
+        font-size: 36px;
+        font-weight: 800;
+    }
+
     div#regTable_wrapper {
         background: white;
         padding: 20px;
@@ -109,6 +135,77 @@ if (isset($requestType) && !empty($requestType)) {
         <!-- END EXAMPLE TABLE PORTLET-->
     </div>
 </div>
+
+<?php
+if(isset($totalSamplesCount))
+{
+    $sample = $totalSamplesCount[0];
+?>
+
+    <div class="row">
+
+        <!-- Total Received -->
+        <div class="col-md-2">
+            <div class="card text-white bg-primary">
+                <div class="card-header text-center" style="padding-top: 10px;"><h3>Total Received</h3></div>
+                <div class="card-body text-center" style="padding-bottom: 10px;">
+                    <h2 class="fw-bold"><?= (!empty($sample['total_received'])) ? $sample['total_received'] : '0'; ?></h2>
+                </div>
+            </div>
+        </div>
+
+            <!-- Total Pending -->
+        <div class="col-md-2">
+            <div class="card text-white bg-warning">
+                <div class="card-header text-center display-6" style="padding-top: 10px;"><h3>Total Pending</h3></div>
+                <div class="card-body text-center" style="padding-bottom: 10px;">
+                    <h2 class="fw-bold"><?= (!empty($sample['total_pending'])) ? $sample['total_pending'] : '0'; ?></h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Tested -->
+        <div class="col-md-2">
+            <div class="card text-white bg-success">
+                <div class="card-header text-center display-6" style="padding-top: 10px;"><h3>Total Tested</div>
+                <div class="card-body text-center" style="padding-bottom: 10px;">
+                    <h2 class="fw-bold"><?= (!empty($sample['total_tested'])) ? $sample['total_tested'] : '0'; ?></h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Approved -->
+        <div class="col-md-2">
+            <div class="card text-white bg-info">
+                <div class="card-header text-center display-6" style="padding-top: 10px;"><h3>Total Approved</h3></div>
+                <div class="card-body text-center" style="padding-bottom: 10px;">
+                    <h2 class="fw-bold"><?= (!empty($sample['total_approved'])) ? $sample['total_approved'] : '0'; ?></h2>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Total Rejected -->
+        <div class="col-md-2">
+            <div class="card text-white bg-danger">
+                <div class="card-header text-center display-6" style="padding-top: 10px;"><h3>Total Rejected</h3></div>
+                <div class="card-body text-center" style="padding-bottom: 10px;">
+                    <h2 class="fw-bold"><?= (!empty($sample['total_rejected'])) ? $sample['total_rejected'] : '0'; ?></h2>
+                </div>
+            </div>
+        </div>
+
+     
+
+    </div>
+
+
+    
+
+<?php } ?>
+
+
+
 <div class="row">
     <div id="sampleResultDetails"></div>
 </div>
