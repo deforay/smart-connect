@@ -248,10 +248,153 @@ class SnapShotService
             $result = $this->adapter->query($sql, Adapter::QUERY_MODE_EXECUTE)->toArray();
             $totalSum = 0;
             foreach ($result as $rRow) {
-                $displayDate = date("d-M-Y", strtotime($rRow[$r . 'Date']));
+                $rawDate = $rRow[$r . 'Date'] ?? null;
+                if (empty($rawDate)) {
+                    continue;
+                }
+                $displayDate = date("d-M-Y", strtotime($rawDate));
                 $finalResult[$r][] = array(array('total' => $rRow['total']), 'date' => $displayDate, $r . 'Date' => $displayDate, $r . 'Total' => $totalSum += $rRow['total']);
             }
         }
         return ['quickStats' => $finalResult['quickStats'] ?? null, 'scResult' => $finalResult['received'] ?? null, 'stResult' => $finalResult['tested'] ?? null, 'srResult' => $finalResult['rejected'] ?? null];
+    }
+
+    public function getFacilityPerformanceData($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $loginContainer = new Container('credo');
+        $mappedFacilities = $loginContainer->mappedFacilities ?? null;
+
+        $dimension = $params['dimension'] ?? 'testing_lab';
+        $facilityColumn = ($dimension === 'health_facility') ? 'facility_id' : 'lab_id';
+        $types = (!isset($params['testType']) || empty($params['testType'])) ? ["vl", "eid", "covid19"] : (array) $params['testType'];
+
+        $whereConditions = [];
+
+        if (isset($params['collectionDate']) && !empty($params['collectionDate'])) {
+            [$from, $to] = CommonService::convertDateRange($params['collectionDate']);
+            $whereConditions[] = new WhereExpression("DATE(sample_collection_date) BETWEEN ? AND ?", [$from, $to]);
+        }
+
+        if (isset($params['testedDate']) && !empty($params['testedDate'])) {
+            [$from, $to] = CommonService::convertDateRange($params['testedDate']);
+            $whereConditions[] = new WhereExpression("DATE(sample_tested_datetime) BETWEEN ? AND ?", [$from, $to]);
+        }
+
+        if (isset($params['provinceName']) && !empty($params['provinceName'])) {
+            $whereConditions[] = new WhereExpression("facility_state_id IN (?)", [implode(",", $params['provinceName'])]);
+        }
+
+        if (isset($params['districtName']) && !empty($params['districtName'])) {
+            $whereConditions[] = new WhereExpression("facility_district_id IN (?)", [implode(",", $params['districtName'])]);
+        }
+
+        if (isset($params['clinicId']) && !empty($params['clinicId'])) {
+            $whereConditions[] = new WhereExpression("facility_id IN (?)", [implode(",", $params['clinicId'])]);
+        }
+
+        if (isset($params['labId']) && !empty($params['labId'])) {
+            $whereConditions[] = new WhereExpression("lab_id IN (?)", [implode(",", $params['labId'])]);
+        }
+
+        if (!empty($params['flag']) && $params['flag'] == 'poc') {
+            $whereConditions[] = new WhereExpression("icm.poc_device = ?", ['yes']);
+        }
+
+        if (!empty($mappedFacilities)) {
+            $whereConditions[] = new WhereExpression("lab_id IN (?)", [implode(", ", $mappedFacilities)]);
+        }
+
+        $unionQueries = [];
+        foreach ($types as $type) {
+            $tableAlias = "t";
+            $facilityAlias = ($dimension === 'health_facility') ? 'hf' : 'lb';
+
+            $select = $sql->select()
+                ->from([$tableAlias => "dash_form_$type"])
+                ->columns([
+                    'facility_id' => new Expression("$tableAlias.$facilityColumn"),
+                    'facility_name' => new Expression("$facilityAlias.facility_name"),
+                    'received_count' => new Expression("SUM(CASE WHEN $tableAlias.sample_collection_date IS NOT NULL AND DATE($tableAlias.sample_collection_date) NOT IN ('1970-01-01', '0000-00-00') THEN 1 ELSE 0 END)"),
+                    'tested_count' => new Expression("SUM(CASE WHEN $tableAlias.sample_tested_datetime IS NOT NULL AND DATE($tableAlias.sample_tested_datetime) NOT IN ('1970-01-01', '0000-00-00') THEN 1 ELSE 0 END)"),
+                    'rejected_count' => new Expression("SUM(CASE WHEN (($tableAlias.reason_for_sample_rejection IS NOT NULL AND $tableAlias.reason_for_sample_rejection != '' AND $tableAlias.reason_for_sample_rejection != 0) OR ($tableAlias.is_sample_rejected LIKE 'yes')) AND ($tableAlias.sample_collection_date IS NOT NULL AND DATE($tableAlias.sample_collection_date) NOT IN ('1970-01-01', '0000-00-00')) THEN 1 ELSE 0 END)")
+                ])
+                ->join([$facilityAlias => 'facility_details'], "$tableAlias.$facilityColumn = $facilityAlias.facility_id", []);
+
+            if (!empty($params['flag']) && $params['flag'] == 'poc') {
+                $select->join(['icm' => 'instrument_machines'], "$tableAlias.import_machine_name = icm.config_machine_id", []);
+            }
+
+            if (!empty($whereConditions)) {
+                foreach ($whereConditions as $condition) {
+                    $select->where($condition);
+                }
+            }
+
+            $select->where(["$tableAlias.$facilityColumn IS NOT NULL"]);
+            $select->group(["$tableAlias.$facilityColumn", "$facilityAlias.facility_name"]);
+            $unionQueries[] = $sql->buildSqlString($select);
+        }
+
+        if (empty($unionQueries)) {
+            return [
+                'totals' => [
+                    'total_received' => 0,
+                    'total_tested' => 0,
+                    'total_rejected' => 0,
+                    'total_pending' => 0,
+                    'overall_pct_tested' => 0
+                ],
+                'perFacility' => []
+            ];
+        }
+
+        $finalQuery = "SELECT facility_id, facility_name,
+                            SUM(received_count) AS received_count,
+                            SUM(tested_count) AS tested_count,
+                            SUM(rejected_count) AS rejected_count
+                        FROM (" . implode(" UNION ALL ", $unionQueries) . ") AS t
+                        GROUP BY facility_id, facility_name";
+
+        $rows = $this->adapter->query($finalQuery, Adapter::QUERY_MODE_EXECUTE)->toArray();
+
+        $perFacility = [];
+        $totalReceived = $totalTested = $totalRejected = 0;
+        foreach ($rows as $row) {
+            $received = (int) ($row['received_count'] ?? 0);
+            $tested = (int) ($row['tested_count'] ?? 0);
+            $rejected = (int) ($row['rejected_count'] ?? 0);
+            $pending = max(0, $received - $tested - $rejected);
+            $pctTested = ($received > 0) ? round(($tested * 100) / $received, 2) : 0;
+
+            $perFacility[] = [
+                'id' => $row['facility_id'],
+                'name' => $row['facility_name'],
+                'received' => $received,
+                'tested' => $tested,
+                'rejected' => $rejected,
+                'pending' => $pending,
+                'pct_tested' => $pctTested
+            ];
+
+            $totalReceived += $received;
+            $totalTested += $tested;
+            $totalRejected += $rejected;
+        }
+
+        $totalPending = max(0, $totalReceived - $totalTested - $totalRejected);
+        $overallPctTested = ($totalReceived > 0) ? round(($totalTested * 100) / $totalReceived, 2) : 0;
+
+        return [
+            'totals' => [
+                'total_received' => $totalReceived,
+                'total_tested' => $totalTested,
+                'total_rejected' => $totalRejected,
+                'total_pending' => $totalPending,
+                'overall_pct_tested' => $overallPctTested
+            ],
+            'perFacility' => $perFacility
+        ];
     }
 }

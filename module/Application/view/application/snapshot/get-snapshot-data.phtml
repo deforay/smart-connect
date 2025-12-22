@@ -17,27 +17,38 @@ $testTypeValue = "for " . implode(",", $testType);
     </div>
 </div>
 <div class="row">
-    <div class="col-md-6 col-sm-6">
+    <div class="col-md-12">
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Recieved ') . strtoupper($testTypeValue); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Facility Performance'); ?></span>
+                </div>
+                <div class="actions pull-right" style="padding-top:6px;">
+                    <div class="btn-group">
+                        <select id="facilityPerformanceDimension" class="form-control input-sm">
+                            <option value="testing_lab"><?php echo $this->translate('Testing Lab'); ?></option>
+                            <option value="health_facility"><?php echo $this->translate('Health Facility'); ?></option>
+                        </select>
+                    </div>
+                    <div class="btn-group" style="margin-left:5px;">
+                        <select id="facilityPerformanceTopN" class="form-control input-sm">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-            <div class="portlet-body" id="femalePatientPieChart">
-                <div id="sampleRecived" style="height:500px;"></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-sm-6">
-        <div class="portlet box blue">
-            <div class="portlet-title">
-                <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Tested ') . strtoupper($testTypeValue); ?></span>
-                </div>
-            </div>
-            <div class="portlet-body" id="lineOfTreatmentPieChart">
-                <div id="sampleTested" style="height:500px;"></div>
+            <div class="portlet-body">
+                <ul class="nav nav-pills" id="facilityPerformanceModes" style="margin-bottom:15px;">
+                    <li class="active"><a href="#" data-mode="backlog"><?php echo $this->translate('Backlog'); ?></a></li>
+                    <li><a href="#" data-mode="pct_tested"><?php echo $this->translate('% Tested'); ?></a></li>
+                    <li><a href="#" data-mode="volume"><?php echo $this->translate('Volume'); ?></a></li>
+                </ul>
+                <div id="facilityPerformanceHelp" class="text-muted" style="margin-bottom:10px; display:none;"></div>
+                <div id="facilityPerformanceChart" style="height:520px;"></div>
+                <div id="facilityPerformanceSummary" class="text-muted" style="display:none;margin-top:8px;"></div>
+                <div id="facilityPerformanceEmpty" class="text-center text-muted" style="display:none;padding:10px;"><?php echo $this->translate('No data available for the selected filters'); ?></div>
             </div>
         </div>
     </div>
@@ -46,17 +57,16 @@ $testTypeValue = "for " . implode(",", $testType);
 <table id="regTable" class="table portlet-body table-striped table-bordered table-hover table-checkable order-column">
     <thead>
         <tr>
-            <th style="width:40%;text-align:left;"><?php echo $this->translate('Lab Name'); ?></th>
-            <th style="width:20%;text-align:center;"><?php echo $this->translate('Samples Recieved'); ?></th>
+            <th style="width:40%;text-align:left;"><?php echo $this->translate('Facility'); ?></th>
+            <th style="width:20%;text-align:center;"><?php echo $this->translate('Samples Received'); ?></th>
             <th style="width:20%;text-align:center;"><?php echo $this->translate('Samples Tested'); ?></th>
             <th style="width:20%;text-align:center;"><?php echo $this->translate('Samples Rejected'); ?></th>
         </tr>
     </thead>
     <tbody>
         <?php
-        $echo = '';
+        $rtotal = $ttotal = $rjtotal = $pjtotal = 0;
         if (isset($result) && !empty($result)) {
-            $rtotal = $ttotal = $rjtotal = $pjtotal = 0;
             foreach ($result as $val) { ?>
                 <tr>
                     <td style="width:40%;text-align:left;"><?php echo $val['clinicName']; ?></td>
@@ -68,12 +78,8 @@ $testTypeValue = "for " . implode(",", $testType);
                 $ttotal += $val['totalTested'];
                 $rjtotal += $val['totalRejected'];
                 $pjtotal += $val['totalPending'];
-            } ?>
-        <?php } else { ?>
-            <tr>
-                <td colspan="4" class="dataTables_empty">No data found </td>
-            </tr>
-        <?php } ?>
+            }
+        } ?>
     </tbody>
     <?php if (isset($result) && !empty($result)) { ?>
         <tfoot>
@@ -87,16 +93,408 @@ $testTypeValue = "for " . implode(",", $testType);
     <?php } ?>
 </table>
 <script>
-    <?php foreach (['sampleRecived', 'sampleTested'] as $val) {
-        $key = ($val == 'sampleRecived') ? 'totalReceived' : 'totalTested';
-        $heading = ($val == 'sampleRecived') ? "Sample Received" : "Sample Tested";
-        $subheading = ($val == 'sampleRecived') ? "Received" : "Tested"; ?>
-        $('#<?php echo $val; ?>').highcharts({
+    (function($) {
+        var facilityPerformanceState = {
+            mode: 'backlog',
+            dimension: 'testing_lab',
+            topN: 10,
+            data: null,
+            chart: null
+        };
+        var facilityTableReady = false;
+        var pendingFacilityFilter = null;
+
+        window.onFacilityTableReady = function() {
+            facilityTableReady = true;
+            if (pendingFacilityFilter) {
+                applyFacilityTableFilter(pendingFacilityFilter);
+                pendingFacilityFilter = null;
+            }
+        };
+
+        function buildFacilityFilters() {
+            return {
+                collectionDate: $('#collectionDate').val(),
+                testedDate: $('#testedDate').val(),
+                testType: $('#testType').val(),
+                provinceName: $('#provinceName').val(),
+                districtName: $('#districtName').val(),
+                clinicId: $('#clinicId').val(),
+                labId: $('#labId').val(),
+                flag: '<?php echo isset($params['flag']) ? $params['flag'] : ''; ?>'
+            };
+        }
+
+        function fetchFacilityPerformance() {
+            $('#facilityPerformanceEmpty').hide();
+            $('#facilityPerformanceChart').html('<div class="text-center" style="padding:15px;"><?php echo $this->translate('Loading facility performance'); ?>...</div>');
+            return $.ajax({
+                url: "<?php echo $this->url('snapshot', ['action' => 'get-facility-performance']); ?>",
+                type: 'POST',
+                dataType: 'json',
+                data: $.extend(buildFacilityFilters(), {
+                    dimension: facilityPerformanceState.dimension,
+                    topN: facilityPerformanceState.topN
+                })
+            }).done(function(response) {
+                facilityPerformanceState.data = response || {
+                    perFacility: [],
+                    totals: {}
+                };
+                renderFacilityChart();
+            }).fail(function() {
+                $('#facilityPerformanceChart').html('<div class="text-center text-danger" style="padding:15px;"><?php echo $this->translate('Unable to load facility performance data.'); ?></div>');
+            });
+        }
+
+        function renderFacilityChart() {
+            var data = facilityPerformanceState.data || {};
+            var facilities = data.perFacility || [];
+            var chartContainer = $('#facilityPerformanceChart');
+            chartContainer.empty();
+            if (facilityPerformanceState.chart) {
+                facilityPerformanceState.chart.destroy();
+                facilityPerformanceState.chart = null;
+            }
+
+            if (!facilities.length) {
+                $('#facilityPerformanceEmpty').show();
+                return;
+            }
+
+            var mode = facilityPerformanceState.mode;
+            var topN = facilityPerformanceState.topN;
+            var categories = [];
+            var series = [];
+            var tooltipFormatter;
+            var plotLines = [];
+            var stacking = null;
+            var othersSummary = null;
+            var barCount = 0;
+            var helpText = '';
+            var overallPct = null;
+
+            if (mode === 'backlog') {
+                var sorted = facilities.slice().sort(function(a, b) {
+                    return (b.pending || 0) - (a.pending || 0);
+                });
+                var top = sorted.slice(0, topN);
+                var remainder = sorted.slice(topN);
+                if (remainder.length) {
+                    var others = remainder.reduce(function(acc, item) {
+                        acc.received += item.received || 0;
+                        acc.tested += item.tested || 0;
+                        acc.rejected += item.rejected || 0;
+                        acc.pending += item.pending || 0;
+                        return acc;
+                    }, {
+                        received: 0,
+                        tested: 0,
+                        rejected: 0,
+                        pending: 0,
+                        name: '<?php echo $this->translate('Others'); ?>',
+                        id: 'others'
+                    });
+                    othersSummary = {
+                        tested: others.tested,
+                        pending: others.pending,
+                        received: others.received,
+                        rejected: others.rejected
+                    };
+                    top.push(others);
+                }
+                categories = top.map(function(item) {
+                    return item.name;
+                });
+                var testedSeries = top.map(function(item) {
+                    return {
+                        y: item.tested || 0,
+                        facilityId: item.id,
+                        facilityName: item.name,
+                        isOther: item.id === 'others',
+                        received: item.received || 0,
+                        tested: item.tested || 0,
+                        rejected: item.rejected || 0,
+                        pending: item.pending || 0,
+                        pctTested: item.pct_tested || 0
+                    };
+                });
+                var pendingSeries = top.map(function(item) {
+                    return {
+                        y: item.pending || 0,
+                        facilityId: item.id,
+                        facilityName: item.name,
+                        isOther: item.id === 'others',
+                        received: item.received || 0,
+                        tested: item.tested || 0,
+                        rejected: item.rejected || 0,
+                        pending: item.pending || 0,
+                        pctTested: item.pct_tested || 0
+                    };
+                });
+                stacking = 'normal';
+                series = [{
+                    name: '<?php echo $this->translate('Tested'); ?>',
+                    data: testedSeries,
+                    color: '#4CAF50'
+                }, {
+                    name: '<?php echo $this->translate('Pending'); ?>',
+                    data: pendingSeries,
+                    color: '#FFD55A'
+                }];
+                tooltipFormatter = function() {
+                    var p = this.point;
+                    return '<b>' + p.facilityName + '</b><br/>' +
+                        '<?php echo $this->translate('Received'); ?>: ' + Highcharts.numberFormat(p.received || 0, 0) + '<br/>' +
+                        '<?php echo $this->translate('Tested'); ?>: ' + Highcharts.numberFormat(p.tested || 0, 0) + '<br/>' +
+                        '<?php echo $this->translate('Pending'); ?>: ' + Highcharts.numberFormat(p.pending || 0, 0) + '<br/>' +
+                        '<?php echo $this->translate('Rejected'); ?>: ' + Highcharts.numberFormat(p.rejected || 0, 0) + '<br/>' +
+                        '<?php echo $this->translate('% Tested'); ?>: ' + Highcharts.numberFormat(p.pctTested || 0, 2) + '%';
+                };
+            } else if (mode === 'pct_tested') {
+                var filtered = facilities.filter(function(item) {
+                    return (item.received || 0) > 0;
+                }).sort(function(a, b) {
+                    return (a.pct_tested || 0) - (b.pct_tested || 0);
+                });
+                var pctTop = filtered.slice(0, topN);
+                categories = pctTop.map(function(item) {
+                    return item.name;
+                });
+                series = [{
+                    name: '<?php echo $this->translate('% Tested'); ?>',
+                    data: pctTop.map(function(item) {
+                        return {
+                            y: item.pct_tested || 0,
+                            facilityId: item.id,
+                            facilityName: item.name,
+                            received: item.received || 0,
+                            tested: item.tested || 0,
+                            rejected: item.rejected || 0,
+                            pending: item.pending || 0,
+                            pctTested: item.pct_tested || 0
+                        };
+                    }),
+                    color: '#039BE6'
+                }];
+                overallPct = data.totals && typeof data.totals.overall_pct_tested !== 'undefined' ? parseFloat(data.totals.overall_pct_tested) : null;
+                if (!isNaN(overallPct)) {
+                    plotLines.push({
+                        color: '#f15c80',
+                        width: 2,
+                        value: overallPct,
+                        zIndex: 5,
+                        label: {
+                            text: Highcharts.numberFormat(overallPct, 1) + '%',
+                            align: 'left',
+                            x: 5,
+                            y: -10,
+                            style: {
+                                color: '#f15c80'
+                            }
+                        }
+                    });
+                }
+                tooltipFormatter = function() {
+                    var p = this.point;
+                    return '<b>' + p.facilityName + '</b><br/>' +
+                        '<?php echo $this->translate('% Tested'); ?>: ' + Highcharts.numberFormat(p.pctTested || 0, 2) + '%<br/>' +
+                        '<?php echo $this->translate('Received'); ?>: ' + Highcharts.numberFormat(p.received || 0, 0) + '<br/>' +
+                        '<?php echo $this->translate('Tested'); ?>: ' + Highcharts.numberFormat(p.tested || 0, 0);
+                };
+                if (!isNaN(overallPct)) {
+                    helpText = '<?php echo $this->translate('% of received samples that are tested (facilities with 0 received are hidden)'); ?>. ' +
+                        '<?php echo $this->translate('Pink line = overall % tested'); ?>: ' + Highcharts.numberFormat(overallPct, 1) + '%';
+                } else {
+                    helpText = '<?php echo $this->translate('% of received samples that are tested (facilities with 0 received are hidden)'); ?>';
+                }
+            } else {
+                var volumeSorted = facilities.slice().sort(function(a, b) {
+                    return (b.received || 0) - (a.received || 0);
+                });
+                var volumeTop = volumeSorted.slice(0, topN);
+                categories = volumeTop.map(function(item) {
+                    return item.name;
+                });
+                series = [{
+                    name: '<?php echo $this->translate('Received'); ?>',
+                    data: volumeTop.map(function(item) {
+                        return {
+                            y: item.received || 0,
+                            facilityId: item.id,
+                            facilityName: item.name,
+                            received: item.received || 0,
+                            tested: item.tested || 0,
+                            rejected: item.rejected || 0,
+                            pending: item.pending || 0,
+                            pctTested: item.pct_tested || 0
+                        };
+                    }),
+                    color: '#7cb5ec'
+                }];
+                tooltipFormatter = function() {
+                    var p = this.point;
+                    return '<b>' + p.facilityName + '</b><br/>' +
+                        '<?php echo $this->translate('Received'); ?>: ' + Highcharts.numberFormat(p.received || 0, 0) + '<br/>' +
+                        '<?php echo $this->translate('Tested'); ?>: ' + Highcharts.numberFormat(p.tested || 0, 0) + '<br/>' +
+                        '<?php echo $this->translate('Pending'); ?>: ' + Highcharts.numberFormat(p.pending || 0, 0) + '<br/>' +
+                        '<?php echo $this->translate('% Tested'); ?>: ' + Highcharts.numberFormat(p.pctTested || 0, 2) + '%';
+                };
+            }
+
+            barCount = categories.length;
+            var dynamicHeight = Math.max(320, (barCount * 38) + 120);
+            chartContainer.height(dynamicHeight);
+            var helpEl = $('#facilityPerformanceHelp');
+            if (helpText) {
+                helpEl.text(helpText).show();
+            } else {
+                helpEl.hide().text('');
+            }
+
+            facilityPerformanceState.chart = Highcharts.chart('facilityPerformanceChart', {
+                chart: {
+                    type: 'bar',
+                    spacing: [10, 20, 10, 20]
+                },
+                title: {
+                    text: ''
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: categories,
+                    title: {
+                        text: null
+                    }
+                },
+                yAxis: {
+                    min: 0,
+                    max: (mode === 'pct_tested') ? 100 : null,
+                    title: {
+                        text: (mode === 'pct_tested') ? '<?php echo $this->translate('% Tested'); ?>' : '<?php echo $this->translate('Samples'); ?>'
+                    },
+                    plotLines: plotLines
+                },
+                tooltip: {
+                    useHTML: true,
+                    formatter: tooltipFormatter
+                },
+                plotOptions: {
+                    series: {
+                        stacking: stacking,
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function() {
+                                    if (this.options && this.options.isOther) {
+                                        return;
+                                    }
+                                    handleFacilityBarClick(this.options);
+                                }
+                            }
+                        },
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                if (mode === 'pct_tested') {
+                                    var p = this.point;
+                                    return Highcharts.numberFormat(p.pctTested || 0, 1) + '% (' +
+                                        Highcharts.numberFormat(p.tested || 0, 0) + '/' +
+                                        Highcharts.numberFormat(p.received || 0, 0) + ')';
+                                }
+                                return Highcharts.numberFormat(this.y, 0);
+                            }
+                        }
+                    }
+                },
+                legend: {
+                    enabled: series.length > 1
+                },
+                series: series
+            });
+
+            var summaryEl = $('#facilityPerformanceSummary');
+            if (mode === 'backlog' && othersSummary) {
+                summaryEl.show().text('<?php echo $this->translate('Others (aggregated)'); ?>: ' +
+                    '<?php echo $this->translate('Tested'); ?>: ' + Highcharts.numberFormat(othersSummary.tested || 0, 0) + '   ' +
+                    '<?php echo $this->translate('Pending'); ?>: ' + Highcharts.numberFormat(othersSummary.pending || 0, 0));
+            } else {
+                summaryEl.hide().text('');
+            }
+        }
+
+        function handleFacilityBarClick(pointOptions) {
+            if (!pointOptions || !pointOptions.facilityName) {
+                return;
+            }
+            applyFacilityTableFilter(pointOptions.facilityName);
+        }
+
+        function applyFacilityTableFilter(facilityName) {
+            if (!facilityName) {
+                return;
+            }
+            if (!facilityTableReady || typeof oTable === 'undefined' || !oTable || !oTable.fnFilter) {
+                pendingFacilityFilter = facilityName;
+                return;
+            }
+            var columnIndex = getFacilityColumnIndex();
+            if (columnIndex !== null) {
+                oTable.fnFilter(facilityName, columnIndex, false, false);
+            } else {
+                oTable.fnFilter('"' + facilityName + '"');
+            }
+            if ($('#regTable').length) {
+                $('html, body').animate({
+                    scrollTop: $('#regTable').offset().top - 60
+                }, 400);
+            }
+        }
+
+        function getFacilityColumnIndex() {
+            var index = null;
+            $('#regTable thead th').each(function(i) {
+                var text = $.trim($(this).text()).toLowerCase();
+                if (text.indexOf('facility') !== -1 || text.indexOf('lab') !== -1) {
+                    index = i;
+                    return false;
+                }
+            });
+            return index;
+        }
+
+        function bindFacilityPerformanceControls() {
+            $('#facilityPerformanceModes').on('click', 'a', function(e) {
+                e.preventDefault();
+                var $parent = $(this).parent('li');
+                if ($parent.hasClass('active')) {
+                    return;
+                }
+                $('#facilityPerformanceModes li').removeClass('active');
+                $parent.addClass('active');
+                facilityPerformanceState.mode = $(this).data('mode');
+                renderFacilityChart();
+            });
+
+            $('#facilityPerformanceDimension').on('change', function() {
+                facilityPerformanceState.dimension = $(this).val();
+                fetchFacilityPerformance();
+            });
+
+            $('#facilityPerformanceTopN').on('change', function() {
+                facilityPerformanceState.topN = parseInt($(this).val(), 10) || 10;
+                renderFacilityChart();
+            });
+        }
+
+        bindFacilityPerformanceControls();
+        fetchFacilityPerformance();
+
+        $('#overallSnapshotStatus').highcharts({
             chart: {
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false,
-                type: 'pie'
+                type: 'column'
             },
             title: {
                 text: ''
@@ -104,130 +502,66 @@ $testTypeValue = "for " . implode(",", $testType);
             exporting: {
                 chartOptions: {
                     subtitle: {
-                        text: '<?php echo $this->translate($heading); ?>',
+                        text: '<?php echo $this->translate('Overall Snapshot Status'); ?>',
                     }
                 }
             },
             credits: {
                 enabled: false
             },
-            tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
+            xAxis: {
+                categories: ['<?php echo $this->translate('Samples Registered'); ?>',
+                    '<?php echo $this->translate('Sample Tested'); ?>',
+                    '<?php echo $this->translate('Sample Pending'); ?>',
+                    '<?php echo $this->translate('Sample Rejected'); ?>',
+                ]
             },
-            legend: {
-                //layout: 'vertical',
-                align: 'center',
-                //backgroundColor: '#f3f3f3',
-                useHTML: true,
-                itemMarginBottom: 5,
-                labelFormatter: function() {
-                    return '<div style="width:230px"><span style="float:left;font-size:10px;">' + this.myData + ' (' + this.name + ') - </span><span style="font-size:10px;padding:1px; ">' + this.percentage.toFixed(1) + '% (' + Highcharts.numberFormat(this.y, 0) + ')</span></div>';
+            yAxis: {
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: '<?php echo $this->translate('No. of Samples'); ?>'
+                }
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>' + this.x + '</b><br/>' +
+                        this.series.name + ': ' + this.y + '<br/>' +
+                        '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
                 }
             },
             plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
+                column: {
+                    stacking: 'normal',
                     dataLabels: {
-                        //enabled : false,
-                        distance: -30
+                        enabled: true
                     },
-                    showInLegend: true
+                    enableMouseTracking: false
                 }
             },
             series: [{
-                name: '<?php echo $this->translate($subheading); ?>',
-                colorByPoint: true,
-                data: [
-                    <?php
-                    if (isset($result) && !empty($result)) {
-                        foreach ($result as $val) { ?> {
-                                name: 'N: <?php echo $val[$key]; ?>',
-                                y: <?php echo $val[$key]; ?>,
-                                number: <?php echo $val[$key]; ?>,
-                                myData: '<?php echo htmlspecialchars($val['clinicName']); ?>'
-                            },
-                    <?php }
-                    } ?>
-                ]
+                name: '<?php echo $this->translate('Sample'); ?>',
+                showInLegend: false,
+                data: [{
+                        y: <?php echo (isset($rtotal)) ? $rtotal : 0; ?>,
+                        color: 'gray'
+                    },
+                    {
+                        y: <?php echo (isset($ttotal)) ? $ttotal : 0; ?>,
+                        color: '#039BE6'
+                    },
+                    {
+                        y: <?php echo (isset($pjtotal)) ? $pjtotal : 0; ?>,
+                        color: '#FFD55A'
+                    },
+                    {
+                        y: <?php echo (isset($rjtotal)) ? $rjtotal : 0; ?>,
+                        color: '#ff1900'
+                    }
+                ],
+                stack: 'total',
+                color: 'red',
             }]
         });
-    <?php } ?>
-
-    $('#overallSnapshotStatus').highcharts({
-        chart: {
-            type: 'column'
-        },
-
-        title: {
-            text: ''
-        },
-        exporting: {
-            chartOptions: {
-                subtitle: {
-                    text: '<?php echo $this->translate('Overall Snapshot Status'); ?>',
-                }
-            }
-        },
-        credits: {
-            enabled: false
-        },
-        xAxis: {
-            categories: ['<?php echo $this->translate('Samples Registered'); ?>',
-                '<?php echo $this->translate('Sample Tested'); ?>',
-                '<?php echo $this->translate('Sample Pending'); ?>',
-                '<?php echo $this->translate('Sample Rejected'); ?>',
-            ]
-        },
-
-        yAxis: {
-            allowDecimals: false,
-            min: 0,
-            title: {
-                text: '<?php echo $this->translate('No. of Samples'); ?>'
-            }
-        },
-
-        tooltip: {
-            formatter: function() {
-                return '<b>' + this.x + '</b><br/>' +
-                    this.series.name + ': ' + this.y + '<br/>' +
-                    '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
-            }
-        },
-
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                dataLabels: {
-                    enabled: true
-                },
-                enableMouseTracking: false
-            }
-        },
-
-        series: [{
-            name: '<?php echo $this->translate('Sample'); ?>',
-            showInLegend: false,
-            data: [{
-                    y: <?php echo (isset($rtotal)) ? $rtotal : 0; ?>,
-                    color: 'gray'
-                },
-                {
-                    y: <?php echo (isset($ttotal)) ? $ttotal : 0; ?>,
-                    color: '#039BE6'
-                },
-                {
-                    y: <?php echo (isset($pjtotal)) ? $pjtotal : 0; ?>,
-                    color: '#FFD55A'
-                },
-                {
-                    y: <?php echo (isset($rjtotal)) ? $rjtotal : 0; ?>,
-                    color: '#ff1900'
-                }
-            ],
-            stack: 'total',
-            color: 'red',
-        }]
-    });
+    })(jQuery);
 </script>

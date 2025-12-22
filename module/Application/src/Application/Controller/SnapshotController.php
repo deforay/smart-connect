@@ -70,4 +70,15 @@ class SnapshotController extends AbstractActionController
             return $viewModel;
         }
     }
+
+    public function getFacilityPerformanceAction()
+    {
+        /** @var \Laminas\Http\Request $request */
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->snapshotService->getFacilityPerformanceData($params);
+            return $this->getResponse()->setContent(CommonService::jsonEncode($result));
+        }
+    }
 }

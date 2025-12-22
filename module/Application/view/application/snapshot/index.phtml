@@ -316,9 +316,10 @@ if (isset($requestType) && !empty($requestType)) {
             function(data) {
                 if (data != "" || data != null || data != undefined) {
                     $('#loadData').html(data);
-                    $('#regTable').dataTable({
+                    oTable = $('#regTable').dataTable({
                         "bAutoWidth": false,
                         "bProcessing": true,
+                        "bDestroy": true,
                         "aaSorting": [
                             [1, "desc"]
                         ],
@@ -334,8 +335,14 @@ if (isset($requestType) && !empty($requestType)) {
                             {
                                 "sClass": "center"
                             }
-                        ]
+                        ],
+                        "language": {
+                            "emptyTable": "<?php echo $this->translate('No data found'); ?>"
+                        }
                     });
+                    if (typeof window.onFacilityTableReady === 'function') {
+                        window.onFacilityTableReady();
+                    }
                 }
             });
         getSampleResult();
