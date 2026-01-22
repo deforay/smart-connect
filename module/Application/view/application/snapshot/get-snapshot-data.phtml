@@ -47,6 +47,16 @@ $testTypeValue = "for " . implode(",", $testType);
                 </ul>
                 <div id="facilityPerformanceHelp" class="text-muted" style="margin-bottom:10px; display:none;"></div>
                 <div id="facilityPerformanceChart" style="height:520px;"></div>
+                <div id="facilityPerformanceDual" class="row" style="display:none;">
+                    <div class="col-md-6">
+                        <h5 class="text-muted" style="margin-top:0;"><?php echo $this->translate('Lowest % Tested'); ?></h5>
+                        <div id="facilityPerformanceChartWorst" style="height:520px;"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="text-muted" style="margin-top:0;"><?php echo $this->translate('Highest % Tested'); ?></h5>
+                        <div id="facilityPerformanceChartBest" style="height:520px;"></div>
+                    </div>
+                </div>
                 <div id="facilityPerformanceSummary" class="text-muted" style="display:none;margin-top:8px;"></div>
                 <div id="facilityPerformanceEmpty" class="text-center text-muted" style="display:none;padding:10px;"><?php echo $this->translate('No data available for the selected filters'); ?></div>
             </div>
@@ -99,7 +109,10 @@ $testTypeValue = "for " . implode(",", $testType);
             dimension: 'testing_lab',
             topN: 10,
             data: null,
-            chart: null
+            chart: null,
+            chartWorst: null,
+            chartBest: null,
+            others: null
         };
         var facilityTableReady = false;
         var pendingFacilityFilter = null;
@@ -134,13 +147,16 @@ $testTypeValue = "for " . implode(",", $testType);
                 dataType: 'json',
                 data: $.extend(buildFacilityFilters(), {
                     dimension: facilityPerformanceState.dimension,
-                    topN: facilityPerformanceState.topN
+                    topN: facilityPerformanceState.topN,
+                    mode: facilityPerformanceState.mode
                 })
             }).done(function(response) {
                 facilityPerformanceState.data = response || {
                     perFacility: [],
-                    totals: {}
+                    totals: {},
+                    others: null
                 };
+                facilityPerformanceState.others = response && response.others ? response.others : null;
                 renderFacilityChart();
             }).fail(function() {
                 $('#facilityPerformanceChart').html('<div class="text-center text-danger" style="padding:15px;"><?php echo $this->translate('Unable to load facility performance data.'); ?></div>');
@@ -151,16 +167,27 @@ $testTypeValue = "for " . implode(",", $testType);
             var data = facilityPerformanceState.data || {};
             var facilities = data.perFacility || [];
             var chartContainer = $('#facilityPerformanceChart');
+            var dualContainer = $('#facilityPerformanceDual');
             chartContainer.empty();
+            $('#facilityPerformanceChartWorst, #facilityPerformanceChartBest').empty();
             if (facilityPerformanceState.chart) {
                 facilityPerformanceState.chart.destroy();
                 facilityPerformanceState.chart = null;
+            }
+            if (facilityPerformanceState.chartWorst) {
+                facilityPerformanceState.chartWorst.destroy();
+                facilityPerformanceState.chartWorst = null;
+            }
+            if (facilityPerformanceState.chartBest) {
+                facilityPerformanceState.chartBest.destroy();
+                facilityPerformanceState.chartBest = null;
             }
 
             if (!facilities.length) {
                 $('#facilityPerformanceEmpty').show();
                 return;
             }
+            $('#facilityPerformanceEmpty').hide();
 
             var mode = facilityPerformanceState.mode;
             var topN = facilityPerformanceState.topN;
@@ -173,36 +200,15 @@ $testTypeValue = "for " . implode(",", $testType);
             var barCount = 0;
             var helpText = '';
             var overallPct = null;
+            var othersFromApi = facilityPerformanceState.others;
+            var dualMode = false;
 
             if (mode === 'backlog') {
                 var sorted = facilities.slice().sort(function(a, b) {
                     return (b.pending || 0) - (a.pending || 0);
                 });
                 var top = sorted.slice(0, topN);
-                var remainder = sorted.slice(topN);
-                if (remainder.length) {
-                    var others = remainder.reduce(function(acc, item) {
-                        acc.received += item.received || 0;
-                        acc.tested += item.tested || 0;
-                        acc.rejected += item.rejected || 0;
-                        acc.pending += item.pending || 0;
-                        return acc;
-                    }, {
-                        received: 0,
-                        tested: 0,
-                        rejected: 0,
-                        pending: 0,
-                        name: '<?php echo $this->translate('Others'); ?>',
-                        id: 'others'
-                    });
-                    othersSummary = {
-                        tested: others.tested,
-                        pending: others.pending,
-                        received: others.received,
-                        rejected: others.rejected
-                    };
-                    top.push(others);
-                }
+                othersSummary = buildOthersSummary(sorted, topN, 'pending', true, othersFromApi);
                 categories = top.map(function(item) {
                     return item.name;
                 });
@@ -211,7 +217,6 @@ $testTypeValue = "for " . implode(",", $testType);
                         y: item.tested || 0,
                         facilityId: item.id,
                         facilityName: item.name,
-                        isOther: item.id === 'others',
                         received: item.received || 0,
                         tested: item.tested || 0,
                         rejected: item.rejected || 0,
@@ -224,7 +229,6 @@ $testTypeValue = "for " . implode(",", $testType);
                         y: item.pending || 0,
                         facilityId: item.id,
                         facilityName: item.name,
-                        isOther: item.id === 'others',
                         received: item.received || 0,
                         tested: item.tested || 0,
                         rejected: item.rejected || 0,
@@ -258,25 +262,43 @@ $testTypeValue = "for " . implode(",", $testType);
                     return (a.pct_tested || 0) - (b.pct_tested || 0);
                 });
                 var pctTop = filtered.slice(0, topN);
+                var bestTop = filtered.slice(Math.max(filtered.length - topN, 0));
+                // enable dual mode only if there are more than topN facilities; otherwise reuse the same list
+                dualMode = filtered.length > topN;
+                if (!dualMode) {
+                    bestTop = pctTop;
+                }
+                bestTop = bestTop.slice().sort(function(a, b) {
+                    return (b.pct_tested || 0) - (a.pct_tested || 0);
+                });
+                othersSummary = buildOthersSummary(filtered, topN, 'pct_tested', false, othersFromApi);
                 categories = pctTop.map(function(item) {
                     return item.name;
                 });
-                series = [{
-                    name: '<?php echo $this->translate('% Tested'); ?>',
-                    data: pctTop.map(function(item) {
-                        return {
-                            y: item.pct_tested || 0,
-                            facilityId: item.id,
-                            facilityName: item.name,
-                            received: item.received || 0,
-                            tested: item.tested || 0,
-                            rejected: item.rejected || 0,
-                            pending: item.pending || 0,
-                            pctTested: item.pct_tested || 0
-                        };
-                    }),
-                    color: '#039BE6'
-                }];
+                var bestCategories = bestTop.map(function(item) {
+                    return item.name;
+                });
+                var buildPctSeries = function(list) {
+                    return [{
+                        name: '<?php echo $this->translate('% Tested'); ?>',
+                        data: list.map(function(item) {
+                            return {
+                                y: item.pct_tested || 0,
+                                facilityId: item.id,
+                                facilityName: item.name,
+                                received: item.received || 0,
+                                tested: item.tested || 0,
+                                rejected: item.rejected || 0,
+                                pending: item.pending || 0,
+                                pctTested: item.pct_tested || 0
+                            };
+                        }),
+                        color: '#039BE6'
+                    }];
+                };
+                var worstSeries = buildPctSeries(pctTop);
+                var bestSeries = buildPctSeries(bestTop);
+                series = worstSeries;
                 overallPct = data.totals && typeof data.totals.overall_pct_tested !== 'undefined' ? parseFloat(data.totals.overall_pct_tested) : null;
                 if (!isNaN(overallPct)) {
                     plotLines.push({
@@ -302,17 +324,16 @@ $testTypeValue = "for " . implode(",", $testType);
                         '<?php echo $this->translate('Received'); ?>: ' + Highcharts.numberFormat(p.received || 0, 0) + '<br/>' +
                         '<?php echo $this->translate('Tested'); ?>: ' + Highcharts.numberFormat(p.tested || 0, 0);
                 };
+                helpText = '<?php echo $this->translate('% of received samples that are tested (facilities with 0 received are hidden)'); ?>';
                 if (!isNaN(overallPct)) {
-                    helpText = '<?php echo $this->translate('% of received samples that are tested (facilities with 0 received are hidden)'); ?>. ' +
-                        '<?php echo $this->translate('Pink line = overall % tested'); ?>: ' + Highcharts.numberFormat(overallPct, 1) + '%';
-                } else {
-                    helpText = '<?php echo $this->translate('% of received samples that are tested (facilities with 0 received are hidden)'); ?>';
+                    helpText += '. <?php echo $this->translate('Pink line = overall % tested'); ?>: ' + Highcharts.numberFormat(overallPct, 1) + '%';
                 }
             } else {
                 var volumeSorted = facilities.slice().sort(function(a, b) {
                     return (b.received || 0) - (a.received || 0);
                 });
                 var volumeTop = volumeSorted.slice(0, topN);
+                othersSummary = buildOthersSummary(volumeSorted, topN, 'received', true, othersFromApi);
                 categories = volumeTop.map(function(item) {
                     return item.name;
                 });
@@ -343,8 +364,9 @@ $testTypeValue = "for " . implode(",", $testType);
             }
 
             barCount = categories.length;
-            var dynamicHeight = Math.max(320, (barCount * 38) + 120);
+            var dynamicHeight = Math.max(320, (barCount * 38) + 160);
             chartContainer.height(dynamicHeight);
+            $('#facilityPerformanceChartWorst, #facilityPerformanceChartBest').height(dynamicHeight);
             var helpEl = $('#facilityPerformanceHelp');
             if (helpText) {
                 helpEl.text(helpText).show();
@@ -352,77 +374,136 @@ $testTypeValue = "for " . implode(",", $testType);
                 helpEl.hide().text('');
             }
 
-            facilityPerformanceState.chart = Highcharts.chart('facilityPerformanceChart', {
-                chart: {
-                    type: 'bar',
-                    spacing: [10, 20, 10, 20]
-                },
-                title: {
-                    text: ''
-                },
-                credits: {
-                    enabled: false
-                },
-                xAxis: {
-                    categories: categories,
-                    title: {
-                        text: null
-                    }
-                },
-                yAxis: {
-                    min: 0,
-                    max: (mode === 'pct_tested') ? 100 : null,
-                    title: {
-                        text: (mode === 'pct_tested') ? '<?php echo $this->translate('% Tested'); ?>' : '<?php echo $this->translate('Samples'); ?>'
+            var chartOptionsBase = function(localCategories, localSeries) {
+                return {
+                    chart: {
+                        type: 'bar',
+                        spacing: [10, 20, 10, 20],
+                        marginLeft: 260
                     },
-                    plotLines: plotLines
-                },
-                tooltip: {
-                    useHTML: true,
-                    formatter: tooltipFormatter
-                },
-                plotOptions: {
-                    series: {
-                        stacking: stacking,
-                        cursor: 'pointer',
-                        point: {
-                            events: {
-                                click: function() {
-                                    if (this.options && this.options.isOther) {
-                                        return;
-                                    }
-                                    handleFacilityBarClick(this.options);
-                                }
-                            }
+                    title: {
+                        text: ''
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        categories: localCategories,
+                        title: {
+                            text: null
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: (mode === 'pct_tested') ? 100 : null,
+                        tickInterval: (mode === 'pct_tested') ? 10 : null,
+                        title: {
+                            text: (mode === 'pct_tested') ? '<?php echo $this->translate('% Tested'); ?>' : '<?php echo $this->translate('Samples'); ?>'
                         },
-                        dataLabels: {
-                            enabled: true,
-                            formatter: function() {
-                                if (mode === 'pct_tested') {
-                                    var p = this.point;
-                                    return Highcharts.numberFormat(p.pctTested || 0, 1) + '% (' +
-                                        Highcharts.numberFormat(p.tested || 0, 0) + '/' +
-                                        Highcharts.numberFormat(p.received || 0, 0) + ')';
+                        plotLines: plotLines
+                    },
+                    tooltip: {
+                        useHTML: true,
+                        formatter: tooltipFormatter
+                    },
+                    plotOptions: {
+                        series: {
+                            stacking: stacking,
+                            cursor: 'pointer',
+                            point: {
+                                events: {
+                                    click: function() {
+                                        if (this.options && this.options.isOther) {
+                                            return;
+                                        }
+                                        handleFacilityBarClick(this.options);
+                                    }
                                 }
-                                return Highcharts.numberFormat(this.y, 0);
+                            },
+                            dataLabels: {
+                                enabled: true,
+                                formatter: function() {
+                                    if (mode === 'pct_tested') {
+                                        var p = this.point;
+                                        return Highcharts.numberFormat(p.pctTested || 0, 1) + '% (' +
+                                            Highcharts.numberFormat(p.tested || 0, 0) + '/' +
+                                            Highcharts.numberFormat(p.received || 0, 0) + ')';
+                                    }
+                                    var total = (this.point.tested || 0) + (this.point.pending || 0);
+                                    if (mode === 'backlog') {
+                                        if (this.y < 50 || (total > 0 && (this.y / total) < 0.02)) {
+                                            return null;
+                                        }
+                                    }
+                                    if (mode === 'volume' && this.y < 50) {
+                                        return null;
+                                    }
+                                    return Highcharts.numberFormat(this.y, 0);
+                                }
                             }
                         }
-                    }
-                },
-                legend: {
-                    enabled: series.length > 1
-                },
-                series: series
-            });
+                    },
+                    legend: {
+                        enabled: localSeries.length > 1
+                    },
+                    series: localSeries
+                };
+            };
+
+            if (dualMode) {
+                dualContainer.show();
+                $('#facilityPerformanceChart').hide();
+                facilityPerformanceState.chartWorst = Highcharts.chart('facilityPerformanceChartWorst', chartOptionsBase(categories, worstSeries));
+                facilityPerformanceState.chartBest = Highcharts.chart('facilityPerformanceChartBest', chartOptionsBase(bestCategories, bestSeries));
+            } else {
+                dualContainer.hide();
+                $('#facilityPerformanceChart').show();
+                facilityPerformanceState.chart = Highcharts.chart('facilityPerformanceChart', chartOptionsBase(categories, series));
+            }
 
             var summaryEl = $('#facilityPerformanceSummary');
-            if (mode === 'backlog' && othersSummary) {
+            if (othersSummary) {
                 summaryEl.show().text('<?php echo $this->translate('Others (aggregated)'); ?>: ' +
+                    '<?php echo $this->translate('Received'); ?>: ' + Highcharts.numberFormat(othersSummary.received || 0, 0) + '   ' +
                     '<?php echo $this->translate('Tested'); ?>: ' + Highcharts.numberFormat(othersSummary.tested || 0, 0) + '   ' +
-                    '<?php echo $this->translate('Pending'); ?>: ' + Highcharts.numberFormat(othersSummary.pending || 0, 0));
+                    '<?php echo $this->translate('Pending'); ?>: ' + Highcharts.numberFormat(othersSummary.pending || 0, 0) + '   ' +
+                    '<?php echo $this->translate('Rejected'); ?>: ' + Highcharts.numberFormat(othersSummary.rejected || 0, 0) + '   ' +
+                    '<?php echo $this->translate('% Tested'); ?>: ' + Highcharts.numberFormat(othersSummary.pct_tested || 0, 2) + '%');
             } else {
                 summaryEl.hide().text('');
             }
+        }
+
+        function buildOthersSummary(sortedFacilities, topN, sortKey, allowZeroReceived, apiOthers) {
+            var eligible = sortedFacilities.slice();
+            if (!allowZeroReceived) {
+                eligible = eligible.filter(function(item) {
+                    return (item.received || 0) > 0;
+                });
+            }
+            if (eligible.length <= topN) {
+                return null;
+            }
+            if (apiOthers && apiOthers.received !== undefined) {
+                return apiOthers;
+            }
+            var remainder = eligible.slice(topN);
+            var summary = {
+                received: 0,
+                tested: 0,
+                rejected: 0,
+                pending: 0,
+                pct_tested: 0
+            };
+            remainder.forEach(function(item) {
+                summary.received += item.received || 0;
+                summary.tested += item.tested || 0;
+                summary.rejected += item.rejected || 0;
+                summary.pending += item.pending || 0;
+            });
+            summary.pending = Math.max(0, summary.pending);
+            summary.pct_tested = (summary.received > 0) ? (summary.tested * 100 / summary.received) : 0;
+            return summary;
         }
 
         function handleFacilityBarClick(pointOptions) {
@@ -475,7 +556,7 @@ $testTypeValue = "for " . implode(",", $testType);
                 $('#facilityPerformanceModes li').removeClass('active');
                 $parent.addClass('active');
                 facilityPerformanceState.mode = $(this).data('mode');
-                renderFacilityChart();
+                fetchFacilityPerformance();
             });
 
             $('#facilityPerformanceDimension').on('change', function() {
@@ -485,7 +566,7 @@ $testTypeValue = "for " . implode(",", $testType);
 
             $('#facilityPerformanceTopN').on('change', function() {
                 facilityPerformanceState.topN = parseInt($(this).val(), 10) || 10;
-                renderFacilityChart();
+                fetchFacilityPerformance();
             });
         }
 

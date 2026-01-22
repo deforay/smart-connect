@@ -77,6 +77,7 @@ class SnapshotController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
+            // Mode is passed so that the service can compute "others" aggregation accurately for the active view.
             $result = $this->snapshotService->getFacilityPerformanceData($params);
             return $this->getResponse()->setContent(CommonService::jsonEncode($result));
         }

@@ -267,8 +267,11 @@ class SnapShotService
         $mappedFacilities = $loginContainer->mappedFacilities ?? null;
 
         $dimension = $params['dimension'] ?? 'testing_lab';
+        // When dimension=health_facility we group by facility_id (the requesting site); otherwise by lab_id.
         $facilityColumn = ($dimension === 'health_facility') ? 'facility_id' : 'lab_id';
         $types = (!isset($params['testType']) || empty($params['testType'])) ? ["vl", "eid", "covid19"] : (array) $params['testType'];
+        $mode = $params['mode'] ?? 'backlog';
+        $topN = isset($params['topN']) ? (int) $params['topN'] : 10;
 
         $whereConditions = [];
 
@@ -386,6 +389,43 @@ class SnapShotService
         $totalPending = max(0, $totalReceived - $totalTested - $totalRejected);
         $overallPctTested = ($totalReceived > 0) ? round(($totalTested * 100) / $totalReceived, 2) : 0;
 
+        // Compute Others aggregation for the active mode + topN to send to UI.
+        $eligible = $perFacility;
+        if ($mode === 'pct_tested') {
+            $eligible = array_filter($perFacility, function ($item) {
+                return ($item['received'] ?? 0) > 0;
+            });
+            usort($eligible, function ($a, $b) {
+                return ($a['pct_tested'] <=> $b['pct_tested']);
+            });
+        } elseif ($mode === 'volume') {
+            usort($eligible, function ($a, $b) {
+                return ($b['received'] <=> $a['received']);
+            });
+        } else {
+            usort($eligible, function ($a, $b) {
+                return ($b['pending'] <=> $a['pending']);
+            });
+        }
+        $others = [
+            'received' => 0,
+            'tested' => 0,
+            'rejected' => 0,
+            'pending' => 0,
+            'pct_tested' => 0
+        ];
+        if (count($eligible) > $topN) {
+            $remainder = array_slice($eligible, $topN);
+            foreach ($remainder as $item) {
+                $others['received'] += $item['received'] ?? 0;
+                $others['tested'] += $item['tested'] ?? 0;
+                $others['rejected'] += $item['rejected'] ?? 0;
+                $others['pending'] += $item['pending'] ?? 0;
+            }
+            $others['pending'] = max(0, $others['pending']);
+            $others['pct_tested'] = ($others['received'] > 0) ? round(($others['tested'] * 100) / $others['received'], 2) : 0;
+        }
+
         return [
             'totals' => [
                 'total_received' => $totalReceived,
@@ -394,7 +434,8 @@ class SnapShotService
                 'total_pending' => $totalPending,
                 'overall_pct_tested' => $overallPctTested
             ],
-            'perFacility' => $perFacility
+            'perFacility' => $perFacility,
+            'others' => $others
         ];
     }
 }

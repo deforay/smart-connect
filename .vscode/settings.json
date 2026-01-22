@@ -3,5 +3,6 @@
     "sonarlint.connectedMode.project": {
         "connectionId": "deforay-sonar",
         "projectKey": "deforay_smart-connect"
-    }
+    },
+    "snyk.advanced.autoSelectOrganization": true
 }
