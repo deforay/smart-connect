@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS `dash_privileges` (
   UNIQUE KEY `resource_id_2` (`resource_id`,`privilege_name`),
   UNIQUE KEY `privilege_id` (`privilege_id`),
   KEY `resource_id` (`resource_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 INSERT IGNORE INTO `dash_privileges` (`resource_id`, `privilege_name`, `display_name`) VALUES
@@ -278,5 +278,16 @@ ON p.resource_id in ('Application\\Controller\\SummaryController','Covid19\\Cont
 WHERE r.role_name = 'Testing Lab Manager';
 
 
-INSERT INTO `dash_resources` (`resource_id`, `display_name`) VALUES ('Application\\Controller\\UserLoginHistoryController', 'Manage User Login History');
-INSERT INTO `dash_privileges` (`privilege_id`, `resource_id`, `privilege_name`, `display_name`) VALUES ('', 'Application\\\\Controller\\\\UserLoginHistoryController', 'index', 'Access'), ('', 'Application\\\\Controller\\\\UserLoginHistoryController', 'show-params', 'Show Params');
+INSERT IGNORE INTO `dash_resources` (`resource_id`, `display_name`) VALUES ('Application\\Controller\\UserLoginHistoryController', 'Manage User Login History');
+INSERT IGNORE INTO `dash_privileges` (`privilege_id`, `resource_id`, `privilege_name`, `display_name`) VALUES ('', 'Application\\Controller\\UserLoginHistoryController', 'index', 'Access'), ('', 'Application\\Controller\\UserLoginHistoryController', 'show-params', 'Show Params');
+
+-- Amit 22 Jan 2026
+DELETE t1
+FROM dash_roles_privileges_map t1
+JOIN dash_roles_privileges_map t2
+  ON t1.role_id = t2.role_id
+ AND t1.privilege_id = t2.privilege_id
+ AND t1.map_id > t2.map_id;
+
+
+ALTER TABLE `dash_roles_privileges_map` ADD UNIQUE(`role_id`, `privilege_id`);

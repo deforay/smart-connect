@@ -16,9 +16,9 @@ class LabsController extends AbstractActionController
     public FacilityService $facilityService;
     public CommonService $commonService;
 
-    const PROVINCE = 0;
-    const DISTRICT = 1;
-    const CLINIC = 2;
+    public const PROVINCE = 0;
+    public const DISTRICT = 1;
+    public const CLINIC = 2;
 
     public function __construct($sampleService, $facilityService, $commonService)
     {

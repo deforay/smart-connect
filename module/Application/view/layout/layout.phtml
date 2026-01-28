@@ -8,7 +8,7 @@ $languagecontainer = new Container('language');
 $config = $this->GetConfigData();
 $activeModule = $this->GetActiveModules();
 $languagecontainer->locale = $this->GetLocaleData('locale', $config['language']);
-$acl=$this->layout()->acl;
+$acl = $this->layout()->acl;
 $role = $loginContainer->roleCode;
 
 if (!isset($activeTab)) {
@@ -21,52 +21,52 @@ $covid19Menu = "";
 $dataManagementMenu = "";
 $snapshotMenu = "";
 $adminMenu = "";
-if (isset($acl) && $acl->isAllowed($role, 'Application\\Controller\\SummaryController', 'dashboard')) {
+if (isset($acl) && $acl->isAllowed($role, Application\Controller\SummaryController::class, 'dashboard')) {
     $vlMenu .= '<li class="nav-item start ' . (($activeTab == 'summary') ? " active open" : "") . '">
-                    <a href="' .$this->url('summary', array('action' => 'dashboard')) .'" class="nav-link ">
+                    <a href="' . $this->url('summary', array('action' => 'dashboard')) . '" class="nav-link ">
                         <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Summary') . '</span>
                     </a>
                 </li>';
 }
 if (isset($acl) && $acl->isAllowed($role, 'Application\\Controller\\LaboratoryController', 'dashboard')) {
     $vlMenu .= '<li class="nav-item end ' . (($activeTab == 'laboratory') ? " active open" : "") . '">
-                    <a href="' . $this->url('laboratory', array('action' => 'dashboard')) .'" class="nav-link ">
+                    <a href="' . $this->url('laboratory', array('action' => 'dashboard')) . '" class="nav-link ">
                         <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Labs Dashboard') . '</span>
                     </a>
                 </li>';
 }
 if (isset($acl) && $acl->isAllowed($role, 'Application\\Controller\\ClinicController', 'dashboard')) {
     $vlMenu .= '<li class="nav-item end ' . (($activeTab == 'clinics') ? " active open" : "") . '">
-                    <a href="' . $this->url('clinics', array('action' => 'dashboard')) .'" class="nav-link ">
+                    <a href="' . $this->url('clinics', array('action' => 'dashboard')) . '" class="nav-link ">
                         <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Clinics Dashboard') . '</span>
                     </a>
                 </li>';
 }
-if (isset($acl) && $acl->isAllowed($role, 'Eid\\Controller\\SummaryController', 'dashboard')) {                                
+if (isset($acl) && $acl->isAllowed($role, 'Eid\\Controller\\SummaryController', 'dashboard')) {
 
     $eidMenu .= '<li class="nav-item start' . (($activeTab == 'eid-summary') ? " active open" : "") . '">
-                    <a href="' . $this->url('eid-summary', array('action' => 'dashboard')) .'" class="nav-link ">
+                    <a href="' . $this->url('eid-summary', array('action' => 'dashboard')) . '" class="nav-link ">
                         <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Summary') . '</span>
                     </a>
                 </li>';
 }
-if (isset($acl) && $acl->isAllowed($role, 'Eid\\Controller\\LabsController', 'dashboard')) {                                
+if (isset($acl) && $acl->isAllowed($role, 'Eid\\Controller\\LabsController', 'dashboard')) {
     $eidMenu .= '<li class="nav-item end ' . (($activeTab == 'eid-labs') ? " active open" : "") . '">
-                    <a href="' . $this->url('eid-labs', array('action' => 'dashboard')) .'" class="nav-link ">
+                    <a href="' . $this->url('eid-labs', array('action' => 'dashboard')) . '" class="nav-link ">
                         <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Labs Dashboard') . '</span>
                     </a>
                 </li>';
 }
 if (isset($acl) && $acl->isAllowed($role, 'Eid\\Controller\\LabsController', 'poc-labs-dashboard')) {
     $eidMenu .= '<li class="nav-item end ' . (($activeTab == 'eid-poc-labs') ? " active open" : "") . '">
-                    <a href="' . $this->url('eid-labs', array('action' => 'poc-labs-dashboard')) .'" class="nav-link ">
+                    <a href="' . $this->url('eid-labs', array('action' => 'poc-labs-dashboard')) . '" class="nav-link ">
                         <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('POC Labs Dashboard') . '</span>
                     </a>
                 </li>';
 }
 if (isset($acl) && $acl->isAllowed($role, 'Eid\\Controller\\ClinicsController', 'dashboard')) {
     $eidMenu .= '<li class="nav-item end ' . (($activeTab == 'eid-clinics') ? " active open" : "") . '">
-                    <a href="' . $this->url('eid-clinics', array('action' => 'dashboard')) .'" class="nav-link ">
+                    <a href="' . $this->url('eid-clinics', array('action' => 'dashboard')) . '" class="nav-link ">
                         <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Clinics Dashboard') . '</span>
                     </a>
                 </li>';
@@ -74,14 +74,14 @@ if (isset($acl) && $acl->isAllowed($role, 'Eid\\Controller\\ClinicsController', 
 if (isset($acl) && $acl->isAllowed($role, 'Covid19\\Controller\\SummaryController', 'dashboard')) {
 
     $covid19Menu .= '<li class="nav-item start ' . (($activeTab == 'covid19-summary') ? " active open" : "") . '">
-                        <a href="' . $this->url('covid19-summary', array('action' => 'dashboard')) .'" class="nav-link ">
-                            <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Summary') .'</span>
+                        <a href="' . $this->url('covid19-summary', array('action' => 'dashboard')) . '" class="nav-link ">
+                            <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Summary') . '</span>
                         </a>
                     </li>';
 }
-if (isset($acl) && $acl->isAllowed($role, 'Covid19\\Controller\\LabsController', 'dashboard')) {                                
+if (isset($acl) && $acl->isAllowed($role, 'Covid19\\Controller\\LabsController', 'dashboard')) {
     $covid19Menu .= '<li class="nav-item end ' . (($activeTab == 'covid19-labs') ? " active open" : "") . '">
-                        <a href="' . $this->url('covid19-labs', array('action' => 'dashboard')) .'" class="nav-link ">
+                        <a href="' . $this->url('covid19-labs', array('action' => 'dashboard')) . '" class="nav-link ">
                             <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Labs Dashboard') . '</span>
                         </a>
                     </li>';
@@ -89,20 +89,20 @@ if (isset($acl) && $acl->isAllowed($role, 'Covid19\\Controller\\LabsController',
 if (isset($acl) && $acl->isAllowed($role, 'DataManagement\\Controller\\DuplicateDataController', 'index')) {
 
     $dataManagementMenu .= '<li class="nav-item start ' . (($activeTab == 'duplicate-data') ? " active open" : "") . '">
-                                <a href="' . $this->url('duplicate-data') .'" class="nav-link ">
+                                <a href="' . $this->url('duplicate-data') . '" class="nav-link ">
                                     <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Duplicate Data') . '</span>
                                 </a>
                             </li>';
 }
 if (isset($acl) && $acl->isAllowed($role, 'Application\\Controller\\SnapshotController', 'index')) {
     $snapshotMenu .= '<li class="nav-item ' . (($activeTab == 'snap-data') ? " active open " : "") . '">
-                        <a href="' . $this->url('snapshot', array('action' => 'index')) .'" class="nav-link active">
+                        <a href="' . $this->url('snapshot', array('action' => 'index')) . '" class="nav-link active">
                             <i class="fa fa-picture-o"></i> <span class="title">' . $this->translate('Snapshot') . '</span>
                         </a>
                     </li>';
 }
 if (isset($acl) && $acl->isAllowed($role, 'Application\\Controller\\ConfigController', 'index')) {
-    $adminMenu .= '<li class="nav-item start ' . (($activeTab == 'config') ? " active open" : "") .'">
+    $adminMenu .= '<li class="nav-item start ' . (($activeTab == 'config') ? " active open" : "") . '">
                         <a href="' . $this->url('config', array('action' => 'index')) . '" class="nav-link ">
                             <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Global Config') . '</span>
                         </a>
@@ -111,7 +111,7 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\\Controller\\ConfigContro
 
 if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\RolesController', 'index')) {
     $adminMenu .= '<li class="nav-item end ' . (($activeTab == 'roles') ? " active open" : "") . '">
-                        <a href="' . $this->url('roles', array('action' => 'index')) .'" class="nav-link ">
+                        <a href="' . $this->url('roles', array('action' => 'index')) . '" class="nav-link ">
                             <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Roles') . '</span>
                         </a>
                     </li>';
@@ -125,21 +125,21 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\UsersControlle
 }
 if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\FacilityController', 'index')) {
     $adminMenu .= '<li class="nav-item end ' . (($activeTab == 'facility') ? " active open" : "") . '">
-                        <a href="' . $this->url('facility', array('action' => 'index')) .'" class="nav-link ">
+                        <a href="' . $this->url('facility', array('action' => 'index')) . '" class="nav-link ">
                             <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Facilities') . '</span>
                         </a>
                    </li>';
 }
 if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\SyncStatusController', 'index')) {
     $adminMenu .= '<li class="nav-item end ' . (($activeTab == 'status') ? " active open" : "") . '">
-                        <a href="' . $this->url('sync-status', array('action' => 'index')) .'" class="nav-link ">
+                        <a href="' . $this->url('sync-status', array('action' => 'index')) . '" class="nav-link ">
                             <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('Sync Status') . '</span>
                         </a>
                     </li>';
 }
 if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistoryController', 'index')) {
     $adminMenu .= '<li class="nav-item end ' . (($activeTab == 'sync-history') ? " active open" : "") . '">
-                        <a href="' . $this->url('api-sync-history', array('action' => 'index')) .'" class="nav-link ">
+                        <a href="' . $this->url('api-sync-history', array('action' => 'index')) . '" class="nav-link ">
                             <i class="fa fa-angle-right"></i> <span class="title">' . $this->translate('API History') . '</span>
                         </a>
                     </li>';
@@ -156,61 +156,78 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
 
 <head>
     <meta charset="utf-8" />
-    <title><?php echo $this->translate('Smart Connect'); ?> | <?php echo $this->translate('National Dashboard for Priority Diseases'); ?></title>
+    <title><?php echo $this->translate('Smart Connect'); ?> |
+        <?php echo $this->translate('National Dashboard for Priority Diseases'); ?>
+    </title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
-    <link href="<?php echo $this->basePath('assets/global/css/google-fonts.css'); ?>" rel="stylesheet" type="text/css" />
-    <link href="<?php echo $this->basePath('assets/global/plugins/font-awesome/css/font-awesome.min.css'); ?>" rel="stylesheet" type="text/css" />
-    <link href="<?php echo $this->basePath('assets/global/plugins/simple-line-icons/simple-line-icons.min.css'); ?>" rel="stylesheet" type="text/css" />
-    <link href="<?php echo $this->basePath('assets/global/plugins/bootstrap/css/bootstrap.min.css'); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->basePath('assets/global/css/google-fonts.css'); ?>" rel="stylesheet"
+        type="text/css" />
+    <link href="<?php echo $this->basePath('assets/global/plugins/font-awesome/css/font-awesome.min.css'); ?>"
+        rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->basePath('assets/global/plugins/simple-line-icons/simple-line-icons.min.css'); ?>"
+        rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->basePath('assets/global/plugins/bootstrap/css/bootstrap.min.css'); ?>"
+        rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="<?php echo $this->basePath() . '/assets/global/css/deforayModal.css'; ?>">
 
     <!-- END GLOBAL MANDATORY STYLES -->
     <!-- BEGIN PAGE LEVEL PLUGINS -->
-    <link href="<?php echo $this->basePath('assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.css'); ?>" rel="stylesheet" type="text/css" />
+    <link
+        href="<?php echo $this->basePath('assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.css'); ?>"
+        rel="stylesheet" type="text/css" />
 
     <!-- END PAGE LEVEL PLUGINS -->
     <!-- BEGIN THEME GLOBAL STYLES -->
-    <link href="<?php echo $this->basePath('assets/global/css/components-rounded.min.css'); ?>" rel="stylesheet" id="style_components" type="text/css" />
+    <link href="<?php echo $this->basePath('assets/global/css/components-rounded.min.css'); ?>" rel="stylesheet"
+        id="style_components" type="text/css" />
     <link href="<?php echo $this->basePath('assets/global/css/plugins.min.css'); ?>" rel="stylesheet" type="text/css" />
     <!-- END THEME GLOBAL STYLES -->
     <!-- BEGIN THEME LAYOUT STYLES -->
-    <link href="<?php echo $this->basePath('assets/layouts/layout/css/layout.min.css'); ?>" rel="stylesheet" type="text/css" />
-    <link href="<?php echo $this->basePath('assets/layouts/layout/css/themes/blue.min.css'); ?>" rel="stylesheet" type="text/css" id="style_color" />
+    <link href="<?php echo $this->basePath('assets/layouts/layout/css/layout.min.css'); ?>" rel="stylesheet"
+        type="text/css" />
+    <link href="<?php echo $this->basePath('assets/layouts/layout/css/themes/blue.min.css'); ?>" rel="stylesheet"
+        type="text/css" id="style_color" />
 
 
-    <link href="<?php echo $this->basePath('assets/global/plugins/select2/css/select2.min.css'); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->basePath('assets/global/plugins/select2/css/select2.min.css'); ?>" rel="stylesheet"
+        type="text/css" />
     <link href="<?php echo $this->basePath('assets/global/css/highcharts.css'); ?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo $this->basePath('assets/bootstrap-toggle/bootstrap-toggle.min.css'); ?>" rel="stylesheet">
     <link href="<?php echo $this->basePath('assets/pages/css/status-indicator.css'); ?>" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdn.datatables.net/v/bs/jszip-3.10.1/dt-1.13.8/af-2.6.0/b-2.4.2/b-colvis-2.4.2/b-html5-2.4.2/b-print-2.4.2/cr-1.7.0/fc-4.3.0/fh-3.4.0/r-2.5.0/rr-1.4.1/sc-2.3.0/datatables.min.css" integrity="sha384-EJVg1U0CmtR+Q972NGex6j37a7gMgXXgTyAM6zHKP5iBneWRNmnR1qF3sX0AJC76" crossorigin="anonymous">
+    <link rel="stylesheet"
+        href="https://cdn.datatables.net/v/bs/jszip-3.10.1/dt-1.13.8/af-2.6.0/b-2.4.2/b-colvis-2.4.2/b-html5-2.4.2/b-print-2.4.2/cr-1.7.0/fc-4.3.0/fh-3.4.0/r-2.5.0/rr-1.4.1/sc-2.3.0/datatables.min.css"
+        integrity="sha384-EJVg1U0CmtR+Q972NGex6j37a7gMgXXgTyAM6zHKP5iBneWRNmnR1qF3sX0AJC76" crossorigin="anonymous">
 
     <style>
-        <?php if ($activeTab != 'duplicate-data') { ?>table.dataTable td.sorting_1,
-        table.dataTable td.sorting_2,
-        table.dataTable td.sorting_3,
-        table.dataTable th.sorting_1,
-        table.dataTable th.sorting_2,
-        table.dataTable th.sorting_3 {
-            background: #fbfcfd !important
-        }
+        <?php if ($activeTab != 'duplicate-data') { ?>
+            table.dataTable td.sorting_1,
+            table.dataTable td.sorting_2,
+            table.dataTable td.sorting_3,
+            table.dataTable th.sorting_1,
+            table.dataTable th.sorting_2,
+            table.dataTable th.sorting_3 {
+                background: #fbfcfd !important
+            }
 
         <?php }
 
-        if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) { ?>body,
-        .nav-item,
-        .page-header.navbar,
-        .portlet.blue,
-        .page-sidebar.navbar-collapse.collapse,
-        .page-sidebar-menu.page-header-fixed.page-sidebar-menu-light.page-sidebar-menu-closed {
-            background-image: url('/assets/img/patterns/blue-pattern.png');
-        }
+        if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) { ?>
+            body,
+            .nav-item,
+            .page-header.navbar,
+            .portlet.blue,
+            .page-sidebar.navbar-collapse.collapse,
+            .page-sidebar-menu.page-header-fixed.page-sidebar-menu-light.page-sidebar-menu-closed {
+                background-image: url('/assets/img/patterns/blue-pattern.png');
+            }
 
-        <?php } ?>.resize-page-logo {
+        <?php } ?>
+        .resize-page-logo {
             width: auto !important;
         }
 
@@ -247,20 +264,26 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
         <div class="page-header-inner ">
             <!-- BEGIN LOGO -->
             <div class="page-logo resize-page-logo">
-                <a href="<?= $this->url('home'); ?>">
+                <a href="/snapshot/">
                     <?php
                     if (isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])) { ?>
-                        <img src="<?php echo $this->basePath('uploads/logo/' . $config['logo']); ?>" alt="logo" class="logo-default manage-logo-default" style="max-width:32px;max-height:32px;margin-top:-5px;margin-right:5px;" />
+                        <img src="<?php echo $this->basePath('uploads/logo/' . $config['logo']); ?>" alt="logo"
+                            class="logo-default manage-logo-default"
+                            style="max-width:32px;max-height:32px;margin-top:-5px;margin-right:5px;" />
                     <?php } else { ?>
-                        <img src="<?php echo $this->basePath('assets/layouts/layout/img/logo.png'); ?>" alt="logo" class="logo-default manage-logo-default" style="max-width:32px;max-height:32px;margin-top:-5px;margin-right:5px;margin-left:-10px;" />
+                        <img src="<?php echo $this->basePath('assets/layouts/layout/img/logo.png'); ?>" alt="logo"
+                            class="logo-default manage-logo-default"
+                            style="max-width:32px;max-height:32px;margin-top:-5px;margin-right:5px;margin-left:-10px;" />
                     <?php } ?>
-                    <span class="default-logo-text hide-default-text" style="color:#fff;line-height:50px;"><?php echo $this->translate('Smart Connect'); ?></span>
+                    <span class="default-logo-text hide-default-text"
+                        style="color:#fff;line-height:50px;"><?php echo $this->translate('Smart Connect'); ?></span>
                 </a>
                 <div class="menu-toggler sidebar-toggler"> </div>
             </div>
             <!-- END LOGO -->
             <!-- BEGIN RESPONSIVE MENU TOGGLER -->
-            <a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse" data-target=".navbar-collapse"> </a>
+            <a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse"
+                data-target=".navbar-collapse"> </a>
             <!-- END RESPONSIVE MENU TOGGLER -->
             <!-- BEGIN TOP NAVIGATION MENU -->
             <!-- <span style="color:#ccc;padding:10px;line-height:50px;font-weight:lighter"><?php echo $this->translate('Development/Test Environment with dummy data'); ?></span> -->
@@ -273,21 +296,29 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
                     <?php if (isset($loginContainer->showCurrentTablesToggle) && $loginContainer->showCurrentTablesToggle) { ?>
                         <li style="width:200px;margin-top:6px;">
                             <select class="form-control" onchange="changeTable(this);" id="change-table">
-                                <option value='current' <?php echo (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) ? "selected" : ""; ?>><?php echo $this->translate("LAST ONE YEAR"); ?></option>
-                                <option value='archive' <?php echo (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === false) ? "selected" : ""; ?>><?php echo $this->translate("FULL DATA"); ?></option>
+                                <option value='current' <?php echo (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === true) ? "selected" : ""; ?>>
+                                    <?php echo $this->translate("LAST ONE YEAR"); ?>
+                                </option>
+                                <option value='archive' <?php echo (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables === false) ? "selected" : ""; ?>>
+                                    <?php echo $this->translate("FULL DATA"); ?>
+                                </option>
                             </select>
                         </li>
                     <?php } ?>
                     <li class="dropdown dropdown-user">
-                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                            <img alt="" class="img-circle" src="<?php echo $this->basePath('assets/img/default-avatar.png'); ?>" />
-                            <span class="username username-hide-on-mobile"> <?php echo $loginContainer->username ?> </span>
+                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+                            data-close-others="true">
+                            <img alt="" class="img-circle"
+                                src="<?php echo $this->basePath('assets/img/default-avatar.png'); ?>" />
+                            <span class="username username-hide-on-mobile"> <?php echo $loginContainer->username ?>
+                            </span>
                             <i class="fa fa-angle-down"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-default">
 
                             <li>
-                                <a href="<?= $this->url('login', array('action' => 'logout')) ?>"><i class="icon-key"></i> <?php echo $this->translate('Log Out'); ?> </a>
+                                <a href="<?= $this->url('login', array('action' => 'logout')) ?>"><i
+                                        class="icon-key"></i> <?php echo $this->translate('Log Out'); ?> </a>
                             </li>
                         </ul>
 
@@ -320,7 +351,8 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
                 <!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
                 <!-- DOC: Set data-keep-expand="true" to keep the submenues expanded -->
                 <!-- DOC: Set data-auto-speed="200" to adjust the sub menu slide up/down speed -->
-                <ul class="page-sidebar-menu page-header-fixed page-sidebar-menu-light page-sidebar-menu-closed" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200" style="padding-top: 20px">
+                <ul class="page-sidebar-menu page-header-fixed page-sidebar-menu-light page-sidebar-menu-closed"
+                    data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200" style="padding-top: 20px">
                     <!-- DOC: To remove the sidebar toggler from the sidebar you just need to completely remove the below "sidebar-toggler-wrapper" LI element -->
                     <li class="sidebar-toggler-wrapper hide">
                         <!-- BEGIN SIDEBAR TOGGLER BUTTON -->
@@ -329,7 +361,8 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
                     </li>
                     <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
                     <?php if ($activeModule['vl'] && trim($vlMenu) != "") { ?>
-                        <li class="nav-item <?php echo ($activeTab == 'summary' || $activeTab == 'laboratory' || $activeTab == 'clinics') ? " active open " : ""; ?>">
+                        <li
+                            class="nav-item <?php echo ($activeTab == 'summary' || $activeTab == 'laboratory' || $activeTab == 'clinics') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="fa fa-flask"></i>
                                 <span class="title"><?php echo $this->translate('Viral Load'); ?></span>
@@ -339,9 +372,10 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
                                 <?php echo $vlMenu; ?>
                             </ul>
                         </li>
-                    <?php } 
+                    <?php }
                     if ($activeModule['eid'] && trim($eidMenu) != "") { ?>
-                        <li class="nav-item <?php echo ($activeTab == 'eid-summary' || $activeTab == 'eid-labs' || $activeTab == 'eid-clinics' || $activeTab == 'eid-poc-labs') ? " active open " : ""; ?>">
+                        <li
+                            class="nav-item <?php echo ($activeTab == 'eid-summary' || $activeTab == 'eid-labs' || $activeTab == 'eid-clinics' || $activeTab == 'eid-poc-labs') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="fa fa-child"></i>
                                 <span class="title"><?php echo $this->translate('EID'); ?></span>
@@ -351,12 +385,17 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
                                 <?php echo $eidMenu; ?>
                             </ul>
                         </li>
-                    <?php } 
+                    <?php }
                     if ($activeModule['covid19'] && trim($covid19Menu) != "") { ?>
-                        <li class="nav-item <?php echo ($activeTab == 'covid19-summary' || $activeTab == 'covid19-labs') ? " active open " : ""; ?>">
+                        <li
+                            class="nav-item <?php echo ($activeTab == 'covid19-summary' || $activeTab == 'covid19-labs') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
-                                <i><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="viruses" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="svg-inline--fa fa-viruses fa-w-20">
-                                        <path fill="currentColor" d="M624,352H611.88c-28.51,0-42.79-34.47-22.63-54.63l8.58-8.57a16,16,0,1,0-22.63-22.63l-8.57,8.58C546.47,294.91,512,280.63,512,252.12V240a16,16,0,0,0-32,0v12.12c0,28.51-34.47,42.79-54.63,22.63l-8.57-8.58a16,16,0,0,0-22.63,22.63l8.58,8.57c20.16,20.16,5.88,54.63-22.63,54.63H368a16,16,0,0,0,0,32h12.12c28.51,0,42.79,34.47,22.63,54.63l-8.58,8.57a16,16,0,1,0,22.63,22.63l8.57-8.58c20.16-20.16,54.63-5.88,54.63,22.63V496a16,16,0,0,0,32,0V483.88c0-28.51,34.47-42.79,54.63-22.63l8.57,8.58a16,16,0,1,0,22.63-22.63l-8.58-8.57C569.09,418.47,583.37,384,611.88,384H624a16,16,0,0,0,0-32ZM480,384a32,32,0,1,1,32-32A32,32,0,0,1,480,384ZM346.51,213.33h16.16a21.33,21.33,0,0,0,0-42.66H346.51c-38,0-57.05-46-30.17-72.84l11.43-11.44A21.33,21.33,0,0,0,297.6,56.23L286.17,67.66c-26.88,26.88-72.84,7.85-72.84-30.17V21.33a21.33,21.33,0,0,0-42.66,0V37.49c0,38-46,57.05-72.84,30.17L86.4,56.23A21.33,21.33,0,0,0,56.23,86.39L67.66,97.83c26.88,26.88,7.85,72.84-30.17,72.84H21.33a21.33,21.33,0,0,0,0,42.66H37.49c38,0,57.05,46,30.17,72.84L56.23,297.6A21.33,21.33,0,1,0,86.4,327.77l11.43-11.43c26.88-26.88,72.84-7.85,72.84,30.17v16.16a21.33,21.33,0,0,0,42.66,0V346.51c0-38,46-57.05,72.84-30.17l11.43,11.43a21.33,21.33,0,0,0,30.17-30.17l-11.43-11.43C289.46,259.29,308.49,213.33,346.51,213.33ZM160,192a32,32,0,1,1,32-32A32,32,0,0,1,160,192Zm80,32a16,16,0,1,1,16-16A16,16,0,0,1,240,224Z" class=""></path>
+                                <i><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="viruses"
+                                        role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"
+                                        class="svg-inline--fa fa-viruses fa-w-20">
+                                        <path fill="currentColor"
+                                            d="M624,352H611.88c-28.51,0-42.79-34.47-22.63-54.63l8.58-8.57a16,16,0,1,0-22.63-22.63l-8.57,8.58C546.47,294.91,512,280.63,512,252.12V240a16,16,0,0,0-32,0v12.12c0,28.51-34.47,42.79-54.63,22.63l-8.57-8.58a16,16,0,0,0-22.63,22.63l8.58,8.57c20.16,20.16,5.88,54.63-22.63,54.63H368a16,16,0,0,0,0,32h12.12c28.51,0,42.79,34.47,22.63,54.63l-8.58,8.57a16,16,0,1,0,22.63,22.63l8.57-8.58c20.16-20.16,54.63-5.88,54.63,22.63V496a16,16,0,0,0,32,0V483.88c0-28.51,34.47-42.79,54.63-22.63l8.57,8.58a16,16,0,1,0,22.63-22.63l-8.58-8.57C569.09,418.47,583.37,384,611.88,384H624a16,16,0,0,0,0-32ZM480,384a32,32,0,1,1,32-32A32,32,0,0,1,480,384ZM346.51,213.33h16.16a21.33,21.33,0,0,0,0-42.66H346.51c-38,0-57.05-46-30.17-72.84l11.43-11.44A21.33,21.33,0,0,0,297.6,56.23L286.17,67.66c-26.88,26.88-72.84,7.85-72.84-30.17V21.33a21.33,21.33,0,0,0-42.66,0V37.49c0,38-46,57.05-72.84,30.17L86.4,56.23A21.33,21.33,0,0,0,56.23,86.39L67.66,97.83c26.88,26.88,7.85,72.84-30.17,72.84H21.33a21.33,21.33,0,0,0,0,42.66H37.49c38,0,57.05,46,30.17,72.84L56.23,297.6A21.33,21.33,0,1,0,86.4,327.77l11.43-11.43c26.88-26.88,72.84-7.85,72.84,30.17v16.16a21.33,21.33,0,0,0,42.66,0V346.51c0-38,46-57.05,72.84-30.17l11.43,11.43a21.33,21.33,0,0,0,30.17-30.17l-11.43-11.43C289.46,259.29,308.49,213.33,346.51,213.33ZM160,192a32,32,0,1,1,32-32A32,32,0,0,1,160,192Zm80,32a16,16,0,1,1,16-16A16,16,0,0,1,240,224Z"
+                                            class=""></path>
                                     </svg></i>
                                 <span class="title"><?php echo $this->translate('Covid 19'); ?></span>
                                 <span class="arrow"></span>
@@ -365,7 +404,7 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
                                 <?php echo $covid19Menu; ?>
                             </ul>
                         </li>
-                    <?php } 
+                    <?php }
                     if (trim($dataManagementMenu) != "") { ?>
                         <li class="nav-item <?php echo ($activeTab == 'duplicate-data') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
@@ -380,9 +419,10 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
                     <?php }
                     if (trim($snapshotMenu) != "") { ?>
                         <?php echo $snapshotMenu; ?>
-                    <?php } 
+                    <?php }
                     if (trim($adminMenu) != "") { ?>
-                        <li class="nav-item <?php echo ($activeTab == 'config' || $activeTab == 'users' || $activeTab == 'facility' || $activeTab == 'import') ? " active open " : ""; ?>">
+                        <li
+                            class="nav-item <?php echo ($activeTab == 'config' || $activeTab == 'users' || $activeTab == 'facility' || $activeTab == 'import') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-equalizer"></i>
                                 <span class="title"><?php echo $this->translate('Admin'); ?></span>
@@ -393,7 +433,7 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
                             </ul>
                         </li>
                     <?php } ?>
-                    <!-- <?php  if (isset($loginContainer->accessType) && $loginContainer->accessType == '4') { ?>
+                    <!-- <?php if (isset($loginContainer->accessType) && $loginContainer->accessType == '4') { ?>
 
                         <li class="nav-item <?php echo ($activeTab == 'admin' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
@@ -585,7 +625,9 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
 
 
 
-            <a href="javascript:void(0);" onclick="clearCache();" style="font-size:8px;cursor:pointer;color:#fff;">Clear Cache</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php echo $this->translate("This project is supported by the U.S. President's Emergency Plan for AIDS Relief (PEPFAR) through the U.S.Centers for Disease Control and Prevention (CDC)."); ?> | ver. <?php echo APP_VERSION; ?>
+            <a href="javascript:void(0);" onclick="clearCache();" style="font-size:8px;cursor:pointer;color:#fff;">Clear
+                Cache</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php echo $this->translate("This project is supported by the U.S. President's Emergency Plan for AIDS Relief (PEPFAR) through the U.S.Centers for Disease Control and Prevention (CDC)."); ?>
+            | ver. <?php echo APP_VERSION; ?>
         </div>
         <div class="scroll-to-top">
             <i class="icon-arrow-up"></i>
@@ -599,73 +641,92 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
         <![endif]-->
     <!-- BEGIN CORE PLUGINS -->
     <script src="<?php echo $this->basePath('assets/js/highcharts.js'); ?>"></script>
-    <script src="https://code.highcharts.com/8.1.2/modules/drilldown.js" integrity="sha384-/bZ6CtQuLezNYSkfJ+SY3lcAqxaNay8FgTwgY08fHNf1JBMFb362fAx8htLK93Bn" crossorigin="anonymous"></script>
+    <script src="https://code.highcharts.com/8.1.2/modules/drilldown.js"
+        integrity="sha384-/bZ6CtQuLezNYSkfJ+SY3lcAqxaNay8FgTwgY08fHNf1JBMFb362fAx8htLK93Bn"
+        crossorigin="anonymous"></script>
     <script src="<?php echo $this->basePath('assets/js/highcharts-exporting.js'); ?>"></script>
     <script src="<?php echo $this->basePath('assets/js/highcharts-offline-exporting.js'); ?>"></script>
     <script src="<?php echo $this->basePath('assets/js/highcharts-export-csv.js'); ?>"></script>
     <script src="<?php echo $this->basePath('assets/global/scripts/highcharts-watermark.js'); ?>"></script>
     <script src="<?php echo $this->basePath('assets/global/scripts/deforayModal.js'); ?>"></script>
 
-    <script src="<?php echo $this->basePath('assets/global/plugins/bootstrap/js/bootstrap.min.js'); ?>" type="text/javascript"></script>
-    <script src="<?php echo $this->basePath('assets/global/plugins/jquery.blockui.min.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/bootstrap/js/bootstrap.min.js'); ?>"
+        type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/jquery.blockui.min.js'); ?>"
+        type="text/javascript"></script>
 
     <!-- END CORE PLUGINS -->
     <!-- BEGIN PAGE LEVEL PLUGINS -->
     <script src="<?php echo $this->basePath('assets/global/plugins/moment.min.js'); ?>" type="text/javascript"></script>
-    <script src="<?php echo $this->basePath('assets/global/plugins/bootstrap-daterangepicker/daterangepicker.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/bootstrap-daterangepicker/daterangepicker.js'); ?>"
+        type="text/javascript"></script>
 
-    <script src="<?php echo $this->basePath('assets/global/plugins/counterup/jquery.waypoints.min.js'); ?>" type="text/javascript"></script>
-    <script src="<?php echo $this->basePath('assets/global/plugins/counterup/jquery.counterup.min.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/counterup/jquery.waypoints.min.js'); ?>"
+        type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/counterup/jquery.counterup.min.js'); ?>"
+        type="text/javascript"></script>
 
 
 
     <!-- END PAGE LEVEL PLUGINS -->
     <!-- BEGIN THEME GLOBAL SCRIPTS -->
     <script src="<?php echo $this->basePath('assets/global/scripts/app.min.js'); ?>" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js" integrity="sha384-VFQrHzqBh5qiJIU0uGU5CIW3+OWpdGGJM9LBnGbuIH2mkICcFZ7lPd/AAtI7SNf7" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js" integrity="sha384-/RlQG9uf0M2vcTw3CX7fbqgbj/h8wKxw7C3zu9/GxcBPRKOEcESxaxufwRXqzq6n" crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/v/bs/jszip-3.10.1/dt-1.13.8/af-2.6.0/b-2.4.2/b-colvis-2.4.2/b-html5-2.4.2/b-print-2.4.2/cr-1.7.0/fc-4.3.0/fh-3.4.0/r-2.5.0/rr-1.4.1/sc-2.3.0/datatables.min.js" integrity="sha384-b32qUk+LbO72VrIQz1sGa6XxfWGleQ0soh27KwPOG9B9t8/KksRxr7ithR0ltrd+" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"
+        integrity="sha384-VFQrHzqBh5qiJIU0uGU5CIW3+OWpdGGJM9LBnGbuIH2mkICcFZ7lPd/AAtI7SNf7"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"
+        integrity="sha384-/RlQG9uf0M2vcTw3CX7fbqgbj/h8wKxw7C3zu9/GxcBPRKOEcESxaxufwRXqzq6n"
+        crossorigin="anonymous"></script>
+    <script
+        src="https://cdn.datatables.net/v/bs/jszip-3.10.1/dt-1.13.8/af-2.6.0/b-2.4.2/b-colvis-2.4.2/b-html5-2.4.2/b-print-2.4.2/cr-1.7.0/fc-4.3.0/fh-3.4.0/r-2.5.0/rr-1.4.1/sc-2.3.0/datatables.min.js"
+        integrity="sha384-b32qUk+LbO72VrIQz1sGa6XxfWGleQ0soh27KwPOG9B9t8/KksRxr7ithR0ltrd+"
+        crossorigin="anonymous"></script>
 
 
-    <script src="<?php echo $this->basePath('assets/global/plugins/select2/js/select2.min.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/select2/js/select2.min.js'); ?>"
+        type="text/javascript"></script>
     <script src="<?php echo $this->basePath('assets/js/jasny-bootstrap.min.js'); ?>" type="text/javascript"></script>
     <!-- END THEME GLOBAL SCRIPTS -->
     <!-- BEGIN PAGE LEVEL SCRIPTS -->
 
     <!-- END PAGE LEVEL SCRIPTS -->
     <!-- BEGIN THEME LAYOUT SCRIPTS -->
-    <script src="<?php echo $this->basePath('assets/layouts/layout/scripts/layout.min.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/layouts/layout/scripts/layout.min.js'); ?>"
+        type="text/javascript"></script>
     <script src="<?php echo $this->basePath('assets/js/deforayValidation.js'); ?>" type="text/javascript"></script>
     <script src="<?php echo $this->basePath('assets/js/cookie.js'); ?>" type="text/javascript"></script>
-    <script src="<?php echo $this->basePath('assets/js/month-year-range-picker.php'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/js/month-year-range-picker.php'); ?>"
+        type="text/javascript"></script>
     <!-- END THEME LAYOUT SCRIPTS -->
 
     <script src="<?php echo $this->basePath('assets/bootstrap-toggle/bootstrap-toggle.min.js'); ?>"></script>
     <!-- page script -->
     <div id="dDiv" class="dialog ">
-        <div style="text-align:center"><span onclick="closeModal();" style="float:right;clear:both;" class="closeModal"></span></div>
-        <iframe id="dFrame" src="" style="border:none;" scrolling='yes' marginwidth='0' marginheight='0' frameborder='0' vspace='0' hspace='0'>some problem</iframe>
+        <div style="text-align:center"><span onclick="closeModal();" style="float:right;clear:both;"
+                class="closeModal"></span></div>
+        <iframe id="dFrame" src="" style="border:none;" scrolling='yes' marginwidth='0' marginheight='0' frameborder='0'
+            vspace='0' hspace='0'>some problem</iframe>
     </div>
     <script>
-        $(function() {
+        $(function () {
             <?php
             if (isset($container->alertMsg) && $container->alertMsg != "") {
-            ?>
+                ?>
                 alert("<?php echo $this->translate($container->alertMsg); ?>");
-            <?php
+                <?php
                 $container->alertMsg = "";
                 unset($container->alertMsg);
             }
             ?>
         });
 
-        $(document).ready(function() {
-            $("body").on("contextmenu", function(e) {
+        $(document).ready(function () {
+            $("body").on("contextmenu", function (e) {
                 //return false;
             });
         });
 
-        $('body').on('click', '.sidebar-toggler', function(e) {
+        $('body').on('click', '.sidebar-toggler', function (e) {
             var body = $('body');
             if (body.hasClass("page-sidebar-closed")) {
                 $('.page-logo').removeClass('resize-page-logo');
@@ -680,7 +741,7 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
             }
         });
 
-        $(document).ajaxStop(function() {
+        $(document).ajaxStop(function () {
             setTimeout(showAnnouncementMsg, 2000);
         });
 
@@ -699,16 +760,16 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
                 message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
             })).ajaxStop($.unblockUI);
             $.post("<?php echo $this->url('common', array('action' => 'clear-cache')); ?>", {},
-                function(data) {
+                function (data) {
                     //The parameter set to 'true' reloads a fresh copy from the server. Leaving it out will serve the page from cache.
                     window.location.reload(true);
                 });
         }
 
         //only visible legends export
-        Highcharts.wrap(Highcharts.Chart.prototype, 'init', function(proceed, options, callback) {
+        Highcharts.wrap(Highcharts.Chart.prototype, 'init', function (proceed, options, callback) {
             if (options.chart && options.chart.forExport && options.series) {
-                $.each(options.series, function() {
+                $.each(options.series, function () {
                     if (this.visible === false) {
                         this.showInLegend = false;
                     }
@@ -726,7 +787,7 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
             }
         });
 
-        jQuery(".checkNum").keydown(function(e) {
+        jQuery(".checkNum").keydown(function (e) {
             // Allow: backspace, delete, tab, escape, enter and .
             if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
                 // Allow: Ctrl+A
@@ -757,9 +818,9 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
         function changeTable(obj) {
 
             $.post("<?php echo $this->url('common', array('action' => 'set-session')); ?>", {
-                    sessionType: obj.value
-                },
-                function(data) {
+                sessionType: obj.value
+            },
+                function (data) {
                     window.location.reload(true);
                 });
         }
