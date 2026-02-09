@@ -103,10 +103,8 @@ class EidSampleService
         $labId = $_POST['labId'] ?? null;
 
         $this->config = $this->sm->get('Config');
-        $input = $this->config['db']['dsn'];
-        preg_match('~=(.*?);~', $input, $output);
-        $dbname = $output[1];
-        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+        /** @var CommonService $commonService */
+        $commonService = $this->sm->get('CommonService');
 
         $fileName = $_FILES['eidFile']['name'];
         $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
@@ -127,17 +125,8 @@ class EidSampleService
             [$apiData, $timestamp] = CommonService::processJsonFile($fileName);
         }
 
-        $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
-                        WHERE TABLE_SCHEMA = '$dbname'
-                        AND table_name='dash_form_eid'";
-        $sResult = $dbAdapter
-            ->query($allColumns, $dbAdapter::QUERY_MODE_EXECUTE)
-            ->toArray();
-        $columnList = array_map('current', $sResult);
-
         $removeKeys = ['eid_id'];
-
-        $columnList = array_diff($columnList, $removeKeys);
+        $localDbFieldArray = $commonService->getTableFieldsAsArray('dash_form_eid', $removeKeys);
 
         /** @var \Eid\Model\EidSampleTable $sampleDb */
         $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
@@ -147,10 +136,7 @@ class EidSampleService
         $currentDateTime = CommonService::getDateTime();
         foreach ($apiData as $rowData) {
             $counter++;
-            $data = [];
-            foreach ($columnList as $colName) {
-                $data[$colName] = $rowData[$colName] ?? null;
-            }
+            $data = CommonService::updateMatchingKeysOnly($localDbFieldArray, (array)$rowData);
 
             $id = $sampleDb->insertOrUpdate($data);
             if (isset($id) && !empty($id) && is_numeric($id)) {

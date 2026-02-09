@@ -1284,10 +1284,6 @@ class SampleService
         //ini_set("memory_limit", -1);
         try {
             $apiData = [];
-            $input = $this->config['db']['dsn'];
-            preg_match('~=(.*?);~', $input, $output);
-            $dbname = $output[1];
-
             //$this->commonService->errorLog($_POST);
 
             $source = $_POST['source'] ?? 'LIS';
@@ -1296,13 +1292,7 @@ class SampleService
             $removeKeys = [
                 'vl_sample_id'
             ];
-            $allColumns = "SELECT COLUMN_NAME
-                            FROM INFORMATION_SCHEMA.COLUMNS
-                            WHERE TABLE_SCHEMA = '$dbname' AND table_name='dash_form_vl'";
-
-            $allColResult = $this->dbAdapter->query($allColumns, Adapter::QUERY_MODE_EXECUTE)->toArray();
-            $columnList = array_map('current', $allColResult);
-            $columnList = array_diff($columnList, $removeKeys);
+            $localDbFieldArray = $this->commonService->getTableFieldsAsArray('dash_form_vl', $removeKeys);
 
             /** @var SampleTable $sampleDb */
             $sampleDb = $this->sm->get('SampleTableWithoutCache');
@@ -1326,10 +1316,7 @@ class SampleService
             $currentDateTime = CommonService::getDateTime();
             foreach ($apiData as $rowData) {
                 $counter++;
-                $data = [];
-                foreach ($columnList as $colName) {
-                    $data[$colName] = isset($rowData[$colName]) ? $rowData[$colName] : null;
-                }
+                $data = CommonService::updateMatchingKeysOnly($localDbFieldArray, (array)$rowData);
                 try {
 
                     $id = $sampleDb->insertOrUpdate($data);
