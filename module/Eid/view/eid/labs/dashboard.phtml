@@ -237,31 +237,6 @@ $endDate = date('Y-m');
 <hr style="background: #000 !important;border-color:#ccc;">
 <form id="pageFilter" action="#" method="">
     <div class="row" style="padding-top:10px;padding-bottom:10px;">
-        <div class="col-lg-6">
-            <select name="provinceName[]" id="provinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();">
-                <?php
-                foreach ($provinceName as $province) {
-                ?>
-                    <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
-                <?php
-                }
-                ?>
-            </select>
-        </div>
-        <div class="col-lg-6" id="districtHeight">
-            <select name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectLabName();">
-                <!-- <?php
-                        foreach ($districtName as $district) {
-                        ?>
-                    <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
-                <?php
-                        }
-                ?>
-                <option value="0">Empty</option> -->
-            </select>
-        </div>
-    </div>
-    <div class="row" style="padding-top:5px;padding-bottom:20px;">
         <div class="col-lg-6" id="labHeight">
             <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                 <?php foreach ($labName as $lab) { ?>
@@ -502,16 +477,6 @@ $endDate = date('Y-m');
 
 
     $(function() {
-        $('#provinceName').select2({
-            placeholder: "<?php echo $this->translate('Provinces'); ?>",
-            allowClear: true
-        });
-        $('#districtName').select2({
-            placeholder: "<?php echo $this->translate('Districts'); ?>",
-            allowClear: true,
-            //maxPlaceholderOpts : 10
-        });
-
         $('#labName').select2({
             placeholder: "<?php echo $this->translate('Testing Labs'); ?>",
             allowClear: true

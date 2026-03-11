@@ -31,13 +31,9 @@ class LabsController extends AbstractActionController
     {
         $this->layout()->setVariable('activeTab', 'eid-labs');
         $labName = $this->sampleService->getAllLabName();
-        $provinceName = $this->sampleService->getAllProvinceList();
-        $districtName = $this->sampleService->getAllDistrictList();
         $clinicName = $this->sampleService->getAllClinicName();
         return new ViewModel(array(
             'labName' => $labName,
-            'provinceName' => $provinceName,
-            'districtName' => $districtName,
             'clinicName' => $clinicName,
         ));
     }

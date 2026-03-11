@@ -34,16 +34,12 @@ class LaboratoryController extends AbstractAppController
 
         $sampleType = $this->sampleService->getSampleType();
         $labName = $this->sampleService->getAllLabName();
-        $provinceName = $this->sampleService->getAllProvinceList();
-        $districtName = $this->sampleService->getAllDistrictList();
         $testReasonName = $this->sampleService->getAllTestReasonName();
         $clinicName = $this->sampleService->getAllClinicName();
 
         return $this->view->setVariables(array(
             'sampleType' => $sampleType,
             'labName' => $labName,
-            'provinceName' => $provinceName,
-            'districtName' => $districtName,
             'testReason' => $testReasonName,
             'clinicName' => $clinicName,
         ));
