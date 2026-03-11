@@ -45,12 +45,7 @@ class SummaryController extends AbstractAppController
         $allLineofTreatmentResult = $this->summaryService->getAllLineOfTreatmentDetails($params);
         $allCollapsibleLineofTreatmentResult = $this->summaryService->getAllCollapsibleLineOfTreatmentDetails($params);
 
-        /* District, Province and Facility */
-
-        $clinicName = $this->sampleService->getAllClinicName();
-        $provinceName = $this->sampleService->getAllProvinceList();
-        $districtName = $this->sampleService->getAllDistrictList();
-        /* Ends Here*/
+        $clinicName = $this->sampleService->getAllLabName();
 
         return new ViewModel(array(
             'summaryTabInfo' => $summaryTabResult,
@@ -59,8 +54,6 @@ class SummaryController extends AbstractAppController
             'startDate' => $params['fromDate'],
             'endDate' => $params['toDate'],
             'clinicName' => $clinicName,
-            'provinceName' => $provinceName,
-            'districtName' => $districtName
         ));
     }
 

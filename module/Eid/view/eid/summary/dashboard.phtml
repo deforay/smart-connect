@@ -265,39 +265,15 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         <div role="tabpanel" class="tab-pane fade in active" id="samplesReceivedTab">
             <div class="row" style="padding-top:5px;padding-bottom:10px;">
                 <div class="col-md-12">
-                    <div class="col-md-2">
-                        <select style="width:100%" name="sampleProvinceName[]" id="sampleProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();">
+                    <div class="col-lg-4">
+                        <select style="width:100%" class="form-control" id="sampleClinicId" name="sampleClinicId[]" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                             <?php
-                            foreach ($provinceName as $province) {
+                            foreach ($clinicName as $clinic) {
                             ?>
-                                <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
+                                <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
                             <?php
                             }
                             ?>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <select style="width:100%" name="sampleDistrictName[]" id="sampleDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectLabName();">
-                            <!-- <?php
-                                    foreach ($districtName as $district) {
-                                    ?>
-                                <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
-                            <?php
-                                    }
-                            ?>
-                            <option value="0">Empty</option> -->
-                        </select>
-                    </div>
-
-                    <div class="col-lg-3">
-                        <select style="width:100%" class="form-control" id="sampleClinicId" name="sampleClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
-                            <!-- <?php
-                                    foreach ($clinicName as $clinic) {
-                                    ?>
-                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
-                            <?php
-                                    }
-                            ?> -->
                         </select>
                     </div>
                     <div class="col-lg-2">
@@ -308,7 +284,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                             <option value="secondThirdPcr">2nd/3rd PCR</option>
                         </select>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesReceivedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetSampleEverything();"><?php echo $this->translate('Reset'); ?></a>
@@ -424,42 +400,18 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         <div role="tabpanel" class="tab-pane fade" id="positiveRateTab">
             <div class="row" style="padding-top:5px;padding-bottom:10px;">
                 <div class="col-md-12">
-                    <div class="col-md-3">
-                        <select style="width:100%" name="positiveProvinceName[]" id="positiveProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
-                            <?php
-                            foreach ($provinceName as $province) {
-                            ?>
-                                <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
-                            <?php
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <select style="width:100%" name="positiveDistrictName[]" id="positiveDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
-                            <?php
-                            foreach ($districtName as $district) {
-                            ?>
-                                <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
-                            <?php
-                            }
-                            ?>
-                            <option value="0">Empty</option>
-                        </select>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <select style="width:100%" class="form-control" id="positiveClinicId" name="positiveClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                    <div class="col-lg-8">
+                        <select style="width:100%" class="form-control" id="positiveClinicId" name="positiveClinicId[]" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                             <?php
                             foreach ($clinicName as $clinic) {
                             ?>
-                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                                <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
                             <?php
                             }
                             ?>
                         </select>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getPositiveRateBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetPositiveEverything();"><?php echo $this->translate('Reset'); ?></a>
@@ -575,42 +527,18 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         <div role="tabpanel" class="tab-pane fade" id="samplesRejectedTab">
             <div class="row" style="padding-top:5px;padding-bottom:10px;">
                 <div class="col-md-12">
-                    <div class="col-md-3">
-                        <select style="width:100%" name="rejectionProvinceName[]" id="rejectionProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
-                            <?php
-                            foreach ($provinceName as $province) {
-                            ?>
-                                <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
-                            <?php
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <select style="width:100%" name="rejectionDistrictName[]" id="rejectionDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
-                            <?php
-                            foreach ($districtName as $district) {
-                            ?>
-                                <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
-                            <?php
-                            }
-                            ?>
-                            <option value="0">Empty</option>
-                        </select>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <select style="width:100%" class="form-control" id="rejectionClinicId" name="rejectionClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                    <div class="col-lg-8">
+                        <select style="width:100%" class="form-control" id="rejectionClinicId" name="rejectionClinicId[]" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                             <?php
                             foreach ($clinicName as $clinic) {
                             ?>
-                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                                <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
                             <?php
                             }
                             ?>
                         </select>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesRejectedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetRejectionEverything();"><?php echo $this->translate('Reset'); ?></a>
@@ -781,41 +709,18 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 </div>
                 <div class="portlet-body">
                     <div class="row">
-                        <div class="col-md-3">
-                            <select style="width:100%" name="indProvinceName[]" id="indProvinceName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
-                                <?php
-                                foreach ($provinceName as $province) {
-                                ?>
-                                    <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
-                                <?php
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <select style="width:100%" name="indDistrictName[]" id="indDistrictName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
-                                <?php
-                                foreach ($districtName as $district) {
-                                ?>
-                                    <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
-                                <?php
-                                }
-                                ?>
-                                <option value="0">Empty</option>
-                            </select>
-                        </div>
-                        <div class="col-lg-4">
-                            <select style="width:100%" class="form-control" id="indClinicId" name="indClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                        <div class="col-lg-8">
+                            <select style="width:100%" class="form-control" id="indClinicId" name="indClinicId[]" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                                 <?php
                                 foreach ($clinicName as $clinic) {
                                 ?>
-                                    <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                                    <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
                                 <?php
                                 }
                                 ?>
                             </select>
                         </div>
-                        <div class="col-lg-2">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSummaryIndicators();"><?php echo $this->translate('Search'); ?></a>
                                 <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetIndicators();"><?php echo $this->translate('Reset'); ?></a>
@@ -970,44 +875,14 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         getSamplesRegisteredTab();
 
 
-        /* District ,Province and Facilities */
-        $('#provinceName').select2({
-            placeholder: "<?php echo $this->translate('All Province'); ?>",
-            allowClear: true
-        });
-        $('#districtName').select2({
-            placeholder: "<?php echo $this->translate('All Districts'); ?>",
-            allowClear: true,
-        });
-        $('#clinicId').select2({
-            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
-            allowClear: true
-        });
-
-
-        $('#indProvinceName').select2({
-            placeholder: "<?php echo $this->translate('All Province'); ?>",
-            allowClear: true
-        });
-        $('#indDistrictName').select2({
-            placeholder: "<?php echo $this->translate('All Districts'); ?>",
-            allowClear: true,
-        });
+        /* Facilities */
         $('#indClinicId').select2({
-            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
         });
 
-        $('#sampleProvinceName').select2({
-            placeholder: "<?php echo $this->translate('All Province'); ?>",
-            allowClear: true
-        });
-        $('#sampleDistrictName').select2({
-            placeholder: "<?php echo $this->translate('Select Province First'); ?>",
-            allowClear: true,
-        });
         $('#sampleClinicId').select2({
-            placeholder: "<?php echo $this->translate('Select District First'); ?>",
+            placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
         });
         $('#sampleResgisteredEidTestType').select2({
@@ -1015,32 +890,16 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             allowClear: true
         });
 
-        $('#positiveProvinceName').select2({
-            placeholder: "<?php echo $this->translate('All Province'); ?>",
-            allowClear: true
-        });
-        $('#positiveDistrictName').select2({
-            placeholder: "<?php echo $this->translate('All Districts'); ?>",
-            allowClear: true,
-        });
         $('#positiveClinicId').select2({
-            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
-        });
-        $('#rejectionProvinceName').select2({
-            placeholder: "<?php echo $this->translate('All Province'); ?>",
-            allowClear: true
-        });
-        $('#rejectionDistrictName').select2({
-            placeholder: "<?php echo $this->translate('All Districts'); ?>",
-            allowClear: true,
         });
         $('#rejectionClinicId').select2({
-            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
         });
 
-        $('#sampleProvinceName,#sampleDistrictName,#sampleClinicId').on('select2:close', function() {
+        $('#sampleClinicId').on('select2:close', function() {
             let select = $(this)
             $(this).next('span.select2').find('ul').html(function() {
                 let count = select.select2('data').length
@@ -1604,15 +1463,11 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     });
 
     function getSamplesReceivedBarChartInfo() {
-        sampDistrictIdList = ($("#sampleDistrictName").val() == null) ? '' : $("#sampleDistrictName").val().join(',');
-        sampProvinceIdList = ($("#sampleProvinceName").val() == null) ? '' : $("#sampleProvinceName").val().join(',');
         sampClinicIdList = ($("#sampleClinicId").val() == null) ? '' : $('#sampleClinicId').val().join(',');
         sampleResgisteredEidTestType = ($("#sampleResgisteredEidTestType").val() == null) ? '' : $('#sampleResgisteredEidTestType').val();
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('eid-summary', array('action' => 'get-samples-received-bar-chart')); ?>", {
-                districts: sampDistrictIdList,
-                provinces: sampProvinceIdList,
                 clinics: sampClinicIdList,
                 sampleResgisteredEidTestType: sampleResgisteredEidTestType,
                 fromDate: fromDate,
@@ -1627,14 +1482,10 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     }
 
     function getPositiveRateBarChartInfo() {
-        supDistrictIdList = ($("#positiveDistrictName").val() == null) ? '' : $("#positiveDistrictName").val().join(',');
-        supProvinceIdList = ($("#positiveProvinceName").val() == null) ? '' : $("#positiveProvinceName").val().join(',');
         supClinicIdList = ($("#positiveClinicId").val() == null) ? '' : $('#positiveClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('eid-summary', array('action' => 'get-positive-rate-bar-chart')); ?>", {
-                districts: supDistrictIdList,
-                provinces: supProvinceIdList,
                 clinics: supClinicIdList,
                 fromDate: fromDate,
                 toDate: toDate
@@ -1648,14 +1499,10 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     }
 
     function getSamplesRejectedBarChartInfo() {
-        rejDistrictIdList = ($("#rejectionDistrictName").val() == null) ? '' : $("#rejectionDistrictName").val().join(',');
-        rejProvinceIdList = ($("#rejectionProvinceName").val() == null) ? '' : $("#rejectionProvinceName").val().join(',');
         rejClinicIdList = ($("#rejectionClinicId").val() == null) ? '' : $('#rejectionClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('eid-summary', array('action' => 'get-samples-rejected-bar-chart')); ?>", {
-                districts: rejDistrictIdList,
-                provinces: rejProvinceIdList,
                 clinics: rejClinicIdList,
                 fromDate: fromDate,
                 toDate: toDate
@@ -1671,8 +1518,6 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     /* Reset Everything Fn */
     function resetEverything() {
-        $("#districtName").select2('val', '');
-        $("#provinceName").select2('val', '');
         $('#clinicId').select2('val', '');
     }
 
@@ -1682,14 +1527,10 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing Summary of Key Indicators')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
-        var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
-        var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('eid-summary', array('action' => 'get-indicators')); ?>", {
-                districts: indDistrictIdList,
-                provinces: indProvinceIdList,
                 clinics: indClinicIdList,
                 fromDate: fromDate,
                 toDate: toDate
@@ -1704,14 +1545,10 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing EID Outcomes')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
-        var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
-        var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('eid-summary', array('action' => 'get-eid-outcomes')); ?>", {
-                districts: indDistrictIdList,
-                provinces: indProvinceIdList,
                 clinics: indClinicIdList,
                 fromDate: fromDate,
                 toDate: toDate
@@ -1726,14 +1563,10 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Age')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
-        var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
-        var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('eid-summary', array('action' => 'get-eid-outcomes-by-age')); ?>", {
-                districts: indDistrictIdList,
-                provinces: indProvinceIdList,
                 clinics: indClinicIdList,
                 fromDate: fromDate,
                 toDate: toDate
@@ -1748,14 +1581,10 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Province')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
-        var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
-        var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('eid-summary', array('action' => 'get-eid-outcomes-by-province')); ?>", {
-                districts: indDistrictIdList,
-                provinces: indProvinceIdList,
                 clinics: indClinicIdList,
                 fromDate: fromDate,
                 toDate: toDate
@@ -1770,14 +1599,10 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Province')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
-        var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
-        var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('eid-summary', array('action' => 'get-tat')); ?>", {
-                districts: indDistrictIdList,
-                provinces: indProvinceIdList,
                 clinics: indClinicIdList,
                 fromDate: fromDate,
                 toDate: toDate
@@ -1789,8 +1614,6 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     }
 
     function resetIndicators() {
-        $("#indDistrictName").select2('val', '');
-        $("#indProvinceName").select2('val', '');
         $('#indClinicId').select2('val', '');
         getSummaryIndicators();
     }
@@ -1831,8 +1654,6 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function resetSampleEverything() {
         $.blockUI();
-        $("#sampleDistrictName").select2('val', '');
-        $("#sampleProvinceName").select2('val', '');
         $('#sampleClinicId').select2('val', '');
         getSamplesReceivedBarChartInfo();
         $.unblockUI();
@@ -1840,8 +1661,6 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function resetPositiveEverything() {
         $.blockUI();
-        $("#positiveDistrictName").select2('val', '');
-        $("#positiveProvinceName").select2('val', '');
         $('#positiveClinicId').select2('val', '');
         getPositiveRateBarChartInfo();
         $.unblockUI();
@@ -1849,8 +1668,6 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function resetRejectionEverything() {
         $.blockUI();
-        $("#rejectionDistrictName").select2('val', '');
-        $("#rejectionProvinceName").select2('val', '');
         $('#rejectionClinicId').select2('val', '');
         getSamplesRejectedBarChartInfo();
         $.unblockUI();
@@ -1906,37 +1723,4 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         return [year, month].join('-');
     }
 
-    function selectDistrictName() {
-        $('#sampleDistrictName,#sampleClinicId').html('');
-        $('#sampleDistrictName,#sampleClinicId').select2('val', '');
-
-        var pName = $("#sampleProvinceName").val();
-        if (pName != null && pName.length > 0) {
-            $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
-                    provinceName: pName
-                },
-                function(data) {
-                    if (data != "" || data != null || data != undefined) {
-                        $('#sampleDistrictName').html(data);
-                    }
-                });
-        }
-    }
-
-    function selectLabName() {
-        $('#sampleClinicId').html('');
-        $('#sampleClinicId').select2('val', '');
-
-        var dName = $("#sampleDistrictName").val();
-        if (dName != null && dName.length > 0) {
-            $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
-                    districtName: dName
-                },
-                function(data) {
-                    if (data != "" || data != null || data != undefined) {
-                        $('#sampleClinicId').html(data);
-                    }
-                });
-        }
-    }
 </script>

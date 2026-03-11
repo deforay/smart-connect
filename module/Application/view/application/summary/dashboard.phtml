@@ -241,42 +241,18 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         <div role="tabpanel" class="tab-pane fade in active" id="samplesReceivedTab">
             <div class="row" style="padding-top:5px;padding-bottom:10px;">
                 <div class="col-md-12">
-                    <div class="col-md-3">
-                        <select style="width:100%" name="sampleProvinceName[]" id="sampleProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();">
+                    <div class="col-lg-8">
+                        <select style="width:100%" class="form-control" id="sampleClinicId" name="sampleClinicId[]" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                             <?php
-                            foreach ($provinceName as $province) {
+                            foreach ($clinicName as $clinic) {
                             ?>
-                                <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
+                                <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
                             <?php
                             }
                             ?>
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <select style="width:100%" name="sampleDistrictName[]" id="sampleDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectLabName();">
-                            <!--  <?php
-                                    foreach ($districtName as $district) {
-                                    ?>
-                                <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
-                            <?php
-                                    }
-                            ?> -->
-                            <!-- <option value="0">Empty</option> -->
-                        </select>
-                    </div>
-
                     <div class="col-lg-4">
-                        <select style="width:100%" class="form-control" id="sampleClinicId" name="sampleClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
-                            <!-- <?php
-                                    foreach ($clinicName as $clinic) {
-                                    ?>
-                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
-                            <?php
-                                    }
-                            ?> -->
-                        </select>
-                    </div>
-                    <div class="col-lg-2">
                         <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesReceivedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetSampleEverything();"><?php echo $this->translate('Reset'); ?></a>
@@ -395,42 +371,18 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         <div role="tabpanel" class="tab-pane fade" id="suppressionRateTab">
             <div class="row" style="padding-top:5px;padding-bottom:10px;">
                 <div class="col-md-12">
-                    <div class="col-md-3">
-                        <select style="width:100%" name="suppressionProvinceName[]" id="suppressionProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
-                            <?php
-                            foreach ($provinceName as $province) {
-                            ?>
-                                <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
-                            <?php
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <select style="width:100%" name="suppressionDistrictName[]" id="suppressionDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
-                            <?php
-                            foreach ($districtName as $district) {
-                            ?>
-                                <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
-                            <?php
-                            }
-                            ?>
-                            <option value="0">Empty</option>
-                        </select>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <select style="width:100%" class="form-control" id="suppressionClinicId" name="suppressionClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                    <div class="col-lg-8">
+                        <select style="width:100%" class="form-control" id="suppressionClinicId" name="suppressionClinicId[]" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                             <?php
                             foreach ($clinicName as $clinic) {
                             ?>
-                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                                <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
                             <?php
                             }
                             ?>
                         </select>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSuppressionRateBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetSuppressionEverything();"><?php echo $this->translate('Reset'); ?></a>
@@ -546,42 +498,18 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         <div role="tabpanel" class="tab-pane fade" id="samplesRejectedTab">
             <div class="row" style="padding-top:5px;padding-bottom:10px;">
                 <div class="col-md-12">
-                    <div class="col-md-3">
-                        <select style="width:100%" name="rejectionProvinceName[]" id="rejectionProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
-                            <?php
-                            foreach ($provinceName as $province) {
-                            ?>
-                                <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
-                            <?php
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <select style="width:100%" name="rejectionDistrictName[]" id="rejectionDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
-                            <?php
-                            foreach ($districtName as $district) {
-                            ?>
-                                <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
-                            <?php
-                            }
-                            ?>
-                            <option value="0">Empty</option>
-                        </select>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <select style="width:100%" class="form-control" id="rejectionClinicId" name="rejectionClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                    <div class="col-lg-8">
+                        <select style="width:100%" class="form-control" id="rejectionClinicId" name="rejectionClinicId[]" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                             <?php
                             foreach ($clinicName as $clinic) {
                             ?>
-                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                                <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
                             <?php
                             }
                             ?>
                         </select>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesRejectedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetRejectionEverything();"><?php echo $this->translate('Reset'); ?></a>
@@ -694,42 +622,18 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                         ?>
                     </div>
                     <br />
-                    <div class="col-md-3">
-                        <select style="width:100%" name="provinceName[]" id="provinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
-                            <?php
-                            foreach ($provinceName as $province) {
-                            ?>
-                                <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
-                            <?php
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3" id="districtHeight">
-                        <select style="width:100%" name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
-                            <?php
-                            foreach ($districtName as $district) {
-                            ?>
-                                <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
-                            <?php
-                            }
-                            ?>
-                            <option value="0">Empty</option>
-                        </select>
-                    </div>
-
-                    <div class="col-lg-4" id="clinicHeight">
-                        <select style="width:100%" class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                    <div class="col-lg-8" id="clinicHeight">
+                        <select style="width:100%" class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                             <?php
                             foreach ($clinicName as $clinic) {
                             ?>
-                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                                <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
                             <?php
                             }
                             ?>
                         </select>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getRegimenGroupBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
@@ -1248,41 +1152,18 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                         </div>
                         <div class="portlet-body">
                             <div class="row">
-                                <div class="col-md-3">
-                                    <select style="width:100%" name="indProvinceName[]" id="indProvinceName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
-                                        <?php
-                                        foreach ($provinceName as $province) {
-                                        ?>
-                                            <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <select style="width:100%" name="indDistrictName[]" id="indDistrictName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
-                                        <?php
-                                        foreach ($districtName as $district) {
-                                        ?>
-                                            <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                        <option value="0">Empty</option>
-                                    </select>
-                                </div>
-                                <div class="col-lg-4">
-                                    <select style="width:100%" class="form-control" id="indClinicId" name="indClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                                <div class="col-lg-8">
+                                    <select style="width:100%" class="form-control" id="indClinicId" name="indClinicId[]" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                                         <?php
                                         foreach ($clinicName as $clinic) {
                                         ?>
-                                            <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                                            <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
                                         <?php
                                         }
                                         ?>
                                     </select>
                                 </div>
-                                <div class="col-lg-2">
+                                <div class="col-lg-4">
                                     <div class="form-group">
                                         <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSummaryIndicators();"><?php echo $this->translate('Search'); ?></a>
                                         <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetIndicators();"><?php echo $this->translate('Reset'); ?></a>
@@ -1396,80 +1277,26 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 
 
         /* District ,Province and Facilities */
-        $('#provinceName').select2({
-            placeholder: "<?php echo $this->translate('All Province'); ?>",
-            allowClear: true
-        });
-        $('#districtName').select2({
-            placeholder: "<?php echo $this->translate('All Districts'); ?>",
-            allowClear: true,
-        });
         $('#clinicId').select2({
-            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
-        });
-
-
-        $('#indProvinceName').select2({
-            placeholder: "<?php echo $this->translate('All Province'); ?>",
-            allowClear: true
-        });
-        $('#indDistrictName').select2({
-            placeholder: "<?php echo $this->translate('All Districts'); ?>",
-            allowClear: true,
         });
         $('#indClinicId').select2({
-            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
-        });
-
-        $('#sampleProvinceName').select2({
-            placeholder: "<?php echo $this->translate('All Province'); ?>",
-            allowClear: true
-        });
-        $('#sampleDistrictName').select2({
-            placeholder: "<?php echo $this->translate('Select Province First'); ?>",
-            allowClear: true,
         });
         $('#sampleClinicId').select2({
-            placeholder: "<?php echo $this->translate('Select Districts First'); ?>",
+            placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
-        });
-
-        $('#suppressionProvinceName').select2({
-            placeholder: "<?php echo $this->translate('All Province'); ?>",
-            allowClear: true
-        });
-        $('#suppressionDistrictName').select2({
-            placeholder: "<?php echo $this->translate('All Districts'); ?>",
-            allowClear: true,
         });
         $('#suppressionClinicId').select2({
-            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
-        });
-        $('#rejectionProvinceName').select2({
-            placeholder: "<?php echo $this->translate('All Province'); ?>",
-            allowClear: true
-        });
-        $('#rejectionDistrictName').select2({
-            placeholder: "<?php echo $this->translate('All Districts'); ?>",
-            allowClear: true,
         });
         $('#rejectionClinicId').select2({
-            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
         });
-
-        $('#sampleProvinceName,#sampleDistrictName,#sampleClinicId').on('select2:close', function() {
-            let select = $(this)
-            $(this).next('span.select2').find('ul').html(function() {
-                let count = select.select2('data').length
-                if (count > 1) {
-                    return "<li>" + count + " items selected</li>"
-                }
-            })
-        })
     });
 
     function districtWiseSamplesReceivedSummaryFn() {
@@ -2100,14 +1927,10 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     });
 
     function getSamplesReceivedBarChartInfo() {
-        sampDistrictIdList = ($("#sampleDistrictName").val() == null) ? '' : $("#sampleDistrictName").val().join(',');
-        sampProvinceIdList = ($("#sampleProvinceName").val() == null) ? '' : $("#sampleProvinceName").val().join(',');
         sampClinicIdList = ($("#sampleClinicId").val() == null) ? '' : $('#sampleClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('summary', array('action' => 'get-samples-received-bar-chart')); ?>", {
-                districts: sampDistrictIdList,
-                provinces: sampProvinceIdList,
                 clinics: sampClinicIdList,
                 fromDate: fromDate,
                 toDate: toDate
@@ -2118,14 +1941,10 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     }
 
     function getSuppressionRateBarChartInfo() {
-        supDistrictIdList = ($("#suppressionDistrictName").val() == null) ? '' : $("#suppressionDistrictName").val().join(',');
-        supProvinceIdList = ($("#suppressionProvinceName").val() == null) ? '' : $("#suppressionProvinceName").val().join(',');
         supClinicIdList = ($("#suppressionClinicId").val() == null) ? '' : $('#suppressionClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('summary', array('action' => 'get-suppression-rate-bar-chart')); ?>", {
-                districts: supDistrictIdList,
-                provinces: supProvinceIdList,
                 clinics: supClinicIdList,
                 fromDate: fromDate,
                 toDate: toDate
@@ -2136,14 +1955,10 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     }
 
     function getSamplesRejectedBarChartInfo() {
-        rejDistrictIdList = ($("#rejectionDistrictName").val() == null) ? '' : $("#rejectionDistrictName").val().join(',');
-        rejProvinceIdList = ($("#rejectionProvinceName").val() == null) ? '' : $("#rejectionProvinceName").val().join(',');
         rejClinicIdList = ($("#rejectionClinicId").val() == null) ? '' : $('#rejectionClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('summary', array('action' => 'get-samples-rejected-bar-chart')); ?>", {
-                districts: rejDistrictIdList,
-                provinces: rejProvinceIdList,
                 clinics: rejClinicIdList,
                 fromDate: fromDate,
                 toDate: toDate
@@ -2154,14 +1969,10 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     }
 
     function getRegimenGroupBarChartInfo() {
-        var districtIdList = ($("#districtName").val() == null) ? '' : $("#districtName").val().join(',');
-        var provinceIdList = ($("#provinceName").val() == null) ? '' : $("#provinceName").val().join(',');
         var clinicIdList = ($("#clinicId").val() == null) ? '' : $('#clinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('summary', array('action' => 'get-regimen-group-bar-chart')); ?>", {
-                districts: districtIdList,
-                provinces: provinceIdList,
                 clinics: clinicIdList,
                 fromDate: fromDate,
                 toDate: toDate
@@ -2173,8 +1984,6 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 
     /* Reset Everything Fn */
     function resetEverything() {
-        $("#districtName").select2('val', '');
-        $("#provinceName").select2('val', '');
         $('#clinicId').select2('val', '');
     }
 
@@ -2184,14 +1993,10 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing Summary of Key Indicators')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
-        var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
-        var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('summary', array('action' => 'get-indicators')); ?>", {
-                districts: indDistrictIdList,
-                provinces: indProvinceIdList,
                 clinics: indClinicIdList,
                 fromDate: fromDate,
                 toDate: toDate
@@ -2203,8 +2008,6 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     }
 
     function resetIndicators() {
-        $("#indDistrictName").select2('val', '');
-        $("#indProvinceName").select2('val', '');
         $('#indClinicId').select2('val', '');
         getSummaryIndicators();
     }
@@ -2245,8 +2048,6 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 
     function resetSampleEverything() {
         $.blockUI();
-        $("#sampleDistrictName").select2('val', '');
-        $("#sampleProvinceName").select2('val', '');
         $('#sampleClinicId').select2('val', '');
         getSamplesReceivedBarChartInfo();
         $.unblockUI();
@@ -2254,8 +2055,6 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 
     function resetSuppressionEverything() {
         $.blockUI();
-        $("#suppressionDistrictName").select2('val', '');
-        $("#suppressionProvinceName").select2('val', '');
         $('#suppressionClinicId').select2('val', '');
         getSuppressionRateBarChartInfo();
         $.unblockUI();
@@ -2263,8 +2062,6 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 
     function resetRejectionEverything() {
         $.blockUI();
-        $("#rejectionDistrictName").select2('val', '');
-        $("#rejectionProvinceName").select2('val', '');
         $('#rejectionClinicId').select2('val', '');
         getSamplesRejectedBarChartInfo();
         $.unblockUI();
@@ -2320,54 +2117,4 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         return [year, month].join('-');
     }
 
-    function selectDistrictName() {
-        $('#sampleDistrictName,#sampleClinicId').html('');
-        $('#sampleDistrictName,#sampleClinicId').select2('val', '');
-
-        var pName = $("#sampleProvinceName").val();
-        if (pName != null && pName.length > 0) {
-            $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
-                    provinceName: pName
-                },
-                function(data) {
-                    if (data != "" || data != null || data != undefined) {
-                        $('#sampleDistrictName').html(data);
-                    }
-                });
-        }
-    }
-
-    function selectLabName() {
-        $('#sampleClinicId').html('');
-        $('#sampleClinicId').select2('val', '');
-
-        var dName = $("#sampleDistrictName").val();
-        if (dName != null && dName.length > 0) {
-            $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
-                    districtName: dName
-                },
-                function(data) {
-                    if (data != "" || data != null || data != undefined) {
-                        $('#sampleClinicId').html(data);
-                    }
-                });
-        }
-    }
-
-    /* function selectProvinceDistrictName() {
-        lName = $("#sampleClinicId").val();
-        if(lName.length > 0){
-            $.post("<?php echo $this->url('common', array('action' => 'get-province-district-by-facility')); ?>", {
-                labName : lName
-            },
-            function(data) {
-                if (data != "" || data != null || data != undefined) {
-                    var setJSON = JSON.parse(data);
-                    console.log(setJSON.province);
-                    $("#sampleDistrictName").val(setJSON.district).trigger("change");
-                    $("#sampleProvinceName").val(setJSON.province).trigger("change");
-                }
-            });
-        }
-    } */
 </script>

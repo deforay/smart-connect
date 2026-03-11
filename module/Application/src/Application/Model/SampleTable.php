@@ -3,6 +3,7 @@
 namespace Application\Model;
 
 use Laminas\Db\Sql\Sql;
+use Laminas\Db\Sql\Select;
 use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
@@ -3212,7 +3213,7 @@ class SampleTable extends AbstractTableGateway
                 "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), Select::JOIN_LEFT)
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array(), 'left')
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
             ->group(new Expression('DATE(sample_collection_date)'))
@@ -3329,7 +3330,7 @@ class SampleTable extends AbstractTableGateway
                 "total_samples_received" => new Expression("(COUNT(*))")
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), Select::JOIN_LEFT)
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array(), 'left')
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
             ->group(new Expression('DATE(sample_collection_date)'))
@@ -4824,7 +4825,7 @@ class SampleTable extends AbstractTableGateway
                     "total_others" => new Expression("SUM(CASE WHEN ((specimen_type!= $this->dbsId AND specimen_type!= $this->plasmaId) AND specimen_type IS NOT NULL AND specimen_type!= '') THEN 1 ELSE 0 END)")
                 )
             )
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), Select::JOIN_LEFT)
             //->where("sample_collection_date <= NOW()")
             //->where("sample_collection_date >= DATE_ADD(Now(),interval - 12 month)")
             ->group(array(new Expression('YEAR(vl.sample_collection_date)'), new Expression('MONTH(vl.sample_collection_date)')));
@@ -4954,8 +4955,8 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'), Select::JOIN_LEFT)
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state_id');
         if (isset($sWhere) && $sWhere != "") {
@@ -5000,8 +5001,8 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'), Select::JOIN_LEFT)
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state_id');
 
@@ -5128,8 +5129,8 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), Select::JOIN_LEFT)
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
         if (isset($sWhere) && $sWhere != "") {
@@ -5174,8 +5175,8 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), Select::JOIN_LEFT)
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
 
@@ -5303,9 +5304,9 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
-            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), Select::JOIN_LEFT)
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'), Select::JOIN_LEFT)
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')")
             ->group('vl.facility_id');
 
@@ -5347,9 +5348,9 @@ class SampleTable extends AbstractTableGateway
         $iQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(array('vl_sample_id'))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array())
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array())
-            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array())
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array())
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array(), Select::JOIN_LEFT)
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array(), Select::JOIN_LEFT)
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array(), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')")
             ->group('vl.facility_id');
 
@@ -5538,7 +5539,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state_id');
 
@@ -5584,7 +5585,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -5705,7 +5706,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
 
@@ -5749,7 +5750,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -5874,8 +5875,8 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'), Select::JOIN_LEFT)
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('vl.facility_id');
 
@@ -5922,8 +5923,8 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'), Select::JOIN_LEFT)
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('vl.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -6132,7 +6133,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
 
@@ -6177,7 +6178,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -6288,7 +6289,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
 
@@ -6333,7 +6334,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -6445,8 +6446,8 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'), Select::JOIN_LEFT)
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_id');
 
@@ -6491,8 +6492,8 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'), Select::JOIN_LEFT)
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), Select::JOIN_LEFT)
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -7314,7 +7315,7 @@ class SampleTable extends AbstractTableGateway
                 "total"                => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, result_approved_datetime), 0)), 2)")
             ])
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id', [])
-            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id', [])
+            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id', [], Select::JOIN_LEFT)
             ->where([
                 new Expression("sample_tested_datetime BETWEEN '$startDate' AND '$endDate'"),
                 new Expression("vl.sample_collection_date IS NOT NULL AND vl.sample_collection_date != '' AND vl.sample_collection_date NOT IN ('1970-01-01', '0000-00-00')")
@@ -7366,7 +7367,7 @@ class SampleTable extends AbstractTableGateway
                 "total"               => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, result_approved_datetime), 0)), 2)")
             ])
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id', [])
-            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id', [])
+            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id', [], Select::JOIN_LEFT)
             ->where([
                 new Expression("sample_tested_datetime BETWEEN '$startDate' AND '$endDate'"),
                 new Expression("vl.sample_collection_date IS NOT NULL AND vl.sample_collection_date != '' AND vl.sample_collection_date NOT IN ('1970-01-01', '0000-00-00')")
@@ -7416,7 +7417,7 @@ class SampleTable extends AbstractTableGateway
                 "total"               => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, result_approved_datetime), 0)), 2)")
             ])
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id', [])
-            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id', [])
+            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id', [], Select::JOIN_LEFT)
             ->where([
                 new Expression("sample_tested_datetime BETWEEN '$startDate' AND '$endDate'"),
                 new Expression("vl.sample_collection_date IS NOT NULL AND vl.sample_collection_date != '' AND vl.sample_collection_date NOT IN ('1970-01-01', '0000-00-00')")

@@ -26,14 +26,12 @@ class LocationDetailsTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->quantifier(Select::QUANTIFIER_DISTINCT)
             ->from(array('l' => 'geographical_divisions'))
-            ->join(array('f' => 'facility_details'), 'f.facility_state_id=l.geo_id', [])
-            ->where('f.facility_type IN (1,3)')
             ->where(array('geo_parent' => 0));
         if ($mappedFacilities != null) {
-            $sQuery = $sQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
+            $sQuery = $sQuery->join(array('f' => 'facility_details'), 'f.facility_state_id=l.geo_id', [])
+                ->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         $sQueryStr = $sql->buildSqlString($sQuery);
-        //error_log($sQueryStr);
         return $dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
@@ -62,12 +60,10 @@ class LocationDetailsTable extends AbstractTableGateway
         $sQuery = $sql->select()
             ->quantifier(Select::QUANTIFIER_DISTINCT)
             ->from(array('l' => 'geographical_divisions'))
-            ->join(array('f' => 'facility_details'), 'f.facility_district_id=l.geo_id', array())
-            //->join(array('ft' => 'facility_type'), 'ft.facility_type_id=f.facility_type')
-            ->where('f.facility_type IN (1,3)')
             ->where(array("geo_parent > 0"));
         if ($mappedFacilities != null) {
-            $sQuery = $sQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
+            $sQuery = $sQuery->join(array('f' => 'facility_details'), 'f.facility_district_id=l.geo_id', [])
+                ->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         $sQueryStr = $sql->buildSqlString($sQuery);
         return $dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->toArray();
