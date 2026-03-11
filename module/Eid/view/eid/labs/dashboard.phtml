@@ -546,7 +546,7 @@ $endDate = date('Y-m');
         getSampleResult('load');
         getEverything();
 
-        $('#provinceName,#districtName,#labName').on('select2:close', function() {
+        $('#labName').on('select2:close', function() {
             let select = $(this)
             $(this).next('span.select2').find('ul').html(function() {
                 let count = select.select2('data').length
@@ -634,40 +634,6 @@ $endDate = date('Y-m');
         $('#daterange-container span').html('<?php echo $this->translate('Choose Date Range'); ?>');
         $('input[name="daterange"]').val('');
         getSampleResult('reset');
-    }
-
-    function selectDistrictName() {
-        $('#districtName').html('');
-        $('#districtName,#labName').select2('val', '');
-
-        var pName = $("#provinceName").val();
-        if (pName != null && pName.length > 0) {
-            $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
-                    provinceName: pName
-                },
-                function(data) {
-                    if (data != "" || data != null || data != undefined) {
-                        $('#districtName').html(data);
-                    }
-                });
-        }
-    }
-
-    function selectLabName() {
-        /* $('#labName').html('');
-        $('#labName').select2('val', '');
-        var dName = $("#districtName").val();
-        if (dName != null && dName.length > 0) {
-            $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
-                    districtName: dName,
-                    facilityType: 2
-                },
-                function(data) {
-                    if (data != "" || data != null || data != undefined) {
-                        $('#labName').html(data);
-                    }
-                });
-        } */
     }
 
     function expandChart(from) {
