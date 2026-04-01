@@ -14,7 +14,7 @@ return [
                     'file_permission' => 0666,
                     'dir_level' => 1,
                     'clear_stat_cache' => true,
-                    'ttl' => 1440, // 1440 minutes = 1 day
+                    'ttl' => 86400, // 1 day in seconds
                 ],
             'plugins' => $isDevelopment
                 ? [] // No plugins for BlackHole adapter
