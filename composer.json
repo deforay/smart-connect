@@ -22,7 +22,7 @@
         "laminas/laminas-mvc-i18n": "^1.9",
         "laminas/laminas-permissions-acl": "^2.18",
         "laminas/laminas-session": "^2.26",
-        "phpoffice/phpspreadsheet": "^5.5",
+        "phpoffice/phpspreadsheet": "^5.7",
         "ramsey/uuid": "^4.9",
         "setasign/fpdi": "^2.6",
         "spatie/once": "^3.1",
