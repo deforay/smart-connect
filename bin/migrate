@@ -1,0 +1,741 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Migration runner for smart-connect.
+ *
+ * Plain SQL migrations versioned as semver, read from /sys/migrations/,
+ * compared against the DB version stored in dash_global_config (name =
+ * 'db_version'). App version is read from composer.json (top-level `version`
+ * field). Uses the Laminas Db Adapter so config merge, credentials, driver
+ * options, and connection lifecycle stay consistent with the web app.
+ *
+ * Uses PhpMyAdmin\SqlParser to split statements (handles triggers, string
+ * literals containing semicolons, etc.) and routes common DDL through
+ * idempotent helpers that check information_schema before executing, so
+ * re-running migrations on an already-migrated database is safe.
+ *
+ * Usage:
+ *   php bin/migrate              run pending migrations
+ *   php bin/migrate --status     show current version and pending files
+ *   php bin/migrate --dry-run    show what would run, no execution
+ *   php bin/migrate --verbose    print info on benign skips
+ *   php bin/migrate --version=X  replay from a specific version
+ *
+ * Env:
+ *   MIG_REPLACE_PK=1   force dropping/recreating differing primary keys
+ *   MIG_VERBOSE=1      same as --verbose
+ */
+
+chdir(dirname(__DIR__));
+require 'vendor/autoload.php';
+
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\Adapter\Exception\ExceptionInterface as DbException;
+use Laminas\Mvc\Service\ServiceManagerConfig;
+use Laminas\ServiceManager\ServiceManager;
+use Laminas\Stdlib\ArrayUtils;
+use PhpMyAdmin\SqlParser\Parser;
+
+if (PHP_SAPI !== 'cli') {
+    exit(1);
+}
+
+ini_set('memory_limit', '-1');
+set_time_limit(0);
+
+// Build the service manager and load modules, but DO NOT bootstrap the MVC
+// application — on a fresh DB, bootstrap listeners that read config tables
+// would die before the migrator gets to create them. Same boot as bin/console.
+$appConfig = require 'config/application.config.php';
+if (file_exists('config/development.config.php')) {
+    $appConfig = ArrayUtils::merge($appConfig, require 'config/development.config.php');
+}
+$serviceManager = new ServiceManager();
+(new ServiceManagerConfig($appConfig['service_manager'] ?? []))->configureServiceManager($serviceManager);
+$serviceManager->setService('ApplicationConfig', $appConfig);
+$serviceManager->get('ModuleManager')->loadModules();
+
+/** @var Adapter $adapter */
+$adapter = $serviceManager->get(Adapter::class);
+
+const MIG_NOT_HANDLED = 0;
+const MIG_EXECUTED = 1;
+const MIG_SKIPPED = 2;
+
+const VERSION_KEY_DB = 'db_version';
+const VERSION_KEY_APP = 'app_version';
+
+$args = getopt('', ['status', 'dry-run', 'verbose', 'version:']);
+$showStatus = isset($args['status']);
+$dryRun = isset($args['dry-run']);
+$verbose = isset($args['verbose']) || (bool) getenv('MIG_VERBOSE');
+$fromVersion = $args['version'] ?? null;
+
+/* ---------------------- Adapter helpers ---------------------- */
+
+/** Run a statement that returns no result set (DDL, INSERT/UPDATE/DELETE). */
+function run_sql(Adapter $adapter, string $sql, array $params = []): void
+{
+    if ($params === []) {
+        $adapter->query($sql, Adapter::QUERY_MODE_EXECUTE);
+    } else {
+        $adapter->query($sql, $params);
+    }
+}
+
+/** Fetch a single scalar (first column of first row), or null. */
+function fetch_scalar(Adapter $adapter, string $sql, array $params = []): mixed
+{
+    $result = $params === []
+        ? $adapter->query($sql, Adapter::QUERY_MODE_EXECUTE)
+        : $adapter->query($sql, $params);
+    foreach ($result as $row) {
+        $arr = is_array($row) ? $row : (array) $row;
+        $val = reset($arr);
+        return $val === false ? null : $val;
+    }
+    return null;
+}
+
+/** Fetch a single-column list. */
+function fetch_column(Adapter $adapter, string $sql, array $params = []): array
+{
+    $result = $params === []
+        ? $adapter->query($sql, Adapter::QUERY_MODE_EXECUTE)
+        : $adapter->query($sql, $params);
+    $out = [];
+    foreach ($result as $row) {
+        $arr = is_array($row) ? $row : (array) $row;
+        $val = reset($arr);
+        if ($val !== false) {
+            $out[] = $val;
+        }
+    }
+    return $out;
+}
+
+/** Extract the underlying MySQL error code from a wrapped DB exception. */
+function db_error_code(Throwable $e): string
+{
+    $prev = $e->getPrevious();
+    if ($prev instanceof PDOException && isset($prev->errorInfo[1])) {
+        return (string) $prev->errorInfo[1];
+    }
+    return (string) $e->getCode();
+}
+
+/* ---------------------- Idempotent DDL helpers ---------------------- */
+
+function current_db(Adapter $adapter): string
+{
+    static $dbName = null;
+    if ($dbName === null) {
+        $dbName = (string) (fetch_scalar($adapter, 'SELECT DATABASE() AS db') ?? '');
+    }
+    return $dbName;
+}
+
+function table_exists(Adapter $adapter, string $table): bool
+{
+    return (bool) fetch_scalar(
+        $adapter,
+        "SELECT 1 FROM information_schema.TABLES
+         WHERE TABLE_SCHEMA=? AND TABLE_NAME=? LIMIT 1",
+        [current_db($adapter), $table]
+    );
+}
+
+function column_exists(Adapter $adapter, string $table, string $column): bool
+{
+    return (bool) fetch_scalar(
+        $adapter,
+        "SELECT 1 FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND COLUMN_NAME=? LIMIT 1",
+        [current_db($adapter), $table, $column]
+    );
+}
+
+function index_exists(Adapter $adapter, string $table, string $index): bool
+{
+    return (bool) fetch_scalar(
+        $adapter,
+        "SELECT 1 FROM information_schema.STATISTICS
+         WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND INDEX_NAME=? LIMIT 1",
+        [current_db($adapter), $table, $index]
+    );
+}
+
+function table_primary_key(Adapter $adapter, string $table): array
+{
+    $cols = fetch_column(
+        $adapter,
+        "SELECT k.COLUMN_NAME
+         FROM information_schema.TABLE_CONSTRAINTS t
+         JOIN information_schema.KEY_COLUMN_USAGE k
+           ON t.CONSTRAINT_NAME = k.CONSTRAINT_NAME
+          AND t.TABLE_SCHEMA   = k.TABLE_SCHEMA
+          AND t.TABLE_NAME     = k.TABLE_NAME
+         WHERE t.TABLE_SCHEMA = ?
+           AND t.TABLE_NAME   = ?
+           AND t.CONSTRAINT_TYPE = 'PRIMARY KEY'
+         ORDER BY k.ORDINAL_POSITION",
+        [current_db($adapter), $table]
+    );
+    return array_map(static fn($c) => strtolower(trim((string) $c)), $cols);
+}
+
+function parse_cols_list(string $list): array
+{
+    $parts = preg_split('/\s*,\s*/', trim($list)) ?: [];
+    return array_map(static function ($c) {
+        $c = trim($c, " \t\r\n`");
+        $c = preg_replace('/\s*\(\s*\d+(?:\s*,\s*\d+)?\s*\)\s*/', '', $c);
+        $c = preg_replace('/\s+(ASC|DESC)\b/i', '', $c);
+        return strtolower($c);
+    }, $parts);
+}
+
+function add_column_if_missing(Adapter $adapter, string $table, string $column, string $ddl): int
+{
+    if (column_exists($adapter, $table, $column)) {
+        return MIG_SKIPPED;
+    }
+
+    // `AFTER <missing>` — the failure mode when an earlier migration that
+    // should have added the anchor column was skipped or edited. Positioning
+    // is cosmetic; strip the clause rather than failing the whole migration.
+    if (
+        preg_match('/\bAFTER\s+`?([a-z0-9_]+)`?\s*;?\s*$/i', $ddl, $m)
+        && !column_exists($adapter, $table, $m[1])
+    ) {
+        $ddl = (string) preg_replace('/\s+AFTER\s+`?[a-z0-9_]+`?\s*(;?\s*)$/i', '$1', $ddl);
+    }
+
+    run_sql($adapter, $ddl);
+    return MIG_EXECUTED;
+}
+
+function add_index_if_missing(Adapter $adapter, string $table, string $index, string $ddl): int
+{
+    if (index_exists($adapter, $table, $index)) {
+        return MIG_SKIPPED;
+    }
+    run_sql($adapter, $ddl);
+    return MIG_EXECUTED;
+}
+
+function create_table_if_missing(Adapter $adapter, string $table, string $ddl): int
+{
+    if (table_exists($adapter, $table)) {
+        return MIG_SKIPPED;
+    }
+    run_sql($adapter, $ddl);
+    return MIG_EXECUTED;
+}
+
+function drop_table_if_exists(Adapter $adapter, string $table): int
+{
+    if (!table_exists($adapter, $table)) {
+        return MIG_SKIPPED;
+    }
+    run_sql($adapter, "DROP TABLE `{$table}`");
+    return MIG_EXECUTED;
+}
+
+function drop_column_if_exists(Adapter $adapter, string $table, string $column): int
+{
+    if (!column_exists($adapter, $table, $column)) {
+        return MIG_SKIPPED;
+    }
+
+    // MySQL refuses DROP COLUMN if any index or foreign key still references
+    // the column. Sweep those references first so the drop always succeeds.
+    $db = current_db($adapter);
+
+    $fks = fetch_column(
+        $adapter,
+        "SELECT DISTINCT CONSTRAINT_NAME
+         FROM information_schema.KEY_COLUMN_USAGE
+         WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND COLUMN_NAME=?
+           AND REFERENCED_TABLE_NAME IS NOT NULL",
+        [$db, $table, $column]
+    );
+    foreach ($fks as $fkName) {
+        run_sql($adapter, "ALTER TABLE `{$table}` DROP FOREIGN KEY `{$fkName}`");
+    }
+
+    $indexes = fetch_column(
+        $adapter,
+        "SELECT DISTINCT INDEX_NAME
+         FROM information_schema.STATISTICS
+         WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND COLUMN_NAME=?
+           AND INDEX_NAME != 'PRIMARY'",
+        [$db, $table, $column]
+    );
+    foreach ($indexes as $indexName) {
+        run_sql($adapter, "ALTER TABLE `{$table}` DROP INDEX `{$indexName}`");
+    }
+
+    run_sql($adapter, "ALTER TABLE `{$table}` DROP `{$column}`");
+    return MIG_EXECUTED;
+}
+
+function drop_index_if_exists(Adapter $adapter, string $table, string $index): int
+{
+    if (!index_exists($adapter, $table, $index)) {
+        return MIG_SKIPPED;
+    }
+    run_sql($adapter, "ALTER TABLE `{$table}` DROP INDEX `{$index}`");
+    return MIG_EXECUTED;
+}
+
+function foreign_key_exists(Adapter $adapter, string $table, string $constraint): bool
+{
+    return (bool) fetch_scalar(
+        $adapter,
+        "SELECT 1 FROM information_schema.TABLE_CONSTRAINTS
+         WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND CONSTRAINT_NAME=?
+           AND CONSTRAINT_TYPE='FOREIGN KEY' LIMIT 1",
+        [current_db($adapter), $table, $constraint]
+    );
+}
+
+function drop_foreign_key_if_exists(Adapter $adapter, string $table, string $constraint): int
+{
+    if (!foreign_key_exists($adapter, $table, $constraint)) {
+        return MIG_SKIPPED;
+    }
+    run_sql($adapter, "ALTER TABLE `{$table}` DROP FOREIGN KEY `{$constraint}`");
+    return MIG_EXECUTED;
+}
+
+function apply_add_primary_key(Adapter $adapter, string $table, string $colsList, string $originalSql): int
+{
+    $wantedCols = parse_cols_list($colsList);
+    $haveCols = table_primary_key($adapter, $table);
+
+    if ($haveCols === []) {
+        run_sql($adapter, $originalSql);
+        return MIG_EXECUTED;
+    }
+    if ($haveCols === $wantedCols) {
+        return MIG_SKIPPED;
+    }
+
+    if (getenv('MIG_REPLACE_PK')) {
+        run_sql($adapter, "ALTER TABLE `{$table}` DROP PRIMARY KEY");
+        $colsSql = implode(',', array_map(static fn($c): string => "`{$c}`", $wantedCols));
+        run_sql($adapter, "ALTER TABLE `{$table}` ADD PRIMARY KEY ({$colsSql})");
+        return MIG_EXECUTED;
+    }
+
+    return MIG_SKIPPED;
+}
+
+/**
+ * Route known DDL patterns through idempotent helpers.
+ * Returns MIG_EXECUTED / MIG_SKIPPED if handled, MIG_NOT_HANDLED to fall through.
+ */
+function handle_idempotent_ddl(Adapter $adapter, string $query): int
+{
+    $q = trim($query);
+
+    if (preg_match('/^create\s+table\s+(?:if\s+not\s+exists\s+)?`?([a-z0-9_]+)`?/i', $q, $m)) {
+        return create_table_if_missing($adapter, $m[1], $q);
+    }
+
+    if (preg_match('/^drop\s+table\s+(?:if\s+exists\s+)?`?([a-z0-9_]+)`?\s*;?$/i', $q, $m)) {
+        return drop_table_if_exists($adapter, $m[1]);
+    }
+
+    if (preg_match('/^alter\s+table\s+`?([a-z0-9_]+)`?\s+add\s+(?:column\s+)?`?([a-z0-9_]+)`?\s+/i', $q, $m)) {
+        $kw = strtolower($m[2]);
+        if (!in_array($kw, ['index', 'key', 'primary', 'constraint', 'unique', 'fulltext', 'spatial', 'foreign'], true)) {
+            return add_column_if_missing($adapter, $m[1], $m[2], $q);
+        }
+    }
+
+    if (preg_match('/^create\s+(unique\s+)?index\s+`?([^`\s]+)`?\s*(?:using\s+btree)?\s+on\s+`?([^`\s(]+)`?\s*\((.+?)\)\s*(?:using\s+btree)?\s*;?$/is', $q, $m)) {
+        return add_index_if_missing($adapter, $m[3], $m[2], $q);
+    }
+
+    if (preg_match('/^alter\s+table\s+`?([a-z0-9_]+)`?\s+add\s+(unique\s+)?index\s+`?([a-z0-9_]+)`?\s*\((.+)\)\s*;?$/is', $q, $m)) {
+        $ddl = sprintf('CREATE %sINDEX `%s` ON `%s` (%s)', empty($m[2]) ? '' : 'UNIQUE ', $m[3], $m[1], trim($m[4]));
+        return add_index_if_missing($adapter, $m[1], $m[3], $ddl);
+    }
+
+    if (preg_match('/^alter\s+table\s+`?([a-z0-9_]+)`?\s+add\s+(unique\s+)?key\s+`?([a-z0-9_]+)`?\s*\((.+)\)\s*;?$/is', $q, $m)) {
+        $ddl = sprintf('CREATE %sINDEX `%s` ON `%s` (%s)', empty($m[2]) ? '' : 'UNIQUE ', $m[3], $m[1], trim($m[4]));
+        return add_index_if_missing($adapter, $m[1], $m[3], $ddl);
+    }
+
+    if (preg_match('/^alter\s+table\s+`?([a-z0-9_]+)`?\s+drop\s+column\s+`?([a-z0-9_]+)`?/i', $q, $m)) {
+        return drop_column_if_exists($adapter, $m[1], $m[2]);
+    }
+
+    if (preg_match('/^alter\s+table\s+`?([a-z0-9_]+)`?\s+drop\s+index\s+`?([a-z0-9_]+)`?/i', $q, $m)) {
+        return drop_index_if_exists($adapter, $m[1], $m[2]);
+    }
+
+    if (preg_match('/^alter\s+table\s+`?([a-z0-9_]+)`?\s+drop\s+foreign\s+key\s+`?([a-z0-9_]+)`?/i', $q, $m)) {
+        return drop_foreign_key_if_exists($adapter, $m[1], $m[2]);
+    }
+
+    if (preg_match('/^alter\s+table\s+`?([a-z0-9_]+)`?\s+add\s+constraint\s+`?([a-z0-9_]+)`?\s+foreign\s+key\b/i', $q, $m)) {
+        if (foreign_key_exists($adapter, $m[1], $m[2])) {
+            return MIG_SKIPPED;
+        }
+        run_sql($adapter, $q);
+        return MIG_EXECUTED;
+    }
+
+    if (preg_match('/^alter\s+table\s+`?([a-z0-9_]+)`?\s+drop\s+`?([a-z0-9_]+)`?/i', $q, $m)) {
+        $kw = strtolower($m[2]);
+        if (in_array($kw, ['foreign', 'primary', 'key', 'check', 'constraint', 'unique', 'fulltext', 'spatial'], true)) {
+            return MIG_NOT_HANDLED;
+        }
+        return drop_column_if_exists($adapter, $m[1], $m[2]);
+    }
+
+    if (preg_match('/^alter\s+table\s+`?([^`\s]+)`?\s+add\s+primary\s+key\s*(?:using\s+btree)?\s*\((.+?)\)\s*(?:using\s+btree)?\s*;?$/is', $q, $m)) {
+        return apply_add_primary_key($adapter, $m[1], $m[2], $q);
+    }
+
+    if (preg_match('/^alter\s+table\s+`?([^`\s]+)`?\s+add\s+constraint\s+`?[^`]+`?\s+primary\s+key\s*(?:using\s+btree)?\s*\((.+?)\)\s*(?:using\s+btree)?\s*;?$/is', $q, $m)) {
+        return apply_add_primary_key($adapter, $m[1], $m[2], $q);
+    }
+
+    return MIG_NOT_HANDLED;
+}
+
+/* ---------------------- Error classifier ---------------------- */
+
+/**
+ * Codes 1054/1146 are warn-able ONLY on schema-change statements
+ * (ALTER … CHANGE/MODIFY/RENAME/DROP, DROP TABLE, RENAME TABLE); on
+ * UPDATE/DELETE/SELECT they almost always mean a typo and FAIL.
+ * 1062 (duplicate key) is warn-able only on INSERT — seed rows being
+ * re-applied on an already-seeded database.
+ */
+function migration_error_is_warnable(string $errorCode, string $statement): bool
+{
+    static $unconditionalWarn = [
+        '1050', // ER_TABLE_EXISTS_ERROR
+        '1060', // ER_DUP_FIELDNAME
+        '1061', // ER_DUP_KEYNAME
+        '1068', // ER_MULTIPLE_PRI_KEY
+        '1091', // ER_CANT_DROP_FIELD_OR_KEY
+        '1826', // ER_DUP_CONSTRAINT_NAME
+    ];
+    static $conditionalWarn = [
+        '1054', // ER_BAD_FIELD_ERROR
+        '1146', // ER_NO_SUCH_TABLE
+    ];
+
+    $errorCode = trim($errorCode);
+    $q = preg_replace('/\s+/', ' ', trim($statement)) ?? '';
+
+    if (in_array($errorCode, $unconditionalWarn, true)) {
+        return true;
+    }
+    if ($errorCode === '1062') { // ER_DUP_ENTRY
+        return (bool) preg_match('/^INSERT\b/i', $q);
+    }
+    if (!in_array($errorCode, $conditionalWarn, true)) {
+        return false;
+    }
+
+    if (preg_match('/^ALTER\s+TABLE\b/i', $q)) {
+        return (bool) preg_match('/\b(CHANGE|MODIFY|RENAME|DROP)\b/i', $q);
+    }
+    if (preg_match('/^DROP\s+(TABLE|INDEX|VIEW|TRIGGER|PROCEDURE|FUNCTION|FOREIGN\s+KEY)\b/i', $q)) {
+        return true;
+    }
+    if (preg_match('/^RENAME\s+TABLE\b/i', $q)) {
+        return true;
+    }
+    return false;
+}
+
+/* ---------------------- Version persistence ---------------------- */
+
+function stamp_global_config(Adapter $adapter, string $key, string $value, string $displayName): void
+{
+    run_sql(
+        $adapter,
+        "INSERT INTO dash_global_config (`display_name`, `name`, `value`, `status`)
+         VALUES (?, ?, ?, 'inactive')
+         ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)",
+        [$displayName, $key, $value]
+    );
+}
+
+function read_global_config(Adapter $adapter, string $key): ?string
+{
+    try {
+        $val = fetch_scalar(
+            $adapter,
+            "SELECT `value` FROM dash_global_config WHERE `name` = ? LIMIT 1",
+            [$key]
+        );
+        return $val === null ? null : (string) $val;
+    } catch (Throwable) {
+        // dash_global_config doesn't exist yet — first run on an empty DB.
+        return null;
+    }
+}
+
+/** Read the app version from composer.json. Single source of truth. */
+function read_app_version(): string
+{
+    $composer = dirname(__DIR__) . '/composer.json';
+    if (!is_readable($composer)) {
+        return '';
+    }
+    $data = json_decode((string) file_get_contents($composer), true);
+    return is_array($data) ? (string) ($data['version'] ?? '') : '';
+}
+
+/* ---------------------- Main ---------------------- */
+
+// Fail fast with a clear message when the DB is unreachable (except for modes
+// that never touch the DB anyway).
+try {
+    $adapter->getDriver()->getConnection()->connect();
+} catch (Throwable $e) {
+    fwrite(STDERR, "Database connection failed: {$e->getMessage()}\n");
+    if (!$showStatus && !$dryRun) {
+        exit(1);
+    }
+    fwrite(STDERR, "Continuing (" . ($showStatus ? '--status' : '--dry-run') . " does not modify the database).\n\n");
+}
+
+$dbVersion = read_global_config($adapter, VERSION_KEY_DB) ?? '0.0.0';
+
+echo "Running migrations...\n";
+echo "Current DB version: {$dbVersion}\n\n";
+
+$migrationDir = dirname(__DIR__) . '/sys/migrations';
+$schemaFiles = glob($migrationDir . '/*.sql') ?: [];
+
+if (!$schemaFiles) {
+    echo "No migration files found in {$migrationDir}\n";
+    exit(0);
+}
+
+$migrations = [];
+foreach ($schemaFiles as $file) {
+    $basename = basename($file, '.sql');
+    if (preg_match('/^(\d+\.\d+\.\d+)(.*)$/', $basename, $m)) {
+        $migrations[] = [
+            'file' => $file,
+            'version' => $m[1],
+            'suffix' => $m[2],
+            'basename' => $basename,
+        ];
+    }
+}
+
+usort($migrations, function ($a, $b) {
+    $vCmp = version_compare($a['version'], $b['version']);
+    if ($vCmp !== 0) {
+        return $vCmp;
+    }
+    return strcmp($a['suffix'], $b['suffix']);
+});
+
+$startVersion = $fromVersion ?? $dbVersion;
+$pending = array_filter(
+    $migrations,
+    fn($m) => version_compare($m['version'], $startVersion, '>=')
+);
+
+if ($showStatus) {
+    $reportable = $fromVersion === null
+        ? array_filter($pending, fn($m) => version_compare($m['version'], $dbVersion, '>'))
+        : $pending;
+    echo "Pending migrations:\n";
+    if (empty($reportable)) {
+        echo "  (none — database is up to date)\n";
+    }
+    foreach ($reportable as $m) {
+        echo "  {$m['basename']}.sql\n";
+    }
+    exit(0);
+}
+
+if (empty($pending)) {
+    echo "Database is up to date. Nothing to run.\n";
+    if (!$dryRun) {
+        $appVersion = read_app_version();
+        if ($appVersion !== '') {
+            try {
+                stamp_global_config($adapter, VERSION_KEY_APP, $appVersion, 'Application Version');
+                echo "  Stamped app_version: {$appVersion}\n";
+            } catch (Throwable $e) {
+                fwrite(STDERR, "Warning: could not persist app_version: {$e->getMessage()}\n");
+            }
+        }
+    }
+    exit(0);
+}
+
+$totalFiles = 0;
+$totalStatements = 0;
+$passed = 0;
+$skipped = 0;
+$warned = 0;
+$failed = 0;
+$lastVersion = $dbVersion;
+
+foreach ($pending as $m) {
+    $totalFiles++;
+    echo "[{$m['basename']}.sql]\n";
+
+    $sql = (string) file_get_contents($m['file']);
+    if (trim($sql) === '') {
+        echo "  (empty file — version marker only)\n\n";
+        $lastVersion = $m['version'];
+        continue;
+    }
+
+    $parser = new Parser($sql);
+
+    $statements = [];
+    foreach ($parser->statements as $statement) {
+        $q = trim($statement->build() ?? '');
+        if ($q !== '') {
+            $statements[] = $q;
+        }
+    }
+
+    if ($dryRun) {
+        foreach ($statements as $stmt) {
+            $preview = substr((string) preg_replace('/\s+/', ' ', $stmt), 0, 80);
+            echo "  WOULD RUN  {$preview}...\n";
+            $totalStatements++;
+        }
+        echo "\n";
+        continue;
+    }
+
+    $filePassed = 0;
+    $fileSkipped = 0;
+    $fileWarned = 0;
+    $fileFailed = 0;
+
+    foreach ($statements as $stmt) {
+        $totalStatements++;
+        $preview = substr((string) preg_replace('/\s+/', ' ', $stmt), 0, 80);
+
+        try {
+            $status = handle_idempotent_ddl($adapter, $stmt);
+
+            if ($status === MIG_SKIPPED) {
+                if ($verbose) {
+                    echo "  \033[36mSKIP\033[0m  {$preview}\n";
+                }
+                $skipped++;
+                $fileSkipped++;
+                continue;
+            }
+
+            if ($status === MIG_EXECUTED) {
+                if ($verbose) {
+                    echo "  \033[32mPASS\033[0m  {$preview}\n";
+                }
+                $passed++;
+                $filePassed++;
+                continue;
+            }
+
+            run_sql($adapter, $stmt);
+            if ($verbose) {
+                echo "  \033[32mPASS\033[0m  {$preview}\n";
+            }
+            $passed++;
+            $filePassed++;
+        } catch (Throwable $e) {
+            if (!($e instanceof DbException) && !($e instanceof PDOException)) {
+                throw $e; // not a DB error, bubble up
+            }
+            $errorCode = db_error_code($e);
+
+            if (migration_error_is_warnable($errorCode, $stmt)) {
+                if ($verbose) {
+                    echo "  \033[33mWARN\033[0m  {$preview}\n";
+                    echo "        ({$e->getMessage()})\n";
+                }
+                $warned++;
+                $fileWarned++;
+            } else {
+                echo "  \033[31mFAIL\033[0m  {$preview}\n";
+                echo "        ({$e->getMessage()})\n";
+                $failed++;
+                $fileFailed++;
+            }
+        }
+    }
+
+    if (!$verbose) {
+        $bits = [];
+        if ($filePassed) {
+            $bits[] = "\033[32m{$filePassed} passed\033[0m";
+        }
+        if ($fileSkipped) {
+            $bits[] = "\033[36m{$fileSkipped} skipped\033[0m";
+        }
+        if ($fileWarned) {
+            $bits[] = "\033[33m{$fileWarned} warned\033[0m";
+        }
+        if ($fileFailed) {
+            $bits[] = "\033[31m{$fileFailed} failed\033[0m";
+        }
+        if ($bits) {
+            echo "  " . implode(', ', $bits) . "\n";
+        }
+    }
+
+    $lastVersion = $m['version'];
+    echo "\n";
+}
+
+$finalDbVersion = $lastVersion;
+$finalAppVersion = $lastVersion;
+if (!$dryRun && $failed === 0) {
+    $appVersion = read_app_version();
+    if ($appVersion === '') {
+        $appVersion = $lastVersion;
+    }
+    try {
+        stamp_global_config($adapter, VERSION_KEY_DB, $lastVersion, 'Database Schema Version');
+        stamp_global_config($adapter, VERSION_KEY_APP, $appVersion, 'Application Version');
+        $finalAppVersion = $appVersion;
+    } catch (Throwable $e) {
+        fwrite(STDERR, "Warning: could not persist version: {$e->getMessage()}\n");
+    }
+}
+
+echo str_repeat('─', 50) . "\n";
+if ($dryRun) {
+    echo "  DRY RUN — no changes made\n";
+} else {
+    echo "  DB version:   {$dbVersion} -> {$finalDbVersion}\n";
+    if ($finalAppVersion !== $finalDbVersion) {
+        echo "  App version:  {$finalAppVersion}\n";
+    }
+}
+echo "  Files run:    {$totalFiles}\n";
+echo "  Statements:   {$totalStatements}\n";
+if (!$dryRun) {
+    echo "  Passed:       {$passed}\n";
+    echo "  Skipped:      {$skipped}\n";
+    echo "  Warned:       {$warned}\n";
+    echo "  Failed:       {$failed}\n";
+}
+echo str_repeat('─', 50) . "\n";
+
+exit($failed > 0 ? 1 : 0);

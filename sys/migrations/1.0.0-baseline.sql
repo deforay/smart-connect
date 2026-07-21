@@ -1,7 +1,8 @@
--- FROZEN as of Jul 2026 — do not add new changes here.
--- This file was snapshotted into sys/migrations/1.0.0-baseline.sql.
--- New schema changes go into sys/migrations/X.Y.Z-<description>.sql and are
--- applied with: php bin/migrate
+-- 1.0.0-baseline: snapshot of data/alter.sql at the point the migrator was
+-- introduced (Jul 2026). Existing installs re-run this harmlessly: the
+-- migrator routes DDL through idempotent handlers and the seed INSERTs are
+-- INSERT IGNORE. New schema changes go into new sys/migrations/X.Y.Z-*.sql
+-- files, NOT into data/alter.sql (frozen) and NOT into this file.
 
 -- Amit 17 Nov 2025
 

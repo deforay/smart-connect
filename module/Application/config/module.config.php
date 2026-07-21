@@ -6,6 +6,10 @@ use Application\Command\SendTempMail;
 use Application\Command\SendTempMailFactory;
 use Application\Command\SeedAdmin;
 use Application\Command\SeedAdminFactory;
+use Application\Command\Housekeeping;
+use Application\Command\HousekeepingFactory;
+use Application\Command\RebuildSnapshots;
+use Application\Command\RebuildSnapshotsFactory;
 
 return [
     'router' => [
@@ -239,6 +243,8 @@ return [
             'translator' => 'Laminas\Mvc\I18n\TranslatorFactory',
             SendTempMail::class => SendTempMailFactory::class,
             SeedAdmin::class => SeedAdminFactory::class,
+            Housekeeping::class => HousekeepingFactory::class,
+            RebuildSnapshots::class => RebuildSnapshotsFactory::class,
         ],
     ],
     'translator' => [
@@ -275,10 +281,14 @@ return [
             'ViewJsonStrategy',
         ],
     ],
-    'laminas-cli' => [
+    // Commands exposed through bin/console (names come from each command's
+    // #[AsCommand] attribute)
+    'console' => [
         'commands' => [
-            'send-mail' => SendTempMail::class,
-            'seed-admin' => SeedAdmin::class,
+            SendTempMail::class,
+            SeedAdmin::class,
+            Housekeeping::class,
+            RebuildSnapshots::class,
         ],
     ],
 ];
