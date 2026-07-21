@@ -379,20 +379,14 @@ class CommonService
           // in case fetchCurrent is true, we want to ensure it is treated as a
           // separate query compared to fetchCurrent = false
           $cacheId = hash("sha512", ($fetchCurrent) ? 'current-' : '' . $queryString);
-          $res = null;
 
           try {
-               if (!$this->cache->hasItem($cacheId)) {
+               return $this->cache->get($cacheId, function () use ($queryString, $dbAdapter, $fetchCurrent) {
                     if (!$fetchCurrent) {
-                         $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                    } else {
-                         $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         return $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                     }
-                    $this->cache->addItem($cacheId, ($res));
-               } else {
-                    $res = ($this->cache->getItem($cacheId));
-               }
-               return $res;
+                    return $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+               });
           } catch (Exception $e) {
                error_log($e->getMessage());
           }
@@ -400,7 +394,7 @@ class CommonService
 
      public function clearAllCache()
      {
-          return $this->cache->flush();
+          return $this->cache->clear();
      }
 
      public function getRoleFacilities($params)

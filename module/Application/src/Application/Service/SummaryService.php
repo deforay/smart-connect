@@ -8,14 +8,13 @@ use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use Application\Model\SampleTable;
-use Laminas\Cache\Pattern\ObjectCache;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class SummaryService
 {
 
-    public SampleTable|ObjectCache $sampleTable;
+    public SampleTable|CachedMethodProxy $sampleTable;
     protected $translator = null;
     protected $dbAdapter = null;
 

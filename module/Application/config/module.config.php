@@ -236,9 +236,6 @@ return [
         ],
     ],
     'service_manager' => [
-        'abstract_factories' => [
-            'Laminas\Cache\Service\StorageCacheAbstractServiceFactory',
-        ],
         'factories' => [
             'translator' => 'Laminas\Mvc\I18n\TranslatorFactory',
             SendTempMail::class => SendTempMailFactory::class,

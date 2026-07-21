@@ -11,7 +11,6 @@ use Laminas\Db\Adapter\Adapter;
 use Application\Model\SampleTable;
 use Application\Model\FacilityTable;
 use Application\Service\CommonService;
-use Laminas\Cache\Pattern\ObjectCache;
 use Application\Model\LocationDetailsTable;
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -22,12 +21,11 @@ class SampleService
 
     public $sm;
     /** @var SampleTable $sampleTable */
-    public SampleTable|ObjectCache $sampleTable;
+    public SampleTable|CachedMethodProxy $sampleTable;
     public $config;
     public CommonService $commonService;
-    //public ObjectCache $sampleTableCached;
     public DashApiReceiverStatsTable $apiTrackerTable;
-    public FacilityTable|ObjectCache $facilityTable;
+    public FacilityTable|CachedMethodProxy $facilityTable;
     public Adapter $dbAdapter;
 
     public function __construct($sm, $sampleTable, $commonService, $apiTrackerTable, $facilityTable, $dbAdapter)

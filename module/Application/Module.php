@@ -31,7 +31,8 @@ use Application\Model\TestReasonTable;
 use Application\Service\CommonService;
 use Application\Service\ConfigService;
 use Application\Service\SampleService;
-use Laminas\Cache\Pattern\ObjectCache;
+use Application\Service\FileCacheUtility;
+use Application\Service\CachedMethodProxy;
 use Application\Service\SummaryService;
 use Application\Model\FacilityTypeTable;
 use Application\Model\SampleStatusTable;
@@ -39,7 +40,6 @@ use Application\Service\FacilityService;
 use Application\Service\SnapShotService;
 use Application\Model\EidSampleTypeTable;
 use Application\Model\OrganizationsTable;
-use Laminas\Cache\Pattern\PatternOptions;
 use Application\Model\GenerateBackupTable;
 use Application\Model\RemovedSamplesTable;
 use Application\View\Helper\GetLocaleData;
@@ -366,6 +366,15 @@ class Module
 	{
 		return [
 			'factories' => [
+				'AppCache' => new class {
+				public function __invoke($diContainer)
+				{
+					$isDevelopment = file_exists(__DIR__ . '/../../config/development.config.php')
+						|| getenv('APPLICATION_ENV') === 'development';
+					// disabled in development => NullAdapter, same as the old BlackHole
+					return new FileCacheUtility(getcwd() . '/data/cache/app', !$isDevelopment);
+				}
+					},
 				'AppAcl' => new class {
 			public function __invoke($diContainer)
 			{
@@ -443,15 +452,9 @@ class Module
 				$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 				$commonService = $diContainer->get('CommonService');
 				$tableObj = new SampleTable($dbAdapter, $diContainer, $mappedFacilities, $sampleTable, $commonService);
-				$storage = $diContainer->get('Cache\Persistent');
 
-				return new ObjectCache(
-					$storage,
-					new PatternOptions([
-						'object' => $tableObj,
-						'object_key' => $sampleTable // this makes sure we have different caches for both current and archive
-					])
-				);
+				// object key makes sure we have different caches for both current and archive
+				return new CachedMethodProxy($tableObj, $diContainer->get('AppCache'), $sampleTable);
 			}
 				},
 				'SampleTableWithoutCache' => new class {
@@ -472,13 +475,7 @@ class Module
 				$commonService = $diContainer->get('CommonService');
 				$tableObj = new FacilityTable($dbAdapter, $commonService, $diContainer);
 
-				$storage = $diContainer->get('Cache\Persistent');
-				return new ObjectCache(
-					$storage,
-					new PatternOptions([
-						'object' => $tableObj
-					])
-				);
+				return new CachedMethodProxy($tableObj, $diContainer->get('AppCache'));
 			}
 				},
 				'FacilityTableWithoutCache' => new class {
@@ -704,7 +701,7 @@ class Module
 			public function __invoke($diContainer)
 			{
 				$tempMailTable = $diContainer->get('TempMailTable');
-				$cache = $diContainer->get('Cache\Persistent');
+				$cache = $diContainer->get('AppCache');
 				return new CommonService($diContainer, $cache, $tempMailTable);
 			}
 				},
@@ -785,9 +782,6 @@ class Module
 			}
 				},
 				'translator' => 'Laminas\Mvc\I18n\TranslatorFactory',
-			],
-			'abstract_factories' => [
-				'Laminas\Cache\Service\StorageCacheAbstractServiceFactory',
 			],
 		];
 	}

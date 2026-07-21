@@ -3,8 +3,7 @@
 namespace Covid19;
 
 use Laminas\Session\Container;
-use Laminas\Cache\Pattern\ObjectCache;
-use Laminas\Cache\Pattern\PatternOptions;
+use Application\Service\CachedMethodProxy;
 
 
 class Module
@@ -59,14 +58,8 @@ class Module
                         $tableObj = new \Covid19\Model\Covid19FormTable($dbAdapter, $diContainer, $mappedFacilities, $covid19SampleTable, $commonService);
 
 
-                        $storage = $diContainer->get('Cache\Persistent');
-                        return new ObjectCache(
-                            $storage,
-                            new PatternOptions([
-                                'object' => $tableObj,
-                                'object_key' => $covid19SampleTable // this makes sure we have different caches for both current and archive
-                            ])
-                        );
+                        // object key makes sure we have different caches for both current and archive
+                        return new CachedMethodProxy($tableObj, $diContainer->get('AppCache'), $covid19SampleTable);
                     }
                 },
 
