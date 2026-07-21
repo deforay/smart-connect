@@ -1,0 +1,40 @@
+# Crunz Configuration Settings
+
+# Where the task files live, relative to this config file.
+# Task files inside it must end with the ":suffix" below.
+source: sys/cron
+
+suffix: Tasks.php
+
+# Timezone used to calculate task run times
+timezone: UTC
+
+# Use the timezone above (instead of the system default) for log timestamps
+timezone_log: false
+
+# Log errors from scheduled tasks
+log_errors: true
+errors_log_file: data/logs/scheduled-tasks.log
+
+# Task output is discarded unless enabled here
+log_output: false
+output_log_file: ~
+
+log_allow_line_breaks: false
+log_ignore_empty_context: false
+
+email_output: false
+email_errors: false
+
+mailer:
+    transport: smtp
+    recipients:
+    sender_name:
+    sender_email:
+
+smtp:
+    host: ~
+    port: ~
+    username: ~
+    password: ~
+    encryption: ~

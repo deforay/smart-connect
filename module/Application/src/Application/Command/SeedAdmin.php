@@ -5,17 +5,18 @@ namespace Application\Command;
 use Application\Model\UsersTable;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
-/**
- * Seeds the first admin user (role_id = 1).
- */
+#[AsCommand(
+    name: 'seed-admin',
+    description: 'Create the first admin user (role_id = 1).'
+)]
 class SeedAdmin extends Command
 {
-    protected static $defaultName = 'seed-admin';
     private UsersTable $usersTable;
 
     public function __construct(UsersTable $usersTable)
@@ -24,10 +25,9 @@ class SeedAdmin extends Command
         $this->usersTable = $usersTable;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setDescription('Create the first admin user (role_id = 1).')
             ->addOption('email', null, InputOption::VALUE_REQUIRED, 'Admin email (required)')
             ->addOption('username', null, InputOption::VALUE_REQUIRED, 'Admin username (required)')
             ->addOption('password', null, InputOption::VALUE_REQUIRED, 'Admin password (required)')

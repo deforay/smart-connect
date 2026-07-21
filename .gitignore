@@ -40,3 +40,6 @@ composer.phar
 
 # Snyk Security Extension 
 .github/instructions/snyk_rules.instructions.md
+
+data/logs/*
+!data/logs/.gitkeep

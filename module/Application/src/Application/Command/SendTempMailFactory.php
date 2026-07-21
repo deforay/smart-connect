@@ -8,7 +8,7 @@ use Application\Command\SendTempMail;
 
 class SendTempMailFactory implements FactoryInterface
 {
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null)
     {
         $commonService = $container->get('CommonService');
         return new SendTempMail($commonService);

@@ -1,6 +1,7 @@
 {
     "name": "deforay/smart-connect",
     "description": "National Dashboard for Priory Diseases (Viral Load, EID, Covid-19)",
+    "version": "1.0.0",
     "type": "project",
     "keywords": [
         "viral load",
@@ -12,16 +13,17 @@
     ],
     "require": {
         "php": "^8.2 || ^8.3 || ^8.4",
+        "crunzphp/crunz": "^3.9",
         "halaxa/json-machine": "^1.2",
         "laminas/laminas-cache": "^3.14",
         "laminas/laminas-cache-storage-adapter-filesystem": "^2.5",
-        "laminas/laminas-cli": "^1.15",
         "laminas/laminas-component-installer": "^3.8",
         "laminas/laminas-db": "^2.22",
         "laminas/laminas-mvc": "^3.8",
         "laminas/laminas-mvc-i18n": "^1.9",
         "laminas/laminas-permissions-acl": "^2.18",
         "laminas/laminas-session": "^2.27",
+        "phpmyadmin/sql-parser": "^6.0",
         "phpoffice/phpspreadsheet": "^5.7",
         "ramsey/uuid": "^4.9",
         "setasign/fpdi": "^2.6",
@@ -42,23 +44,35 @@
         "development-disable": "laminas-development-mode disable",
         "development-enable": "laminas-development-mode enable",
         "development-status": "laminas-development-mode status",
+        "housekeeping": "@php bin/console housekeeping",
+        "migrate": "@php bin/migrate",
+        "cron": "crunz schedule:run",
+        "cron-list": "crunz schedule:list",
         "post-install-cmd": "@clear-config-cache",
         "post-update-cmd": "@clear-config-cache",
-        "serve": [
-            "Composer\\Config::disableProcessTimeout",
-            "php -S 0.0.0.0:8080 -t public"
+        "post-update": [
+            "php bin/migrate || true",
+            "php bin/console housekeeping || true"
         ],
-        "test": "vendor/bin/phpunit",
-        "scripts-descriptions": {
-            "clear-config-cache": "Clears merged config cache. Required for config changes to be applied.",
-            "cs-check": "Run coding standards checks.",
-            "cs-fix": "Automatically fix coding standard issues.",
-            "development-disable": "Disable development mode.",
-            "development-enable": "Enable development mode.",
-            "development-status": "Detail whether or not the application is in development mode.",
-            "serve": "Start the built-in PHP web server and serve the application.",
-            "test": "Run unit tests."
-        }
+        "refresh": [
+            "git refresh",
+            "@composer install",
+            "@composer post-update"
+        ],
+        "test": "vendor/bin/phpunit"
+    },
+    "scripts-descriptions": {
+        "clear-config-cache": "Clears merged config cache. Required for config changes to be applied.",
+        "cs-check": "Run coding standards checks.",
+        "cs-fix": "Automatically fix coding standard issues.",
+        "development-disable": "Disable development mode.",
+        "development-enable": "Enable development mode.",
+        "development-status": "Detail whether or not the application is in development mode.",
+        "housekeeping": "Housekeeping — remove old temporary files, uploads, cache files and stale DB rows.",
+        "migrate": "Run pending database migrations from sys/migrations (see bin/migrate --help comments for flags).",
+        "cron": "Run due scheduled tasks (crunz). Meant to be called every minute from the crontab.",
+        "cron-list": "List the scheduled tasks defined in sys/cron.",
+        "test": "Run unit tests."
     },
     "config": {
         "allow-plugins": {

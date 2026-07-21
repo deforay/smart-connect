@@ -1,0 +1,38 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Console entry point. Boots the service container (module configs, constants,
+ * DB adapter) without dispatching the MVC application, then hands the commands
+ * listed under config key 'console' => 'commands' to symfony/console.
+ */
+
+declare(strict_types=1);
+
+use Laminas\Mvc\Service\ServiceManagerConfig;
+use Laminas\ServiceManager\ServiceManager;
+use Laminas\Stdlib\ArrayUtils;
+use Symfony\Component\Console\Application;
+
+chdir(dirname(__DIR__));
+
+require 'vendor/autoload.php';
+
+$appConfig = require 'config/application.config.php';
+if (file_exists('config/development.config.php')) {
+    $appConfig = ArrayUtils::merge($appConfig, require 'config/development.config.php');
+}
+
+$serviceManager = new ServiceManager();
+(new ServiceManagerConfig($appConfig['service_manager'] ?? []))->configureServiceManager($serviceManager);
+$serviceManager->setService('ApplicationConfig', $appConfig);
+$serviceManager->get('ModuleManager')->loadModules();
+
+$config = $serviceManager->get('config');
+
+$cli = new Application('smart-connect');
+foreach ($config['console']['commands'] ?? [] as $serviceName) {
+    $cli->addCommand($serviceManager->get($serviceName));
+}
+
+exit($cli->run());
