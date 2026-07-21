@@ -6,6 +6,7 @@
  * This should be an array of module namespaces used in the application.
  */
 return [
+    'Laminas\Serializer',
     'Laminas\Cache',
     'Laminas\Session',
     'Laminas\Mvc\I18n',

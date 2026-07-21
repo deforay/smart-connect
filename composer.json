@@ -22,6 +22,7 @@
         "laminas/laminas-mvc": "^3.8",
         "laminas/laminas-mvc-i18n": "^1.9",
         "laminas/laminas-permissions-acl": "^2.18",
+        "laminas/laminas-serializer": "^2.14",
         "laminas/laminas-session": "^2.27",
         "phpmyadmin/sql-parser": "^6.0",
         "phpoffice/phpspreadsheet": "^5.7",

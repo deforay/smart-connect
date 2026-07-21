@@ -222,11 +222,22 @@ class Module
 				$privilege = $params['action'];
 				$role = $session->roleCode;
 
+				// The home page has no content of its own — it only redirects
+				// (see IndexController::indexAction), so it stays outside the ACL
+				$isHomeRedirect = $resource == Controller\IndexController::class && $privilege == 'index';
+
 				// Check if the ACL allows access to the resource (controller/action)
-				if (!$acl->hasResource($resource) || !$acl->isAllowed($role, $resource, $privilege)) {
+				if (!$isHomeRedirect && (!$acl->hasResource($resource) || !$acl->isAllowed($role, $resource, $privilege))) {
 					/** @var \Laminas\Http\PhpEnvironment\Response $response */
 					$response = $e->getResponse();
 					$response->setStatusCode(403);
+
+					$errorModel = new \Laminas\View\Model\ViewModel([
+						'resource' => $resource,
+						'privilege' => $privilege,
+					]);
+					$errorModel->setTemplate('error/403');
+					$response->setContent($diContainer->get('ViewRenderer')->render($errorModel));
 
 					$stopCallBack = function ($event) use ($response) {
 						$event->stopPropagation();

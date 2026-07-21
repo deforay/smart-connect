@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Access Denied</title>
+    <style>
+        body {
+            font-family: "Open Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+            background: #f4f6f9;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .error-box {
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+            max-width: 420px;
+            padding: 40px 48px;
+            text-align: center;
+        }
+        .error-box .code {
+            color: #3c5a78;
+            font-size: 64px;
+            font-weight: 300;
+            margin: 0;
+        }
+        .error-box h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 8px 0 12px;
+        }
+        .error-box p {
+            color: #6b7580;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0 0 24px;
+        }
+        .error-box a {
+            background: #3c5a78;
+            border-radius: 4px;
+            color: #fff;
+            display: inline-block;
+            font-size: 14px;
+            padding: 10px 24px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-box">
+        <p class="code">403</p>
+        <h1><?= $this->translate('Access Denied') ?></h1>
+        <p><?= $this->translate('You do not have permission to view this page. If you believe this is a mistake, please contact your administrator.') ?></p>
+        <a href="/"><?= $this->translate('Go to Dashboard') ?></a>
+    </div>
+</body>
+</html>
