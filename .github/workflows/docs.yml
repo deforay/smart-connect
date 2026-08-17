@@ -25,11 +25,14 @@ jobs:
     name: Build Documentation
     runs-on: ubuntu-latest
     steps:
+      # Action majors are kept current so their JavaScript runs on the Node
+      # version they declare. An action pinned to node20 still runs, but the
+      # runner forces it onto node24 and annotates every build.
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
@@ -41,8 +44,10 @@ jobs:
       - name: Build site
         run: mkdocs build --strict
 
+      # v5 is the first release whose bundled actions/upload-artifact is on
+      # node24. v4 still pins upload-artifact 4.6.2, which is not.
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
@@ -59,4 +64,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
