@@ -15,12 +15,8 @@
         "php": "^8.2 || ^8.3 || ^8.4",
         "crunzphp/crunz": "^3.9",
         "halaxa/json-machine": "^1.2",
-        "laminas/laminas-component-installer": "^3.8",
         "laminas/laminas-db": "^2.22",
         "laminas/laminas-mvc": "^3.8",
-        "laminas/laminas-mvc-i18n": "^1.9",
-        "laminas/laminas-permissions-acl": "^2.18",
-        "laminas/laminas-session": "^2.27",
         "phpmyadmin/sql-parser": "^6.0",
         "phpoffice/phpspreadsheet": "^5.7",
         "ramsey/uuid": "^4.9",
@@ -29,6 +25,7 @@
         "symfony/cache": "^7.4",
         "symfony/console": "^8.0",
         "symfony/mailer": "^7.4",
+        "symfony/translation": "^8.0",
         "tecnickcom/tcpdf": "^6.11"
     },
     "autoload": {
@@ -40,9 +37,6 @@
         "clear-config-cache": "php bin/clear-config-cache.php",
         "cs-check": "vendor/bin/phpcs",
         "cs-fix": "vendor/bin/phpcbf",
-        "development-disable": "laminas-development-mode disable",
-        "development-enable": "laminas-development-mode enable",
-        "development-status": "laminas-development-mode status",
         "housekeeping": "@php bin/console housekeeping",
         "migrate": "@php bin/migrate",
         "cron": "crunz schedule:run",
@@ -64,9 +58,6 @@
         "clear-config-cache": "Clears merged config cache. Required for config changes to be applied.",
         "cs-check": "Run coding standards checks.",
         "cs-fix": "Automatically fix coding standard issues.",
-        "development-disable": "Disable development mode.",
-        "development-enable": "Enable development mode.",
-        "development-status": "Detail whether or not the application is in development mode.",
         "housekeeping": "Housekeeping — remove old temporary files, uploads, cache files and stale DB rows.",
         "migrate": "Run pending database migrations from sys/migrations (see bin/migrate --help comments for flags).",
         "cron": "Run due scheduled tasks (crunz). Meant to be called every minute from the crontab.",
@@ -75,9 +66,7 @@
     },
     "config": {
         "allow-plugins": {
-            "composer/package-versions-deprecated": true,
-            "laminas/laminas-component-installer": true,
-            "laminas/laminas-skeleton-installer": true
+            "composer/package-versions-deprecated": true
         },
         "preferred-install": "dist",
         "sort-packages": true,
@@ -87,7 +76,6 @@
         }
     },
     "require-dev": {
-        "laminas/laminas-developer-tools": "^2.5",
         "symfony/var-dumper": "^7.2"
     }
 }
