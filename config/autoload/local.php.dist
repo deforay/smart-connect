@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * Local Configuration Override
+ *
+ * Environment-specific and security-sensitive settings. Copy this file to
+ * local.php and fill in the values for this deployment.
+ *
+ * local.php is gitignored, so credentials never reach version control. The
+ * database name and host live in global.php, in the DSN.
+ */
+
+return [
+    'db' => [
+        'username' => '',
+        'password' => '',
+    ],
+];
