@@ -29,7 +29,7 @@ A 200 response confirms v2 is available.
 }
 ```
 
-If this returns 404, the deployment predates v2. Upgrade Smart Connect first. The LIS keeps using the legacy `/api/*` endpoints until then.
+If this returns 404, the deployment does not serve the API. Upgrade Smart Connect first.
 
 ## Set the enrollment key
 

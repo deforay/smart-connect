@@ -19,8 +19,9 @@
     which auto-generates `api.enrollment_key` on `composer post-update`, so a
     deployment does not have to invent one.
 
-    For what actually shipped, see the [API v2 reference](../api/index.md) and
-    [About the API v2 design](../explanation/api-v2-design.md).
+    For what actually shipped, see the [API reference](../api/index.md).
+    The one-time cutover runbook for the pre-1.2.0 endpoints is
+    [Retire the legacy API](retiring-the-legacy-api.md).
 
 ## Context
 

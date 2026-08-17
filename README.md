@@ -8,8 +8,11 @@ Full documentation is at <https://deforay.github.io/smart-connect/>, built from
 `docs/` with [MkDocs](https://www.mkdocs.org/). Start there for:
 
 - [Connecting a LIS](docs/guides/connecting-a-lis.md) — enrollment through first sync
-- [API v2 reference](docs/api/index.md) — endpoints, fields, status codes
-- [Retiring the legacy API](docs/guides/retiring-the-legacy-api.md) — the `/api/*` cutoff
+- [Manage the enrollment key](docs/guides/enrollment-key.md) — generate, read, and rotate the key
+- [API reference](docs/api/index.md) — endpoints, fields, status codes
+
+`docs/internal/` holds material for whoever maintains Smart Connect itself. It
+stays out of the published site.
 
 To preview the site locally:
 

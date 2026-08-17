@@ -36,7 +36,7 @@ To widen or narrow the window, pass `--days`.
 php bin/console api-usage --days 180
 ```
 
-A laboratory marked `NO — would be cut off` loses its sync on the cutoff date. Upgrade its InteLIS installation before continuing. See [Connect a LIS to Smart Connect](connecting-a-lis.md).
+A laboratory marked `NO — would be cut off` loses its sync on the cutoff date. Upgrade its InteLIS installation before continuing. See [Connect a LIS to Smart Connect](../guides/connecting-a-lis.md).
 
 ## Announce the date
 

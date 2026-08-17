@@ -41,17 +41,14 @@ nav:
   - Connecting a LIS:
       - Connect a LIS to Smart Connect: guides/connecting-a-lis.md
       - Manage the enrollment key: guides/enrollment-key.md
-  - Operations:
-      - Retire the legacy API: guides/retiring-the-legacy-api.md
   - Reference:
-      - API v2: api/index.md
-  - Explanation:
-      - Why API v2 looks like this: explanation/api-v2-design.md
+      - API: api/index.md
 
-# The original build plan (internal/api-v2-plan.md) stays in the repository as a
-# record of the design discussion, but it is deliberately not published. Parts of
-# it were dropped during implementation and a published plan that contradicts the
-# shipped API is worse than no plan at all.
+# docs/internal holds material written for whoever maintains Smart Connect
+# itself: the original build plan, and the one-time runbook for retiring the
+# pre-1.2.0 endpoints. Country teams operate the dashboard and connect
+# laboratories to it. They never used the endpoints being retired, so that
+# history is noise on the published site.
 not_in_nav: |
   internal/*
 

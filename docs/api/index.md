@@ -62,7 +62,7 @@ Smart Connect stores the sha256 of each client token. The plaintext token appear
 
 Reports that the API is reachable. Requires no authentication. Touches neither the database nor the Laminas container.
 
-A 404 from this endpoint means the deployment predates v2. Clients that receive 404 use the legacy `/api/*` endpoints.
+A 404 from this endpoint means the deployment does not serve the API. Upgrade Smart Connect.
 
 Request parameters: none.
 
@@ -126,7 +126,7 @@ curl -X POST https://dashboard.example.org/api/v2/enroll \
 
 ### POST /api/v2/auth/login
 
-Issues a `user` token. Requires no Bearer token. Replaces `POST /api/user`.
+Issues a `user` token. Requires no Bearer token.
 
 | Field | Type | Description | Default |
 | --- | --- | --- | --- |
@@ -143,7 +143,7 @@ curl -X POST https://dashboard.example.org/api/v2/auth/login \
 
 ### POST /api/v2/vl
 
-Stores viral load records in `dash_form_vl`. Requires a `client` token. Replaces `POST /api/vlsm`.
+Stores viral load records in `dash_form_vl`. Requires a `client` token.
 
 | Field | Type | Description | Default |
 | --- | --- | --- | --- |
@@ -154,8 +154,6 @@ Stores viral load records in `dash_form_vl`. Requires a `client` token. Replaces
 Each request also updates `facility_details.facility_attributes`, inserts one row into `dash_api_receiver_stats`, inserts one row into `dash_track_api_requests`, and sets `dash_api_clients.last_seen`.
 
 Returns 422 when `vlFile` is absent, empty, failed to upload, or carries another extension. Returns 413 when the body exceeds `post_max_size`.
-
-The `api-version` field that v1 accepted does not exist in v2. This endpoint always uses the v2 storage path.
 
 ```bash
 curl -X POST https://dashboard.example.org/api/v2/vl \
@@ -169,7 +167,7 @@ curl -X POST https://dashboard.example.org/api/v2/vl \
 
 ### POST /api/v2/eid
 
-Stores early infant diagnosis records. Requires a `client` token. Replaces `POST /api/vlsm-eid`.
+Stores early infant diagnosis records. Requires a `client` token.
 
 Identical to `POST /api/v2/vl`, with the upload field named `eidFile`.
 
@@ -181,7 +179,7 @@ curl -X POST https://dashboard.example.org/api/v2/eid \
 
 ### POST /api/v2/covid19
 
-Stores Covid-19 records. Requires a `client` token. Replaces `POST /api/vlsm-covid19`.
+Stores Covid-19 records. Requires a `client` token.
 
 Identical to `POST /api/v2/vl`, with the upload field named `covid19File`.
 
@@ -193,7 +191,7 @@ curl -X POST https://dashboard.example.org/api/v2/covid19 \
 
 ### POST /api/v2/metadata
 
-Merges reference tables such as facilities, geography, and instruments. Requires a `client` token. Replaces `POST /api/vlsm-metadata`.
+Merges reference tables such as facilities, geography, and instruments. Requires a `client` token.
 
 | Field | Type | Description | Default |
 | --- | --- | --- | --- |
@@ -210,7 +208,7 @@ curl -X POST https://dashboard.example.org/api/v2/metadata \
 
 ### POST /api/v2/vl/weblims
 
-Stores viral load records sent in the WebLIMS format. Requires a `client` token. Replaces `POST /api/weblims-vl`.
+Stores viral load records sent in the WebLIMS format. Requires a `client` token.
 
 Takes a raw JSON body rather than a file upload. Records live under the `data` pointer. Rows with a `TestId` other than `VIRAL_LOAD_2` are skipped.
 
@@ -227,7 +225,7 @@ curl -X POST https://dashboard.example.org/api/v2/vl/weblims \
 
 ### POST /api/v2/vl/import
 
-Stores an uploaded file in `public/uploads/not-import-vl` for offline processing. Requires a `client` token. Replaces `POST /api/import-viral-load`.
+Stores an uploaded file in `public/uploads/not-import-vl` for offline processing. Requires a `client` token.
 
 | Field | Type | Description | Default |
 | --- | --- | --- | --- |
@@ -249,9 +247,9 @@ curl -X POST https://dashboard.example.org/api/v2/vl/import \
 
 ### POST /api/v2/vl/source-data
 
-Returns viral load results. Requires a `user` token. Replaces `POST /api/source-data`.
+Returns viral load results. Requires a `user` token.
 
-v1 read the token from the request body. v2 reads it from the `Authorization` header. A `token` field in the body is ignored.
+The token comes from the `Authorization` header. A `token` field in the request body is ignored.
 
 | Field | Type | Description | Default |
 | --- | --- | --- | --- |
@@ -270,7 +268,7 @@ curl -X POST https://dashboard.example.org/api/v2/vl/source-data \
 
 ### POST /api/v2/facilities
 
-Returns the facility list. Requires a `user` token. Replaces `POST /api/facility`.
+Returns the facility list. Requires a `user` token.
 
 Request parameters: none.
 
@@ -310,22 +308,9 @@ php bin/generate-enrollment-key.php --show
 
 Rotating the key does not affect clients that already hold a token. Clients that have not enrolled cannot enroll until their vlsm config carries the new key.
 
-## Legacy endpoints
-
-The `/api/*` endpoints listed under each v2 entry keep their v1 behavior. Their responses carry two headers.
-
-| Header | Value |
-| --- | --- |
-| `Deprecation` | `true` |
-| `Link` | `</api/v2/health>; rel="successor-version"` |
-
-When `api.legacy_sunset` holds a date, responses also carry `Sunset` with that date in HTTP-date format. On and after that date, every `/api/*` endpoint returns 410 with the standard error envelope plus a `sunset` field.
-
-`/api/receiver/vl`, `/api/receiver/eid`, and `/api/receiver/covid19` were removed in 1.2.0. They return 404. They have no v2 equivalent.
-
 ## Client identity and revocation
 
-`bin/console api-usage` lists enrolled clients and legacy callers.
+`bin/console api-usage` lists the laboratories that have enrolled and when each one last called.
 
 | Option | Type | Description | Default |
 | --- | --- | --- | --- |
