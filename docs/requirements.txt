@@ -1,0 +1,8 @@
+# Documentation build dependencies. CI installs from this file so a local
+# `mkdocs build` matches what GitHub Pages publishes.
+#
+# mkdocs is pinned below 2.0 deliberately. The Material for MkDocs team has
+# stated that MkDocs 2.0 removes the plugin system and the theming system with
+# no migration path, which would break this site on an unattended CI run.
+mkdocs>=1.6,<2.0
+mkdocs-material>=9.5,<10.0

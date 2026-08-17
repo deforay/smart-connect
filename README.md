@@ -2,6 +2,22 @@
 
 Open source national dashboard for priority diseases (Viral Load, EID, COVID-19).
 
+## Documentation
+
+Full documentation is at <https://deforay.github.io/smart-connect/>, built from
+`docs/` with [MkDocs](https://www.mkdocs.org/). Start there for:
+
+- [Connecting a LIS](docs/guides/connecting-a-lis.md) — enrollment through first sync
+- [API v2 reference](docs/api/index.md) — endpoints, fields, status codes
+- [Retiring the legacy API](docs/guides/retiring-the-legacy-api.md) — the `/api/*` cutoff
+
+To preview the site locally:
+
+```sh
+pip install -r docs/requirements.txt
+mkdocs serve
+```
+
 ## Requirements
 
 - PHP 8.2+ with the usual extensions (pdo_mysql, intl, mbstring, gd, zip)
@@ -47,6 +63,7 @@ php bin/console housekeeping [--dry-run]   # prune temp files, API payloads, sta
 php bin/console rebuild-snapshots [-f]     # rebuild dash_form_*_current snapshot tables
 php bin/console seed-admin                 # create the first admin user
 php bin/console send-mail                  # send queued mails from temp_mail
+php bin/console api-usage [--days=90]      # who uses API v2 vs the legacy /api/* endpoints
 ```
 
 Common composer shortcuts:
@@ -56,6 +73,9 @@ composer migrate         # run pending database migrations
 composer housekeeping    # run housekeeping
 composer cron-list       # show the scheduled task list
 composer refresh         # pull latest code, install deps, migrate + housekeeping
+
+composer generate-enrollment-key            # create the API v2 enrollment key if unset
+php bin/generate-enrollment-key.php --show  # print the configured key
 ```
 
 ## Scheduled tasks
