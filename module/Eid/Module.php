@@ -2,7 +2,7 @@
 
 namespace Eid;
 
-use Laminas\Session\Container;
+use Application\Session\Container;
 use Application\Service\CachedMethodProxy;
 
 

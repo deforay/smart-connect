@@ -4,7 +4,7 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-use Laminas\Session\Container;
+use Application\Session\Container;
 use Application\Service\CommonService;
 
 $languagecontainer = new Container('language');

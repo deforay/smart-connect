@@ -15,7 +15,7 @@ use DateTimeImmutable;
 use JsonMachine\Items;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Insert;
-use Laminas\Session\Container;
+use Application\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use Symfony\Component\Mime\Email;
 use Application\Model\TempMailTable;

@@ -2,7 +2,7 @@
 
 namespace Application\Service;
 
-use Laminas\Session\Container;
+use Application\Session\Container;
 
 class OrganizationService {
 

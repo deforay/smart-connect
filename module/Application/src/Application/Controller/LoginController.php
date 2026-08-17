@@ -2,7 +2,7 @@
 
 namespace Application\Controller;
 
-use Laminas\Session\Container;
+use Application\Session\Container;
 use Laminas\View\Model\ViewModel;
 use Application\Service\CommonService;
 use Laminas\Mvc\Controller\AbstractActionController;

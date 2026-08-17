@@ -9,7 +9,7 @@ use Laminas\Mvc\MvcEvent;
 use Laminas\View\Model\JsonModel;
 
 use Application\Model\Acl;
-use Laminas\Session\Container;
+use Application\Session\Container;
 use Application\Model\RolesTable;
 use Application\Model\UsersTable;
 use Application\Model\GlobalTable;

@@ -3,7 +3,7 @@
 namespace Application\Service;
 
 use Exception;
-use Laminas\Session\Container;
+use Application\Session\Container;
 
 class ConfigService
 {
