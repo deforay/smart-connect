@@ -12,7 +12,8 @@
         "intelis"
     ],
     "require": {
-        "php": "^8.2 || ^8.3 || ^8.4",
+        "php": "^8.4.1",
+        "amitdugar/db-tools": "^3.3",
         "crunzphp/crunz": "^3.9",
         "halaxa/json-machine": "^1.2",
         "laminas/laminas-db": "^2.22",
@@ -25,10 +26,10 @@
         "slim/psr7": "^1.8",
         "slim/slim": "^4",
         "spatie/once": "^3.1",
-        "symfony/cache": "^7.4",
-        "symfony/console": "^8.0",
-        "symfony/mailer": "^7.4",
-        "symfony/translation": "^8.0",
+        "symfony/cache": "^8.1",
+        "symfony/console": "^8.1",
+        "symfony/mailer": "^8.1",
+        "symfony/translation": "^8.1",
         "tecnickcom/tcpdf": "^6.11"
     },
     "autoload": {
@@ -43,6 +44,7 @@
         "cs-check": "vendor/bin/phpcs",
         "cs-fix": "vendor/bin/phpcbf",
         "housekeeping": "@php bin/console housekeeping",
+        "backup": "@php vendor/bin/db-tools backup",
         "migrate": "@php bin/migrate",
         "cron": "crunz schedule:run",
         "cron-list": "crunz schedule:list",
@@ -66,6 +68,7 @@
         "cs-check": "Run coding standards checks.",
         "cs-fix": "Automatically fix coding standard issues.",
         "housekeeping": "Housekeeping — remove old temporary files, uploads, cache files and stale DB rows.",
+        "backup": "Back up the database to backup/db using the credentials in config/autoload. Restore with: php vendor/bin/db-tools restore backup/db/NAME.sql.zst",
         "migrate": "Run pending database migrations from sys/migrations (see bin/migrate --help comments for flags).",
         "cron": "Run due scheduled tasks (crunz). Meant to be called every minute from the crontab.",
         "cron-list": "List the scheduled tasks defined in sys/cron.",
@@ -79,7 +82,7 @@
         "sort-packages": true,
         "secure-http": true,
         "platform": {
-            "php": "8.4"
+            "php": "8.4.1"
         }
     },
     "require-dev": {
