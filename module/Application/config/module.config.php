@@ -10,6 +10,8 @@ use Application\Command\Housekeeping;
 use Application\Command\HousekeepingFactory;
 use Application\Command\RebuildSnapshots;
 use Application\Command\RebuildSnapshotsFactory;
+use Application\Command\ApiUsage;
+use Application\Command\ApiUsageFactory;
 use Application\I18n\TranslatorFactory;
 
 return [
@@ -246,6 +248,7 @@ return [
             SeedAdmin::class => SeedAdminFactory::class,
             Housekeeping::class => HousekeepingFactory::class,
             RebuildSnapshots::class => RebuildSnapshotsFactory::class,
+            ApiUsage::class => ApiUsageFactory::class,
         ],
     ],
     'translator' => [
@@ -291,6 +294,7 @@ return [
             SeedAdmin::class,
             Housekeeping::class,
             RebuildSnapshots::class,
+            ApiUsage::class,
         ],
     ],
 ];

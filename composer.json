@@ -1,7 +1,7 @@
 {
     "name": "deforay/smart-connect",
     "description": "National Dashboard for Priory Diseases (Viral Load, EID, Covid-19)",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "type": "project",
     "keywords": [
         "viral load",
@@ -17,10 +17,13 @@
         "halaxa/json-machine": "^1.2",
         "laminas/laminas-db": "^2.22",
         "laminas/laminas-mvc": "^3.8",
+        "php-di/php-di": "^7.1",
         "phpmyadmin/sql-parser": "^6.0",
         "phpoffice/phpspreadsheet": "^5.7",
         "ramsey/uuid": "^4.9",
         "setasign/fpdi": "^2.6",
+        "slim/psr7": "^1.8",
+        "slim/slim": "^4",
         "spatie/once": "^3.1",
         "symfony/cache": "^7.4",
         "symfony/console": "^8.0",
@@ -30,11 +33,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Application\\": "module/Application/src/Application/"
+            "Application\\": "module/Application/src/Application/",
+            "App\\": "src/"
         }
     },
     "scripts": {
         "clear-config-cache": "php bin/clear-config-cache.php",
+        "generate-enrollment-key": "@php bin/generate-enrollment-key.php",
         "cs-check": "vendor/bin/phpcs",
         "cs-fix": "vendor/bin/phpcbf",
         "housekeeping": "@php bin/console housekeeping",
@@ -44,6 +49,7 @@
         "post-install-cmd": "@clear-config-cache",
         "post-update-cmd": "@clear-config-cache",
         "post-update": [
+            "php bin/generate-enrollment-key.php || true",
             "php bin/migrate || true",
             "php bin/console housekeeping || true"
         ],
@@ -56,6 +62,7 @@
     },
     "scripts-descriptions": {
         "clear-config-cache": "Clears merged config cache. Required for config changes to be applied.",
+        "generate-enrollment-key": "Generate the API v2 enrollment key if one is not already set. Idempotent; --show prints the current key, --force rotates it.",
         "cs-check": "Run coding standards checks.",
         "cs-fix": "Automatically fix coding standard issues.",
         "housekeeping": "Housekeeping — remove old temporary files, uploads, cache files and stale DB rows.",

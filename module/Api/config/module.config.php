@@ -121,42 +121,10 @@ return array(
                     ),
                 ),
             ),
-            'receive-vl-data' => array(
-                'type'    => 'segment',
-                'options' => array(
-                    'route'    => '/api/receiver/vl[/:id]',
-                    'constraints' => array(
-                        'id'     => '[0-9]+',
-                    ),
-                    'defaults' => array(
-                        'controller' => 'Api\Controller\ReceiveVlData',
-                    ),
-                ),
-            ),
-            'receive-eid-data' => array(
-                'type'    => 'segment',
-                'options' => array(
-                    'route'    => '/api/receiver/eid[/:id]',
-                    'constraints' => array(
-                        'id'     => '[0-9]+',
-                    ),
-                    'defaults' => array(
-                        'controller' => 'Api\Controller\ReceiveEidData',
-                    ),
-                ),
-            ),
-            'receive-covid19-data' => array(
-                'type'    => 'segment',
-                'options' => array(
-                    'route'    => '/api/receiver/covid19[/:id]',
-                    'constraints' => array(
-                        'id'     => '[0-9]+',
-                    ),
-                    'defaults' => array(
-                        'controller' => 'Api\Controller\ReceiveCovid19Data',
-                    ),
-                ),
-            ),
+            // /api/receiver/{vl,eid,covid19} removed in 1.2.0: the controllers
+            // called saveVLDataFromAPI() / saveEidDataFromAPI() /
+            // saveCovid19DataFromAPI(), none of which exist, so every request
+            // to them was a fatal. They have no v2 equivalent.
         ),
     ),
     'view_manager' => array(

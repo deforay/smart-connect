@@ -3,6 +3,7 @@
 namespace Application\Model;
 
 use Exception;
+use Throwable;
 use Laminas\Db\Sql\Sql;
 use Application\Session\Container;
 use Laminas\Db\Adapter\Adapter;
@@ -200,9 +201,11 @@ class DashTrackApiRequestsTable extends BaseTableGateway
                 $data['response_data'] = '/uploads/track-api/responses/' . $transactionId . '.json';
             }
             return $this->insert($data);
-        } catch (Exception $exc) {
+        } catch (Throwable $exc) {
+            // $this->db does not exist on a TableGateway, so the old
+            // $this->db->getLastError() call threw from inside the handler and
+            // replaced the real DB error with "Invalid magic property access".
             error_log($exc->getMessage());
-            error_log($this->db->getLastError());
             error_log($exc->getTraceAsString());
             return 0;
         }
