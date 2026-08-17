@@ -41,6 +41,8 @@ nav:
   - Connecting a LIS:
       - Connect a LIS to Smart Connect: guides/connecting-a-lis.md
       - Manage the enrollment key: guides/enrollment-key.md
+  - Troubleshooting:
+      - Diagnose a laboratory that is not syncing: guides/troubleshooting.md
   - Reference:
       - API: api/index.md
 

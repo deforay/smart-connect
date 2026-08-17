@@ -9,6 +9,10 @@ Use the sidebar to navigate.
 - [Connect a LIS to Smart Connect](guides/connecting-a-lis.md) — the whole path, from enrollment key to first sync
 - [Manage the enrollment key](guides/enrollment-key.md) — generate, read, and rotate the key
 
+## Troubleshooting
+
+- [Diagnose a laboratory that is not syncing](guides/troubleshooting.md) — find the stage where records stop
+
 ## Reference
 
 - [API](api/index.md) — every endpoint, field, and status code
