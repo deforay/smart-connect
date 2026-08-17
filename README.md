@@ -9,6 +9,8 @@ Full documentation is at <https://deforay.github.io/smart-connect/>, built from
 
 - [Connecting a LIS](docs/guides/connecting-a-lis.md) — enrollment through first sync
 - [Manage the enrollment key](docs/guides/enrollment-key.md) — generate, read, and rotate the key
+- [Set up off-machine backups](docs/guides/backups.md) — database and configuration, copied to another machine
+- [Restore from a backup](docs/guides/restoring-a-backup.md) — put one back, including onto a rebuilt server
 - [API reference](docs/api/index.md) — endpoints, fields, status codes
 
 `docs/internal/` holds material for whoever maintains Smart Connect itself. It
@@ -96,6 +98,24 @@ crunz evaluates the schedule every minute and runs whatever is due
 
 The nightly snapshot rebuild is OFF by default; enable it by setting
 `daily_snapshot_rebuild` to `yes` in the admin global configuration settings.
+
+## Backups
+
+`bin/remote-backup.sh` sets up automatic off-machine backups of the database and
+`config/autoload`, to another Linux machine over SSH, a Windows shared folder, or
+an external drive.
+
+```sh
+sudo bin/remote-backup.sh                          # set up or change the backup
+sudo smart-connect-backup.sh --status              # did the last one work?
+sudo smart-connect-backup.sh --list                # what is stored
+sudo smart-connect-backup.sh --restore latest      # put the newest one back
+```
+
+Each run leaves a dated folder holding a fresh dump and a copy of the
+configuration, verified by checksum at the destination. Full instructions are in
+[Set up off-machine backups](docs/guides/backups.md) and
+[Restore from a backup](docs/guides/restoring-a-backup.md).
 
 ## Database migrations
 
