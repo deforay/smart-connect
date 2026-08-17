@@ -781,7 +781,10 @@ class Module
 				return new RoleService($diContainer);
 			}
 				},
-				'translator' => 'Laminas\Mvc\I18n\TranslatorFactory',
+				// 'translator' was registered here as well as in
+				// module.config.php, both pointing at the same Laminas factory.
+				// Only the module.config.php one remains, next to the
+				// 'translator' config block it reads.
 			],
 		];
 	}
@@ -950,6 +953,15 @@ class Module
 			{
 				$config = $diContainer->get('Config');
 				return new \Application\View\Helper\GetActiveModules($config);
+			}
+				},
+				// laminas-i18n used to register this one. Same name and
+				// signature, so the ~3300 translate() calls in the views are
+				// untouched.
+				'translate' => new class {
+			public function __invoke($diContainer)
+			{
+				return new \Application\View\Helper\Translate($diContainer->get('translator'));
 			}
 				},
 			],

@@ -10,6 +10,7 @@ use Application\Command\Housekeeping;
 use Application\Command\HousekeepingFactory;
 use Application\Command\RebuildSnapshots;
 use Application\Command\RebuildSnapshotsFactory;
+use Application\I18n\TranslatorFactory;
 
 return [
     'router' => [
@@ -237,7 +238,10 @@ return [
     ],
     'service_manager' => [
         'factories' => [
-            'translator' => 'Laminas\Mvc\I18n\TranslatorFactory',
+            // Was Laminas\Mvc\I18n\TranslatorFactory. Reads the same
+            // 'translator' config block below, so the catalogue location and
+            // the locale are still declared in one place.
+            'translator' => TranslatorFactory::class,
             SendTempMail::class => SendTempMailFactory::class,
             SeedAdmin::class => SeedAdminFactory::class,
             Housekeeping::class => HousekeepingFactory::class,
