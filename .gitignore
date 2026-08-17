@@ -19,6 +19,9 @@ public/temporary/*
 vendor/
 error_log
 .DS_Store
+
+# Stamped into each deployment by bin/upgrade.sh, never committed.
+VERSION.txt
 [Tt]humbs.db
 
 # glob-style ignores
