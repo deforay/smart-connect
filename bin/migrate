@@ -39,6 +39,7 @@ require 'vendor/autoload.php';
 
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Adapter\Exception\ExceptionInterface as DbException;
+use Laminas\Db\Adapter\Exception\RuntimeException as LaminasDbRuntimeException;
 use Laminas\Mvc\Service\ServiceManagerConfig;
 use Laminas\ServiceManager\ServiceManager;
 use Laminas\Stdlib\ArrayUtils;
@@ -223,11 +224,106 @@ function add_column_if_missing(Adapter $adapter, string $table, string $column, 
     return MIG_EXECUTED;
 }
 
+/**
+ * Is a UNIQUE index over exactly these columns already present, under any name?
+ *
+ * data/setup.sql adds these constraints without naming them, so MySQL names each
+ * one after its first column. The migrator asks for the same constraint under a
+ * longer name. Matching on the column list rather than the name is what stops an
+ * install ending up with two copies of one unique index.
+ */
+function unique_index_over_columns(Adapter $adapter, string $table, array $columns): bool
+{
+    if ($columns === [] || !table_exists($adapter, $table)) {
+        return false;
+    }
+
+    $matches = fetch_column(
+        $adapter,
+        "SELECT INDEX_NAME,
+                GROUP_CONCAT(LOWER(COLUMN_NAME) ORDER BY SEQ_IN_INDEX) AS cols
+           FROM information_schema.STATISTICS
+          WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND NON_UNIQUE = 0
+          GROUP BY INDEX_NAME
+         HAVING cols = ?",
+        [current_db($adapter), $table, implode(',', $columns)]
+    );
+
+    return $matches !== [];
+}
+
+/**
+ * Describe the rows that stop a UNIQUE index being created.
+ *
+ * MySQL reports one offending value and nothing else, which is not enough to
+ * decide what to do. A dashboard table collects rows from every LIS that reports
+ * to it, so a constraint added long after the data started arriving can meet
+ * duplicates the schema never prevented. Return null when the data allows the
+ * index.
+ */
+function unique_index_blockers(Adapter $adapter, string $table, array $columns): ?string
+{
+    if ($columns === [] || !table_exists($adapter, $table)) {
+        return null;
+    }
+    foreach ($columns as $column) {
+        if (!column_exists($adapter, $table, $column)) {
+            return null; // let the DDL itself report the missing column
+        }
+    }
+
+    $quoted = implode(', ', array_map(static fn($c) => "`{$c}`", $columns));
+    $grouped = "SELECT COUNT(*) AS copies FROM `{$table}`
+                 GROUP BY {$quoted} HAVING COUNT(*) > 1";
+
+    $groups = (int) fetch_scalar($adapter, "SELECT COUNT(*) FROM ({$grouped}) AS blocking");
+    if ($groups === 0) {
+        return null;
+    }
+
+    $surplus = (int) fetch_scalar(
+        $adapter,
+        "SELECT COALESCE(SUM(copies) - COUNT(*), 0) FROM ({$grouped}) AS blocking"
+    );
+    $examples = fetch_column(
+        $adapter,
+        "SELECT CONCAT_WS(' + ', {$quoted}) FROM `{$table}`
+          GROUP BY {$quoted} HAVING COUNT(*) > 1 LIMIT 3"
+    );
+
+    $label = implode(' + ', $columns);
+    $message = "{$groups} value(s) of ({$label}) repeat in `{$table}`, over {$surplus} surplus row(s).";
+    if ($examples !== []) {
+        $message .= ' For example: ' . implode(', ', array_map('strval', $examples)) . '.';
+    }
+    return $message;
+}
+
 function add_index_if_missing(Adapter $adapter, string $table, string $index, string $ddl): int
 {
     if (index_exists($adapter, $table, $index)) {
         return MIG_SKIPPED;
     }
+
+    if (preg_match('/^\s*CREATE\s+UNIQUE\s+INDEX\b.*?\bON\b[^(]*\((.+)\)\s*;?\s*$/is', $ddl, $m)) {
+        $columns = parse_cols_list($m[1]);
+
+        if (unique_index_over_columns($adapter, $table, $columns)) {
+            return MIG_SKIPPED;
+        }
+
+        // Reaching MySQL with a UNIQUE index the data cannot support buys a
+        // bare 1062 naming one value. Count the duplicates first, so the log
+        // says how much is in the way without anyone querying the database.
+        $blockers = unique_index_blockers($adapter, $table, $columns);
+        if ($blockers !== null) {
+            throw new LaminasDbRuntimeException(
+                "cannot create unique index `{$index}`. {$blockers}"
+                . ' Resolve the duplicates, then run this again.'
+            );
+        }
+    }
+
     run_sql($adapter, $ddl);
     return MIG_EXECUTED;
 }
