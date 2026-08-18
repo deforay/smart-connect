@@ -4,7 +4,7 @@
 #
 # Run it straight from the repo:
 #
-#   sudo bash -c "$(curl -fsSL "https://raw.githubusercontent.com/deforay/smart-connect/master/bin/upgrade.sh?v=$(date +%s)")" -- -A
+#   sudo bash -c "$(curl -fsSL "https://raw.githubusercontent.com/deforay/smart-connect/master/bin/upgrade.sh?v=$(date +%s)")"
 #
 # Note the shape. The script is an argument, not stdin. Piping it in as
 # `curl ... | sudo bash` breaks the prompts. Where sudoers sets use_pty, which
@@ -35,11 +35,14 @@
 # Trees too old to carry db-tools fall back to mysqldump and a .sql.gz.
 #
 # Usage:
-#   sudo bin/upgrade.sh [-A] [-p PATH] [-b] [-y]
+#   sudo bin/upgrade.sh [-p PATH] [-b] [-y]
+#
+# With no -p it upgrades every smart-connect instance found in /var/www. Almost
+# every server hosts exactly one, so that is the whole command. Servers that
+# also run a training instance get both in one pass.
 #
 # Options:
-#   -A       upgrade every smart-connect instance found in /var/www
-#   -p PATH  upgrade one instance (default /var/www/smart-connect)
+#   -p PATH  upgrade only this instance, wherever it lives
 #   -b       skip the backups. The config/autoload tarball is always taken
 #   -y       non-interactive. Every prompt takes its default, which is the safe
 #            answer, so a failed backup stops that instance rather than plough on
@@ -153,7 +156,7 @@ ask_yes_no() {
         # question, so stop spending a minute apiece to ask it.
         prompt_is_deaf=true
         say warning "No answer reached this script in 60s. Taking the default for this and every later question."
-        say warning "If you did type one, the pipe swallowed it. Run it as: sudo bash -c \"\$(curl -fsSL ${REPO_SCRIPT_URL})\" -- -A"
+        say warning "If you did type one, the pipe swallowed it. Run it as: sudo bash -c \"\$(curl -fsSL ${REPO_SCRIPT_URL})\""
         answer="$default"
     fi
     exec 3>&-
@@ -720,13 +723,11 @@ upgrade_instance() {
 
 app_path=""
 target_path=""
-upgrade_all=false
 skip_backups=false
 assume_defaults=false
 
-while getopts ":Ap:by" opt; do
+while getopts ":p:by" opt; do
     case $opt in
-        A) upgrade_all=true ;;
         p) target_path="$OPTARG" ;;
         b) skip_backups=true ;;
         y) assume_defaults=true ;;
@@ -740,17 +741,18 @@ done
 
 declare -a app_paths=()
 
-if [ "$upgrade_all" = true ]; then
-    [ -n "$target_path" ] && print warning "-A given, ignoring -p ${target_path}"
-    print info "Scanning ${SEARCH_DIR} for smart-connect installations..."
-    mapfile -t app_paths < <(detect_installations)
-    [ ${#app_paths[@]} -gt 0 ] || die "No smart-connect installations found in ${SEARCH_DIR}."
-else
-    target_path="${target_path:-/var/www/smart-connect}"
+# Scanning is the default. A server almost always holds one instance, and
+# finding it is exactly what -p would have been typed to say.
+if [ -n "$target_path" ]; then
     target_path="$(cd "$target_path" 2>/dev/null && pwd)" || die "Path not found: ${target_path}"
     is_smart_connect_path "$target_path" ||
         die "${target_path} does not look like a smart-connect installation ($(why_not_smart_connect "$target_path"))."
     app_paths=("$target_path")
+else
+    print info "Scanning ${SEARCH_DIR} for smart-connect installations..."
+    mapfile -t app_paths < <(detect_installations)
+    [ ${#app_paths[@]} -gt 0 ] ||
+        die "No smart-connect installations found in ${SEARCH_DIR}. Name one with -p PATH."
 fi
 
 web_user="www-data"

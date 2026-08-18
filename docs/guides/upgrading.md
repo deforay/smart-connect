@@ -2,7 +2,7 @@
 
 `bin/upgrade.sh` brings an installed Smart Connect up to the latest released code. It backs up what cannot be replaced, deploys the new source over the tree, installs dependencies, applies migrations, resets permissions, and reloads the web server.
 
-One server often hosts several dashboards. The script upgrades all of them in one run and keeps going when one fails.
+A server usually hosts one dashboard. Where it hosts more, the script upgrades all of them in one run and keeps going when one fails.
 
 The script does no system-level work. PHP, MySQL, and Apache belong to the setup script and are left alone.
 
@@ -12,36 +12,35 @@ The script does no system-level work. PHP, MySQL, and Apache belong to the setup
 - `php`, `composer`, and `rsync` installed
 - Working off-machine backups, ideally. See [Set up off-machine backups](backups.md)
 
-## Upgrade every installation on the server
+## Upgrade the server
 
 Run this as root:
 
 ```bash
-sudo bash -c "$(curl -fsSL "https://raw.githubusercontent.com/deforay/smart-connect/master/bin/upgrade.sh?v=$(date +%s)")" -- -A
+sudo bash -c "$(curl -fsSL "https://raw.githubusercontent.com/deforay/smart-connect/master/bin/upgrade.sh?v=$(date +%s)")"
 ```
 
 Pass the script to `bash -c` as an argument, exactly as shown above. Piping it in as `curl ... | sudo bash` breaks the prompts, and the script then answers its own questions with whatever the pipe holds.
 
 The `?v=` on the URL defeats the raw CDN cache, so the run always fetches the current script.
 
-`-A` finds every Smart Connect installation under `/var/www` and upgrades each one. A server hosting `smart-connect` and `smart-connect-training` needs one run. The script lists what it found and asks for confirmation before starting.
+The script finds every Smart Connect installation under `/var/www` and upgrades each one. Almost every server hosts a single installation, so no options are needed. A server that also runs `smart-connect-training` gets both in the same run. The script lists what it found and asks for confirmation before starting.
 
 ## Upgrade one installation
 
-From a checkout on the server:
+Name the installation with `-p`:
 
 ```bash
 sudo bin/upgrade.sh -p /var/www/smart-connect-training
 ```
 
-Without `-p`, the script upgrades `/var/www/smart-connect`.
+Use `-p` for an installation outside `/var/www`, which the scan does not reach.
 
 ## Options
 
 | Option | Effect |
 |---|---|
-| `-A` | Upgrades every installation found in `/var/www` |
-| `-p PATH` | Upgrades one installation. Defaults to `/var/www/smart-connect` |
+| `-p PATH` | Upgrades only this installation. Without it, every installation found in `/var/www` |
 | `-b` | Skips the database dump. The `config/autoload` tarball is still taken |
 | `-y` | Answers every prompt with its default and never blocks |
 

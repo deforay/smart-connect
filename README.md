@@ -108,12 +108,12 @@ the new source, installs dependencies, applies migrations, resets permissions,
 and reloads the web server. It does no system-level work.
 
 ```sh
-# every installation under /var/www, on a server with no checkout
-sudo bash -c "$(curl -fsSL "https://raw.githubusercontent.com/deforay/smart-connect/master/bin/upgrade.sh?v=$(date +%s)")" -- -A
+# on a server with no checkout
+sudo bash -c "$(curl -fsSL "https://raw.githubusercontent.com/deforay/smart-connect/master/bin/upgrade.sh?v=$(date +%s)")"
 
-sudo bin/upgrade.sh -A                              # every installation
+sudo bin/upgrade.sh                                      # every installation found
 sudo bin/upgrade.sh -p /var/www/smart-connect-training   # just this one
-sudo bin/upgrade.sh -A -y                           # unattended, safe defaults
+sudo bin/upgrade.sh -y                                   # unattended, safe defaults
 ```
 
 Pass the script to `bash -c` as an argument, as shown. Piping it in with
