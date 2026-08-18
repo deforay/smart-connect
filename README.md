@@ -11,6 +11,7 @@ Full documentation is at <https://deforay.github.io/smart-connect/>, built from
 - [Manage the enrollment key](docs/guides/enrollment-key.md) — generate, read, and rotate the key
 - [Set up off-machine backups](docs/guides/backups.md) — database and configuration, copied to another machine
 - [Restore from a backup](docs/guides/restoring-a-backup.md) — put one back, including onto a rebuilt server
+- [Upgrade an installation](docs/guides/upgrading.md) — bring a server up to the latest release
 - [API reference](docs/api/index.md) — endpoints, fields, status codes
 
 `docs/internal/` holds material for whoever maintains Smart Connect itself. It
@@ -98,6 +99,31 @@ crunz evaluates the schedule every minute and runs whatever is due
 
 The nightly snapshot rebuild is OFF by default; enable it by setting
 `daily_snapshot_rebuild` to `yes` in the admin global configuration settings.
+
+## Upgrading
+
+`bin/upgrade.sh` brings an installation up to the latest released code. It backs
+up `config/autoload` and the database to `/var/smart-connect-backup/`, deploys
+the new source, installs dependencies, applies migrations, resets permissions,
+and reloads the web server. It does no system-level work.
+
+```sh
+# every installation under /var/www, on a server with no checkout
+sudo bash -c "$(curl -fsSL "https://raw.githubusercontent.com/deforay/smart-connect/master/bin/upgrade.sh?v=$(date +%s)")" -- -A
+
+sudo bin/upgrade.sh -A                              # every installation
+sudo bin/upgrade.sh -p /var/www/smart-connect-training   # just this one
+sudo bin/upgrade.sh -A -y                           # unattended, safe defaults
+```
+
+Pass the script to `bash -c` as an argument, as shown. Piping it in with
+`curl ... | sudo bash` breaks the prompts.
+
+This deployment's `config/autoload/global.php`, `local.php`, `custom.global.php`,
+and any `*.local.php` are never overwritten, and neither are `vendor/`,
+`data/`, `public/uploads/`, `public/temporary/`, `temporary/`, or `backup/`.
+One failing installation does not stop the others. Full instructions are in
+[Upgrade an installation](docs/guides/upgrading.md).
 
 ## Backups
 

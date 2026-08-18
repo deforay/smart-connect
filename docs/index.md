@@ -14,6 +14,10 @@ Use the sidebar to navigate.
 - [Set up off-machine backups](guides/backups.md) — copy the database and configuration to another machine
 - [Restore from a backup](guides/restoring-a-backup.md) — put one back, including onto a rebuilt server
 
+## Upgrading
+
+- [Upgrade an installation](guides/upgrading.md) — bring a server up to the latest release, one instance or all of them
+
 ## Troubleshooting
 
 - [Diagnose a laboratory that is not syncing](guides/troubleshooting.md) — find the stage where records stop

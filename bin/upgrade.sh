@@ -35,14 +35,12 @@
 # Trees too old to carry db-tools fall back to mysqldump and a .sql.gz.
 #
 # Usage:
-#   sudo bin/upgrade.sh [-A] [-p PATH] [-b] [-f] [-y]
+#   sudo bin/upgrade.sh [-A] [-p PATH] [-b] [-y]
 #
 # Options:
 #   -A       upgrade every smart-connect instance found in /var/www
 #   -p PATH  upgrade one instance (default /var/www/smart-connect)
 #   -b       skip the backups. The config/autoload tarball is always taken
-#   -f       also copy the whole app folder aside first. Off by default. It is
-#            the slowest step by far, and the code comes back from git anyway
 #   -y       non-interactive. Every prompt takes its default, which is the safe
 #            answer, so a failed backup stops that instance rather than plough on
 #
@@ -492,7 +490,7 @@ upgrade_instance() {
     app_path="$1"
     local position="$2" total="$3"
     local ref_before ref_after lock_before
-    local config_backup db_backup folder_backup exclude pattern
+    local config_backup db_backup exclude pattern
     local -a rsync_excludes
     # Dynamically scoped, so dump_database and write_defaults_file see them.
     local db_name db_user db_pass db_host db_port defaults_file=""
@@ -501,7 +499,7 @@ upgrade_instance() {
     say info "Currently at: $(installed_ref)"
 
     # --- backups ------------------------------------------------------------
-    mkdir -p "$BACKUP_ROOT/db" "$BACKUP_ROOT/config" "$BACKUP_ROOT/www"
+    mkdir -p "$BACKUP_ROOT/db" "$BACKUP_ROOT/config"
 
     # The deploy rewrites tracked files under config/autoload, so this tarball is
     # taken on every run regardless of -b. It is a few kilobytes.
@@ -534,21 +532,11 @@ upgrade_instance() {
         say info "Skipping database backup (-b)."
     fi
 
-    # The deploy overwrites the tree, so offer a copy of it, but default to
-    # skipping. On an instance with a large public/ this rsync is the slowest
-    # step of the whole upgrade, and it is the least valuable copy of the three.
-    # The code comes back from git, config/autoload is already tarballed above,
-    # and the deploy neither deletes untracked files nor touches uploads.
-    if [ "$skip_backups" = false ] && [ "$backup_folder" = true ]; then
-        if ask_yes_no "Back up ${app_path} before overwriting it (slow)" "no"; then
-            folder_backup="${BACKUP_ROOT}/www/$(basename "$app_path")-${stamp}"
-            print info "Copying ${app_path} to ${folder_backup}..."
-            rsync -a --exclude 'public/temporary/' --exclude 'vendor/' \
-                "$app_path/" "$folder_backup/" 2>>"$log_file" ||
-                { fail "Folder backup failed for ${app_path}. See ${log_file}."; return 1; }
-            say success "Folder backed up to ${folder_backup}"
-        fi
-    fi
+    # The code is not backed up. The deploy overwrites the tree, but the code
+    # comes back from git, config/autoload is already tarballed above, and the
+    # deploy neither deletes untracked files nor touches uploads. Copying the
+    # whole folder aside is the slowest step of an upgrade by far and buys none
+    # of that back.
 
     # --- source -------------------------------------------------------------
     lock_before="$(checksum "$app_path/composer.lock")"
@@ -733,15 +721,13 @@ app_path=""
 target_path=""
 upgrade_all=false
 skip_backups=false
-backup_folder=false
 assume_defaults=false
 
-while getopts ":Ap:bfy" opt; do
+while getopts ":Ap:by" opt; do
     case $opt in
         A) upgrade_all=true ;;
         p) target_path="$OPTARG" ;;
         b) skip_backups=true ;;
-        f) backup_folder=true ;;
         y) assume_defaults=true ;;
         *) : ;;
     esac

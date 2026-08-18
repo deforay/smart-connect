@@ -629,7 +629,7 @@ print header "Installing the backup runner"
 
 cat > "$RUNNER" <<'RUNNER_SCRIPT'
 #!/bin/bash
-# Smart Connect backup runner. Installed by bin/remote-backup.sh; reads its
+# Smart Connect backup runner. Installed by bin/remote-backup.sh. It reads its
 # settings from /etc/smart-connect/backup.conf. Safe to run by hand at any time.
 #
 # Each run produces one dated folder at the destination holding a fresh database
