@@ -7,6 +7,7 @@ use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Mvc\Application;
 use Laminas\Mvc\MvcEvent;
 use Laminas\View\Model\JsonModel;
+use App\Log\AppLogger;
 
 use Application\Model\Acl;
 use Application\Session\Container;
@@ -99,6 +100,10 @@ class Module
 			$eventManager->attach('dispatch', function (MvcEvent $e) {
 				return $this->preSetter($e);
 			}, 100);
+			// Ahead of the responders, so the line is written whatever they
+			// then decide to render.
+			$eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'logMvcError'], 10000);
+			$eventManager->attach(MvcEvent::EVENT_RENDER_ERROR, [$this, 'logMvcError'], 10000);
 			$eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'renderJsonErrorForAjax'], 1000);
 			$eventManager->attach(MvcEvent::EVENT_RENDER_ERROR, [$this, 'renderJsonErrorForAjax'], 1000);
 			//$eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, array($this, 'dispatchError'), -999);
@@ -107,6 +112,33 @@ class Module
 			// Just a call to the translator, nothing special!
 			$this->initTranslator($e);
 		}
+	}
+
+	/**
+	 * Record why a request failed.
+	 *
+	 * Laminas catches a controller throwable and turns it into this event, so
+	 * without a listener here the only trace of a 500 is whatever the host's
+	 * PHP error log kept. The URL is included because the exception alone does
+	 * not say which page an operator was on when it broke.
+	 */
+	public function logMvcError(MvcEvent $event)
+	{
+		$exception = $event->getParam('exception');
+		$request = $event->getRequest();
+		$uri = $request instanceof Request ? $request->getUriString() : 'cli';
+
+		if ($exception instanceof \Throwable) {
+			AppLogger::logThrowable($exception, 'Request failed', ['url' => $uri]);
+			return;
+		}
+
+		// A routing miss carries no exception. It is still worth a line, at a
+		// level that does not read as a crash.
+		AppLogger::logWarning('Request could not be dispatched', [
+			'url' => $uri,
+			'reason' => (string) $event->getError(),
+		]);
 	}
 
 	public function renderJsonErrorForAjax(MvcEvent $event)
@@ -197,7 +229,15 @@ class Module
 
 
 
-		if ($moduleName == 'Application' && $controllerName != Controller\LoginController::class) {
+		// The login page is reachable before there is a session to check. So is
+		// the endpoint browser errors are reported to, because an error on the
+		// login page is exactly the kind nobody would otherwise hear about.
+		$isPublic = in_array($controllerName, [
+			Controller\LoginController::class,
+			Controller\ClientErrorController::class,
+		], true);
+
+		if ($moduleName == 'Application' && !$isPublic) {
 
 			if (empty($session->userId)) {
 				$url = $e->getRouter()->assemble([], ['name' => 'login']);
@@ -386,6 +426,12 @@ class Module
 				$rolesTable = $diContainer->get('RolesTable');
 				// return new Acl($resourcesTable->fetchAllResourceMap(), $rolesTable->fecthAllActiveRoles());
 				return new Acl($resourcesTable->fetchAllResourceMap(), $rolesTable->fecthAllActiveRoles(), $rolesTable->getAllPrivilegesMap(), $rolesTable->getAllPrivileges());
+			}
+				},
+				'LogFileReader' => new class {
+			public function __invoke($diContainer)
+			{
+				return new \App\Log\LogFileReader(\App\Log\AppLogger::logPath());
 			}
 				},
 				'ResourcesTable' => new class {
@@ -852,6 +898,19 @@ class Module
 			{
 				$facilityService = $diContainer->get('FacilityService');
 				return new \Application\Controller\FacilityController($facilityService);
+			}
+				},
+				'Application\Controller\ClientErrorController' => new class {
+			public function __invoke($diContainer)
+			{
+				return new \Application\Controller\ClientErrorController();
+			}
+				},
+				'Application\Controller\LogsController' => new class {
+			public function __invoke($diContainer)
+			{
+				$logFileReader = $diContainer->get('LogFileReader');
+				return new \Application\Controller\LogsController($logFileReader);
 			}
 				},
 				'Application\Controller\ApiSyncHistoryController' => new class {

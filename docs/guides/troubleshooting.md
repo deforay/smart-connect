@@ -150,17 +150,11 @@ Match the message the laboratory received. Every message below is also recorded 
 
 ## Trace a 500 with its error_id
 
-Every 500 response carries an `error_id`. The same value is stored against the call in **API History**, and written to the PHP error log with the failure behind it.
+Every 500 response carries an `error_id`. The same value is stored against the call in **API History**, and written to the application log with the failure behind it.
 
 Filter **API History** to `Failures only` and open the call. The banner shows the `error_id` without anyone having to ask the laboratory for it.
 
-To read the failure itself, search the log for that value.
-
-```bash
-grep 'error_id=9f2c1a7b4e01d3a5' /var/log/apache2/error.log
-```
-
-The matching line names the file and line that failed, and the stack trace follows it.
+To read the failure itself, open **Logs**, select the file for that day, and search for the `error_id`. The entry names the file and line that failed. Select **details** for the stack trace. See [Read the application log](reading-the-logs.md).
 
 Setting `api.debug` to true puts the exception message in the response body. Turn it off again afterwards, because it exposes internal detail to every caller.
 

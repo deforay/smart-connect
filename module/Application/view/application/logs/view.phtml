@@ -1,0 +1,207 @@
+<?php
+
+use Application\Session\Container;
+
+$sessionLogin = new Container('credo');
+$role = $sessionLogin->roleCode;
+$acl = $this->layout()->acl;
+$canDownload = $acl->isAllowed($role, 'Application\Controller\LogsController', 'download');
+
+$levels = ['DEBUG', 'INFO', 'NOTICE', 'WARNING', 'ERROR', 'CRITICAL', 'ALERT', 'EMERGENCY'];
+
+// Severity drives the stripe down the left of each entry, so a page of entries
+// can be skimmed for the ones that matter without reading any of them.
+$levelClass = function (string $level): string {
+	return match ($level) {
+		'EMERGENCY', 'ALERT', 'CRITICAL', 'ERROR' => 'log-error',
+		'WARNING' => 'log-warning',
+		'NOTICE', 'INFO' => 'log-info',
+		default => 'log-debug',
+	};
+};
+
+$pageUrl = function (array $overrides) use ($file, $search, $level, $offset) {
+	$params = array_merge([
+		'file' => $file,
+		'q' => $search,
+		'level' => $level,
+		'offset' => $offset,
+	], $overrides);
+
+	return $this->url('logs', ['action' => 'view']) . '?' . http_build_query(array_filter(
+		$params,
+		fn($value) => $value !== '' && $value !== null && $value !== 0
+	));
+};
+?>
+<style>
+	.log-entry {
+		background: #fff;
+		border: 1px solid #eee;
+		border-left: 4px solid #bbb;
+		padding: 10px 14px;
+		margin-bottom: 8px;
+		font-family: 'Courier New', Courier, monospace;
+		font-size: 13px;
+		word-break: break-word;
+	}
+
+	.log-entry.log-error { border-left-color: #e7505a; }
+	.log-entry.log-warning { border-left-color: #f0ad4e; }
+	.log-entry.log-info { border-left-color: #337ab7; }
+	.log-entry.log-debug { border-left-color: #bbb; }
+
+	.log-entry .log-meta {
+		color: #888;
+		font-size: 12px;
+		margin-bottom: 6px;
+	}
+
+	.log-entry .log-message {
+		white-space: pre-wrap;
+		margin: 0;
+		color: #222;
+	}
+
+	.log-entry .log-context {
+		margin: 8px 0 0;
+		padding: 8px 10px;
+		background: #f7f7f9;
+		border: 1px solid #eee;
+		white-space: pre-wrap;
+		font-size: 12px;
+		color: #444;
+		display: none;
+	}
+
+	.log-entry.is-open .log-context { display: block; }
+
+	.log-toggle {
+		cursor: pointer;
+		color: #337ab7;
+		font-size: 12px;
+	}
+</style>
+<div class="page-bar">
+	<ul class="page-breadcrumb">
+		<li>
+			<a href="/"><?php echo $this->translate('Dashboard'); ?></a>
+			<i class="fa fa-circle"></i>
+		</li>
+		<li>
+			<a href="<?php echo $this->url('logs', ['action' => 'index']); ?>"><?php echo $this->translate('Logs'); ?></a>
+			<i class="fa fa-circle"></i>
+		</li>
+		<li><?php echo $this->escapeHtml($file); ?></li>
+	</ul>
+</div>
+<h3 class="page-title"></h3>
+<div class="row">
+	<div class="col-md-12">
+		<div class="portlet box blue">
+			<div class="portlet-title">
+				<div class="caption">
+					<i class="fa fa-file-text-o"></i><?php echo $this->translate('Log Viewer'); ?>
+				</div>
+			</div>
+			<div class="portlet-body">
+				<form method="get" action="<?php echo $this->url('logs', ['action' => 'view']); ?>" class="form-inline" style="margin-bottom:15px;">
+					<select name="file" class="form-control" style="margin-right:6px;">
+						<?php foreach ($files as $option) { ?>
+							<option value="<?php echo $this->escapeHtmlAttr($option['name']); ?>" <?php echo $option['name'] === $file ? 'selected' : ''; ?>>
+								<?php echo $this->escapeHtml($option['name']); ?>
+							</option>
+						<?php } ?>
+					</select>
+					<select name="level" class="form-control" style="margin-right:6px;">
+						<option value=""><?php echo $this->translate('-- All levels --'); ?></option>
+						<?php foreach ($levels as $option) { ?>
+							<option value="<?php echo $option; ?>" <?php echo $option === $level ? 'selected' : ''; ?>>
+								<?php echo $option; ?><?php echo $this->translate(' and above'); ?>
+							</option>
+						<?php } ?>
+					</select>
+					<input type="text" name="q" class="form-control" style="width:280px;margin-right:6px;"
+						placeholder="<?php echo $this->translate('Search this file'); ?>"
+						value="<?php echo $this->escapeHtmlAttr($search); ?>" />
+					<button type="submit" class="btn btn-primary"><?php echo $this->translate('Search'); ?></button>
+					<a href="<?php echo $this->url('logs', ['action' => 'view']); ?>?file=<?php echo urlencode($file); ?>" class="btn btn-default">
+						<?php echo $this->translate('Reset'); ?>
+					</a>
+					<?php if ($canDownload && $file !== '') { ?>
+						<a href="<?php echo $this->url('logs', ['action' => 'download']); ?>?file=<?php echo urlencode($file); ?>" class="btn btn-default pull-right">
+							<?php echo $this->translate('Download'); ?>
+						</a>
+					<?php } ?>
+				</form>
+
+				<?php if ($truncated) { ?>
+					<div class="alert alert-warning">
+						<?php echo $this->translate('Stopped searching part way through this file because it is large. Narrow the search or pick an older file to look further back.'); ?>
+					</div>
+				<?php } ?>
+
+				<?php if ($entries === []) { ?>
+					<div class="alert alert-info">
+						<?php echo $this->translate('Nothing to show for this file and filter.'); ?>
+					</div>
+				<?php } else { ?>
+					<?php foreach ($entries as $index => $entry) { ?>
+						<div class="log-entry <?php echo $levelClass($entry['level']); ?>" id="entry-<?php echo $index; ?>">
+							<div class="log-meta">
+								<strong><?php echo $this->escapeHtml($entry['level']); ?></strong>
+								&middot; <?php echo $this->escapeHtml($entry['time']); ?>
+								&middot; <?php echo $this->escapeHtml($entry['channel']); ?>
+								<?php if ($entry['context'] !== []) { ?>
+									&middot; <span class="log-toggle" data-target="entry-<?php echo $index; ?>"><?php echo $this->translate('details'); ?></span>
+								<?php } ?>
+							</div>
+							<pre class="log-message"><?php echo $this->escapeHtml($entry['message']); ?></pre>
+							<?php if ($entry['context'] !== []) { ?>
+								<?php
+								// The trace is the reason anyone opens an entry, and pretty
+								// JSON would show it as one line of escaped \n. It gets its
+								// own block, with its line breaks intact. Browser errors
+								// carry the same thing under 'stack'.
+								$context = $entry['context'];
+								$trace = $context['trace'] ?? $context['stack'] ?? null;
+								unset($context['trace'], $context['stack']);
+								?>
+								<pre class="log-context"><?php
+									if ($context !== []) {
+										echo $this->escapeHtml(json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+									}
+									if (is_string($trace) && $trace !== '') {
+										echo $context !== [] ? "\n\n" : '';
+										echo $this->escapeHtml($trace);
+									}
+								?></pre>
+							<?php } ?>
+						</div>
+					<?php } ?>
+
+					<div style="margin-top:15px;">
+						<?php if ($offset > 0) { ?>
+							<a class="btn btn-default" href="<?php echo $pageUrl(['offset' => max(0, $offset - $pageSize)]); ?>">
+								&laquo; <?php echo $this->translate('Newer'); ?>
+							</a>
+						<?php } ?>
+						<?php if ($hasMore) { ?>
+							<a class="btn btn-default" href="<?php echo $pageUrl(['offset' => $offset + $pageSize]); ?>">
+								<?php echo $this->translate('Older'); ?> &raquo;
+							</a>
+						<?php } ?>
+						<span class="pull-right" style="line-height:34px;color:#888;">
+							<?php echo sprintf($this->translate('Showing %d-%d, newest first'), $offset + 1, $offset + count($entries)); ?>
+						</span>
+					</div>
+				<?php } ?>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).on('click', '.log-toggle', function() {
+		$('#' + $(this).data('target')).toggleClass('is-open');
+	});
+</script>

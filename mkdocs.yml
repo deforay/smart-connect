@@ -48,6 +48,7 @@ nav:
       - Upgrade an installation: guides/upgrading.md
   - Troubleshooting:
       - Diagnose a laboratory that is not syncing: guides/troubleshooting.md
+      - Read the application log: guides/reading-the-logs.md
   - Reference:
       - API: api/index.md
 

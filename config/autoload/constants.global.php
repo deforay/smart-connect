@@ -12,5 +12,10 @@ defined('UPLOAD_PATH')
 defined('TEMP_UPLOAD_PATH')
     || define('TEMP_UPLOAD_PATH', WEB_ROOT . DIRECTORY_SEPARATOR . 'temporary');
 
+// Where AppLogger writes and the log viewer reads. Defined here so a deployment
+// can point the logs at another volume without patching code.
+defined('LOG_PATH')
+    || define('LOG_PATH', APPLICATION_PATH . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'logs');
+
 // returning this empty array to avoid error in config merging
 return [];

@@ -1,7 +1,7 @@
 {
     "name": "deforay/smart-connect",
     "description": "National Dashboard for Priory Diseases (Viral Load, EID, Covid-19)",
-    "version": "3.2.0",
+    "version": "3.3.0",
     "type": "project",
     "keywords": [
         "viral load",
@@ -18,6 +18,7 @@
         "halaxa/json-machine": "^1.2",
         "laminas/laminas-db": "^2.22",
         "laminas/laminas-mvc": "^3.8",
+        "monolog/monolog": "^3.10",
         "php-di/php-di": "^7.1",
         "phpmyadmin/sql-parser": "^6.0",
         "phpoffice/phpspreadsheet": "^5.7",

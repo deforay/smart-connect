@@ -1,0 +1,83 @@
+<?php
+
+use Application\Session\Container;
+
+$sessionLogin = new Container('credo');
+$role = $sessionLogin->roleCode;
+$acl = $this->layout()->acl;
+$canDownload = $acl->isAllowed($role, 'Application\Controller\LogsController', 'download');
+
+$humanSize = function (int $bytes): string {
+	$units = ['B', 'KB', 'MB', 'GB'];
+	$unit = 0;
+	while ($bytes >= 1024 && $unit < count($units) - 1) {
+		$bytes /= 1024;
+		$unit++;
+	}
+	return round($bytes, $unit === 0 ? 0 : 1) . ' ' . $units[$unit];
+};
+?>
+<div class="page-bar">
+	<ul class="page-breadcrumb">
+		<li>
+			<a href="/"><?php echo $this->translate('Dashboard'); ?></a>
+			<i class="fa fa-circle"></i>
+		</li>
+		<li>
+			<?php echo $this->translate('Logs'); ?>
+		</li>
+	</ul>
+</div>
+<h3 class="page-title"></h3>
+<div class="row">
+	<div class="col-md-12">
+		<div class="portlet box blue">
+			<div class="portlet-title">
+				<div class="caption">
+					<i class="fa fa-file-text-o"></i><?php echo $this->translate('Log Files'); ?>
+				</div>
+			</div>
+			<div class="portlet-body">
+				<?php if ($files === []) { ?>
+					<div class="alert alert-info" style="margin-bottom:0;">
+						<?php echo $this->translate('No log files yet. One is created the first time the application logs something.'); ?>
+					</div>
+				<?php } else { ?>
+					<table class="table table-striped table-bordered table-hover">
+						<thead>
+							<tr>
+								<th style="width:45%;"><?php echo $this->translate('File'); ?></th>
+								<th style="width:15%;"><?php echo $this->translate('Size'); ?></th>
+								<th style="width:25%;"><?php echo $this->translate('Last Written'); ?></th>
+								<th style="width:15%;" class="center"><?php echo $this->translate('Action'); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php foreach ($files as $file) { ?>
+								<tr>
+									<td>
+										<a href="<?php echo $this->url('logs', ['action' => 'view']); ?>?file=<?php echo urlencode($file['name']); ?>">
+											<?php echo $this->escapeHtml($file['name']); ?>
+										</a>
+									</td>
+									<td><?php echo $humanSize($file['size']); ?></td>
+									<td><?php echo date('d-M-Y H:i:s', $file['modified']); ?></td>
+									<td class="center">
+										<a href="<?php echo $this->url('logs', ['action' => 'view']); ?>?file=<?php echo urlencode($file['name']); ?>" class="btn btn-primary btn-xs">
+											<?php echo $this->translate('View'); ?>
+										</a>
+										<?php if ($canDownload) { ?>
+											<a href="<?php echo $this->url('logs', ['action' => 'download']); ?>?file=<?php echo urlencode($file['name']); ?>" class="btn btn-default btn-xs">
+												<?php echo $this->translate('Download'); ?>
+											</a>
+										<?php } ?>
+									</td>
+								</tr>
+							<?php } ?>
+						</tbody>
+					</table>
+				<?php } ?>
+			</div>
+		</div>
+	</div>
+</div>

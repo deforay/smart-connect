@@ -206,6 +206,26 @@ return [
                     ],
                 ],
             ],
+            'client-error' => [
+                'type'    => 'segment',
+                'options' => [
+                    'route'    => '/client-error[/]',
+                    'defaults' => [
+                        'controller' => Controller\ClientErrorController::class,
+                        'action' => 'index',
+                    ],
+                ],
+            ],
+            'logs' => [
+                'type'    => 'segment',
+                'options' => [
+                    'route'    => '/logs[/][:action][/:id]',
+                    'defaults' => [
+                        'controller' => Controller\LogsController::class,
+                        'action' => 'index',
+                    ],
+                ],
+            ],
             'user-login-history' => [
                 'type'    => 'segment',
                 'options' => [
