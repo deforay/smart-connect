@@ -21,14 +21,39 @@ INSERT IGNORE INTO `dash_locale_details` (`locale_id`, `locale`, `display_name`,
 (3, 'en_CD', 'DRC - English', 'active');
 
 -- Amit 13 Sep 2018
+-- Taken from a running install. The definition inherited from data/alter.sql
+-- declared a varchar(1000) primary key, which needs 4000 bytes under utf8mb4
+-- and so exceeded InnoDB's 3072-byte index limit. No MySQL 8 server ever
+-- created this table from it. Existing installs never noticed, because
+-- IF NOT EXISTS skips a table that is already there. That old definition also
+-- named columns no install has: SampleTable joins patients.patient_code.
 CREATE TABLE IF NOT EXISTS `patients` (
-  `patient_art_no` varchar(1000) NOT NULL,
-  `first_name` varchar(1000) DEFAULT NULL,
-  `middle_name` varchar(1000) DEFAULT NULL,
-  `last_name` varchar(1000) DEFAULT NULL,
-  `skey` text,
-  PRIMARY KEY (`patient_art_no`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `system_patient_code` varchar(43) NOT NULL,
+  `is_encrypted` varchar(10) DEFAULT NULL,
+  `patient_code_prefix` varchar(256) DEFAULT NULL,
+  `patient_code_key` int DEFAULT NULL,
+  `patient_code` varchar(256) DEFAULT NULL,
+  `patient_first_name` text,
+  `patient_middle_name` text,
+  `patient_last_name` text,
+  `patient_gender` varchar(256) DEFAULT NULL,
+  `patient_phone_number` varchar(50) DEFAULT NULL,
+  `patient_age_in_years` int DEFAULT NULL,
+  `patient_age_in_months` int DEFAULT NULL,
+  `patient_dob` date DEFAULT NULL,
+  `patient_address` text,
+  `is_patient_pregnant` varchar(10) DEFAULT NULL,
+  `is_patient_breastfeeding` varchar(10) DEFAULT NULL,
+  `patient_province` int DEFAULT NULL,
+  `patient_district` int DEFAULT NULL,
+  `status` varchar(11) DEFAULT NULL,
+  `patient_registered_on` datetime DEFAULT NULL,
+  `patient_registered_by` text,
+  `updated_datetime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`system_patient_code`),
+  UNIQUE KEY `patient_code_prefix` (`patient_code_prefix`,`patient_code_key`),
+  UNIQUE KEY `single_patient` (`patient_code`,`patient_gender`,`patient_dob`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 
