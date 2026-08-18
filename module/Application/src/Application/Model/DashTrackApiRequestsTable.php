@@ -33,8 +33,8 @@ class DashTrackApiRequestsTable extends BaseTableGateway
     {
 
 
-        $aColumns = array('transaction_id', 'number_of_records', 'request_type', 'test_type', "api_url", "DATE_FORMAT(requested_on,'%d-%b-%Y')");
-        $orderColumns = array('transaction_id', 'number_of_records', 'request_type', 'test_type', 'api_url', 'requested_on');
+        $aColumns = array('transaction_id', 'number_of_records', 'request_type', 'test_type', 'outcome', "api_url", "DATE_FORMAT(requested_on,'%d-%b-%Y')");
+        $orderColumns = array('transaction_id', 'number_of_records', 'request_type', 'test_type', 'outcome', 'api_url', 'requested_on');
 
 
         $sLimit = "";
@@ -112,6 +112,16 @@ class DashTrackApiRequestsTable extends BaseTableGateway
         if (isset($parameters['testType']) && trim($parameters['testType']) != '') {
             $sQuery->where('a.test_type like "' . $parameters['testType'] . '"');
         }
+
+        // Bound and whitelisted. The filters above interpolate their values
+        // straight into the SQL, which is a real problem but an older one, and
+        // fixing it belongs in its own change rather than being widened here.
+        $outcome = trim((string) ($parameters['outcome'] ?? ''));
+        if ($outcome === 'failures') {
+            $sQuery->where(['a.outcome' => ['failed', 'partial']]);
+        } elseif (in_array($outcome, ['success', 'partial', 'failed'], true)) {
+            $sQuery->where(['a.outcome' => $outcome]);
+        }
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
         }
@@ -155,6 +165,7 @@ class DashTrackApiRequestsTable extends BaseTableGateway
             $row[] = $aRow['number_of_records'];
             $row[] = str_replace("-", " ", ($aRow['request_type']));
             $row[] = strtoupper($aRow['test_type']);
+            $row[] = $this->outcomeLabel($aRow);
             $row[] = $aRow['api_url'];
             $row[] = $common->humanReadableDateFormat($aRow['requested_on'], true);
             if ($view) {
@@ -165,7 +176,48 @@ class DashTrackApiRequestsTable extends BaseTableGateway
         return $output;
     }
 
-    public function addApiTracking($transactionId, $user, $numberOfRecords, $requestType, $testType, $url = null, $requestData = null, $responseData = null, $format = null, $labId = null)
+    /**
+     * The outcome column, as a coloured label carrying the HTTP status.
+     *
+     * Rows written before 3.2.0 have no outcome, and calling those a failure
+     * would be a lie, so they read as unknown.
+     */
+    private function outcomeLabel(array $row)
+    {
+        $outcome = $row['outcome'] ?? null;
+        $httpStatus = $row['http_status'] ?? null;
+
+        if (empty($outcome)) {
+            return '<span class="text-muted" title="Recorded before outcomes were tracked">&mdash;</span>';
+        }
+
+        $class = match ($outcome) {
+            'failed' => 'label-danger',
+            'partial' => 'label-warning',
+            'success' => 'label-success',
+            default => 'label-default',
+        };
+
+        $label = '<span class="label ' . $class . '">' . htmlspecialchars(strtoupper((string) $outcome), ENT_QUOTES) . '</span>';
+
+        if (!empty($httpStatus)) {
+            $label .= ' <small>' . htmlspecialchars((string) $httpStatus, ENT_QUOTES) . '</small>';
+        }
+
+        if (!empty($row['error_message'])) {
+            $label = '<span title="' . htmlspecialchars((string) $row['error_message'], ENT_QUOTES) . '">' . $label . '</span>';
+        }
+
+        return $label;
+    }
+
+    /**
+     * @param array $outcome Optional. Any of http_status, outcome,
+     *                       error_message, error_id, failed_records,
+     *                       duration_ms. Trailing and optional so the legacy
+     *                       call sites keep working unchanged.
+     */
+    public function addApiTracking($transactionId, $user, $numberOfRecords, $requestType, $testType, $url = null, $requestData = null, $responseData = null, $format = null, $labId = null, array $outcome = [])
     {
         try {
             $common = new CommonService();
@@ -200,6 +252,15 @@ class DashTrackApiRequestsTable extends BaseTableGateway
             if ($responseData !== null && $responseData !== '' && $responseData != '[]') {
                 $data['response_data'] = '/uploads/track-api/responses/' . $transactionId . '.json';
             }
+
+            // Whitelisted rather than merged wholesale, so a caller passing a
+            // stray key cannot turn the insert into a column error.
+            foreach (['http_status', 'outcome', 'error_message', 'error_id', 'failed_records', 'duration_ms'] as $column) {
+                if (isset($outcome[$column])) {
+                    $data[$column] = $outcome[$column];
+                }
+            }
+
             return $this->insert($data);
         } catch (Throwable $exc) {
             // $this->db does not exist on a TableGateway, so the old
