@@ -32,6 +32,8 @@ declare(strict_types=1);
  * Env:
  *   MIG_REPLACE_PK=1   force dropping/recreating differing primary keys
  *   MIG_VERBOSE=1      same as --verbose
+ *   MIG_NO_DEDUP=1     fail on duplicates that block a UNIQUE index, instead of
+ *                      quarantining them in <table>_dupes_<stamp>
  */
 
 chdir(dirname(__DIR__));
@@ -253,6 +255,19 @@ function unique_index_over_columns(Adapter $adapter, string $table, array $colum
 }
 
 /**
+ * The rows a UNIQUE index can actually reject.
+ *
+ * MySQL lets a UNIQUE index hold any number of rows whose indexed columns are
+ * NULL. Those rows never block the index, so counting them as duplicates fails
+ * a migration the data supports, and deduplicating them discards rows nothing
+ * was wrong with. Every duplicate query below carries this predicate.
+ */
+function unique_index_row_filter(array $columns): string
+{
+    return implode(' AND ', array_map(static fn($c) => "`{$c}` IS NOT NULL", $columns));
+}
+
+/**
  * Describe the rows that stop a UNIQUE index being created.
  *
  * MySQL reports one offending value and nothing else, which is not enough to
@@ -273,7 +288,8 @@ function unique_index_blockers(Adapter $adapter, string $table, array $columns):
     }
 
     $quoted = implode(', ', array_map(static fn($c) => "`{$c}`", $columns));
-    $grouped = "SELECT COUNT(*) AS copies FROM `{$table}`
+    $filter = unique_index_row_filter($columns);
+    $grouped = "SELECT COUNT(*) AS copies FROM `{$table}` WHERE {$filter}
                  GROUP BY {$quoted} HAVING COUNT(*) > 1";
 
     $groups = (int) fetch_scalar($adapter, "SELECT COUNT(*) FROM ({$grouped}) AS blocking");
@@ -287,7 +303,7 @@ function unique_index_blockers(Adapter $adapter, string $table, array $columns):
     );
     $examples = fetch_column(
         $adapter,
-        "SELECT CONCAT_WS(' + ', {$quoted}) FROM `{$table}`
+        "SELECT CONCAT_WS(' + ', {$quoted}) FROM `{$table}` WHERE {$filter}
           GROUP BY {$quoted} HAVING COUNT(*) > 1 LIMIT 3"
     );
 
@@ -297,6 +313,88 @@ function unique_index_blockers(Adapter $adapter, string $table, array $columns):
         $message .= ' For example: ' . implode(', ', array_map('strval', $examples)) . '.';
     }
     return $message;
+}
+
+/** One timestamp for the whole run, so a run's quarantine tables sort together. */
+function migration_run_stamp(): string
+{
+    static $stamp = null;
+    if ($stamp === null) {
+        $stamp = date('Ymd_His');
+    }
+    return $stamp;
+}
+
+/** The table's AUTO_INCREMENT primary key, or null when it has no single one. */
+function auto_increment_key(Adapter $adapter, string $table): ?string
+{
+    $pk = table_primary_key($adapter, $table);
+    if (count($pk) !== 1) {
+        return null;
+    }
+
+    $extra = (string) (fetch_scalar(
+        $adapter,
+        "SELECT EXTRA FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND COLUMN_NAME=? LIMIT 1",
+        [current_db($adapter), $table, $pk[0]]
+    ) ?? '');
+
+    return str_contains(strtolower($extra), 'auto_increment') ? $pk[0] : null;
+}
+
+/**
+ * Move the rows that block a UNIQUE index into a sibling table.
+ *
+ * Ingestion upserts on this very index, so until the index exists, each re-push
+ * from a laboratory lands as another row instead of updating the one already
+ * there. An installation old enough to predate the constraint therefore holds
+ * duplicates the application itself created. Fresh installations never do,
+ * because data/setup.sql adds the constraint before any data arrives.
+ *
+ * Clearing them by hand is one manual step per installation, and a country runs
+ * hundreds. So the migrator resolves them. The highest primary key of each
+ * repeated value stays, because an AUTO_INCREMENT key makes that the copy that
+ * arrived last. The rest move to `<table>_dupes_<stamp>` and the log names that
+ * table, so a discarded row is still readable after the upgrade.
+ *
+ * Return the quarantine table name, or null when no survivor can be chosen.
+ */
+function quarantine_duplicate_rows(Adapter $adapter, string $table, array $columns): ?string
+{
+    $key = auto_increment_key($adapter, $table);
+    if ($key === null) {
+        return null;
+    }
+
+    $quoted = implode(', ', array_map(static fn($c) => "`{$c}`", $columns));
+    $filter = unique_index_row_filter($columns);
+
+    // The derived table is what lets one statement read and write `$table`.
+    // MySQL rejects a subquery naming the table being deleted from unless the
+    // subquery is materialised first.
+    $survivors = "SELECT MAX(`{$key}`) AS keep FROM `{$table}` WHERE {$filter} GROUP BY {$quoted}";
+    $surplus = "{$filter} AND `{$key}` NOT IN (SELECT keep FROM ({$survivors}) AS survivors)";
+
+    $moved = (int) fetch_scalar($adapter, "SELECT COUNT(*) FROM `{$table}` WHERE {$surplus}");
+    if ($moved === 0) {
+        return null;
+    }
+
+    $suffix = '_dupes_' . migration_run_stamp();
+    $quarantine = substr($table, 0, 64 - strlen($suffix)) . $suffix;
+
+    // No indexes on the copy. The rows being archived are duplicates by
+    // definition, and a copied UNIQUE index would reject them on arrival.
+    run_sql($adapter, "CREATE TABLE IF NOT EXISTS `{$quarantine}` AS SELECT * FROM `{$table}` WHERE 1=0");
+    run_sql($adapter, "INSERT INTO `{$quarantine}` SELECT * FROM `{$table}` WHERE {$surplus}");
+    run_sql($adapter, "DELETE FROM `{$table}` WHERE {$surplus}");
+
+    $label = implode(' + ', $columns);
+    echo "  \033[33mDEDUP\033[0m {$table}: {$moved} surplus row(s) moved to `{$quarantine}`.\n";
+    echo "        Kept the highest {$key} of each repeated ({$label}).\n";
+
+    return $quarantine;
 }
 
 function add_index_if_missing(Adapter $adapter, string $table, string $index, string $ddl): int
@@ -317,10 +415,22 @@ function add_index_if_missing(Adapter $adapter, string $table, string $index, st
         // says how much is in the way without anyone querying the database.
         $blockers = unique_index_blockers($adapter, $table, $columns);
         if ($blockers !== null) {
-            throw new LaminasDbRuntimeException(
-                "cannot create unique index `{$index}`. {$blockers}"
-                . ' Resolve the duplicates, then run this again.'
-            );
+            if (getenv('MIG_NO_DEDUP')) {
+                throw new LaminasDbRuntimeException(
+                    "cannot create unique index `{$index}`. {$blockers}"
+                    . ' MIG_NO_DEDUP is set, so the duplicates were left alone.'
+                    . ' Resolve them, then run this again.'
+                );
+            }
+
+            if (quarantine_duplicate_rows($adapter, $table, $columns) === null) {
+                throw new LaminasDbRuntimeException(
+                    "cannot create unique index `{$index}`. {$blockers}"
+                    . " `{$table}` has no single AUTO_INCREMENT primary key, so the"
+                    . ' migrator cannot tell which copy arrived last.'
+                    . ' Resolve the duplicates, then run this again.'
+                );
+            }
         }
     }
 

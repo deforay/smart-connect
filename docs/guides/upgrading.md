@@ -106,6 +106,7 @@ A run can succeed and still print warnings that need acting on.
 | `custom.global.php was missing` | Fill in the SMTP settings, and check the enrollment key |
 | `global.php was missing. Copied the upstream one` | Check the DSN names this deployment's database |
 | `has settings this deployment does not` | The release added settings. The application uses its built-in defaults until you add them |
+| `DEDUP <table>: N surplus row(s) moved` | The installation held rows a unique index forbids. Read `<table>_dupes_<stamp>` to see which rows moved aside |
 | `Version check failed` | The database is not at the code's version. Run `php bin/migrate` again and read the error |
 | `still has a .git` | Harmless. The deploy ignores git, so that `HEAD` no longer describes the files on disk |
 
