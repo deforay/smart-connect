@@ -1,7 +1,7 @@
 {
     "name": "deforay/smart-connect",
     "description": "National Dashboard for Priory Diseases (Viral Load, EID, Covid-19)",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "type": "project",
     "keywords": [
         "viral load",
