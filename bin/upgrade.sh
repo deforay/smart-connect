@@ -568,6 +568,13 @@ upgrade_instance() {
         "$src_dir/" "$app_path/" 2>>"$log_file" ||
         { fail "rsync deploy failed for ${app_path}. See ${log_file}."; return 1; }
 
+    # sys/migrations holds nothing a deployment owns, so the release decides what
+    # is in it. The deploy above runs without --delete, so a migration renamed
+    # between releases would otherwise stay on disk beside its replacement, and
+    # bin/migrate would then apply the same schema twice.
+    rsync -a --delete "$src_dir/sys/migrations/" "$app_path/sys/migrations/" 2>>"$log_file" ||
+        { fail "Could not refresh sys/migrations in ${app_path}. See ${log_file}."; return 1; }
+
     say success "Source deployed. This deployment's config/autoload files were left untouched."
 
     # An instance can arrive here without one of the deployment-owned files.
