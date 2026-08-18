@@ -12,6 +12,11 @@ declare(strict_types=1);
  * field). Uses the Laminas Db Adapter so config merge, credentials, driver
  * options, and connection lifecycle stay consistent with the web app.
  *
+ * Every version bump in composer.json needs a migration file carrying that
+ * version, so db_version keeps pace with app_version. A release with no schema
+ * change still gets one. The file may be empty, and the migrator treats it as a
+ * version marker.
+ *
  * Uses PhpMyAdmin\SqlParser to split statements (handles triggers, string
  * literals containing semicolons, etc.) and routes common DDL through
  * idempotent helpers that check information_schema before executing, so
@@ -491,12 +496,26 @@ function read_global_config(Adapter $adapter, string $key): ?string
 /** Read the app version from composer.json. Single source of truth. */
 function read_app_version(): string
 {
-    $composer = dirname(__DIR__) . '/composer.json';
-    if (!is_readable($composer)) {
-        return '';
+    return \App\Version::app();
+}
+
+/**
+ * Warn when the app version has no migration file behind it.
+ *
+ * db_version tracks the highest migration file that ran, so it only reaches the
+ * app version if a file carries that version. A release with no schema change
+ * still needs a marker file, otherwise every dashboard footer reports drift
+ * that is not there.
+ */
+function warn_missing_version_marker(string $appVersion, string $dbVersion): void
+{
+    if ($appVersion === '' || $dbVersion === '' || version_compare($appVersion, $dbVersion, '<=')) {
+        return;
     }
-    $data = json_decode((string) file_get_contents($composer), true);
-    return is_array($data) ? (string) ($data['version'] ?? '') : '';
+    echo "\n  Warning: no migration carries version {$appVersion}, so the database\n";
+    echo "           stays at {$dbVersion} and the dashboard reports version drift.\n";
+    echo "           Add sys/migrations/{$appVersion}-<name>.sql. An empty file is\n";
+    echo "           enough when the release changes no schema.\n";
 }
 
 /* ---------------------- Main ---------------------- */
@@ -575,6 +594,7 @@ if (empty($pending)) {
             try {
                 stamp_global_config($adapter, VERSION_KEY_APP, $appVersion, 'Application Version');
                 echo "  Stamped app_version: {$appVersion}\n";
+                warn_missing_version_marker($appVersion, $dbVersion);
             } catch (Throwable $e) {
                 fwrite(STDERR, "Warning: could not persist app_version: {$e->getMessage()}\n");
             }
@@ -703,8 +723,12 @@ foreach ($pending as $m) {
     echo "\n";
 }
 
-$finalDbVersion = $lastVersion;
-$finalAppVersion = $lastVersion;
+// Only a clean run advances the recorded version. Reporting the version the
+// files carry, rather than the one that reached the database, is how a half
+// applied schema reads as a finished upgrade.
+$versionStamped = false;
+$finalDbVersion = $dbVersion;
+$finalAppVersion = $dbVersion;
 if (!$dryRun && $failed === 0) {
     $appVersion = read_app_version();
     if ($appVersion === '') {
@@ -713,7 +737,9 @@ if (!$dryRun && $failed === 0) {
     try {
         stamp_global_config($adapter, VERSION_KEY_DB, $lastVersion, 'Database Schema Version');
         stamp_global_config($adapter, VERSION_KEY_APP, $appVersion, 'Application Version');
+        $finalDbVersion = $lastVersion;
         $finalAppVersion = $appVersion;
+        $versionStamped = true;
     } catch (Throwable $e) {
         fwrite(STDERR, "Warning: could not persist version: {$e->getMessage()}\n");
     }
@@ -722,11 +748,14 @@ if (!$dryRun && $failed === 0) {
 echo str_repeat('─', 50) . "\n";
 if ($dryRun) {
     echo "  DRY RUN — no changes made\n";
-} else {
+} elseif ($versionStamped) {
     echo "  DB version:   {$dbVersion} -> {$finalDbVersion}\n";
     if ($finalAppVersion !== $finalDbVersion) {
         echo "  App version:  {$finalAppVersion}\n";
+        warn_missing_version_marker($finalAppVersion, $finalDbVersion);
     }
+} else {
+    echo "  DB version:   {$dbVersion} (unchanged)\n";
 }
 echo "  Files run:    {$totalFiles}\n";
 echo "  Statements:   {$totalStatements}\n";
@@ -737,5 +766,11 @@ if (!$dryRun) {
     echo "  Failed:       {$failed}\n";
 }
 echo str_repeat('─', 50) . "\n";
+
+if (!$dryRun && $failed > 0) {
+    echo "\nThe version was not advanced, because {$failed} statement(s) failed. The\n";
+    echo "schema is part way between {$dbVersion} and {$lastVersion}. Fix the errors above\n";
+    echo "and run this again.\n";
+}
 
 exit($failed > 0 ? 1 : 0);

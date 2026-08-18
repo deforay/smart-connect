@@ -6,7 +6,7 @@ This guide covers finding out who still calls the legacy endpoints, and setting 
 
 ## Prerequisites
 
-- Smart Connect 1.2.0 or above
+- Smart Connect 3.1.0 or above
 - Shell access to the Smart Connect server
 - Write access to `config/autoload/custom.global.php`
 

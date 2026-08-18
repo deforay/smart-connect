@@ -1,4 +1,4 @@
--- 1.0.0-baseline: snapshot of data/alter.sql at the point the migrator was
+-- 3.0.0-baseline: snapshot of data/alter.sql at the point the migrator was
 -- introduced (Jul 2026). Existing installs re-run this harmlessly: the
 -- migrator routes DDL through idempotent handlers and the seed INSERTs are
 -- INSERT IGNORE. New schema changes go into new sys/migrations/X.Y.Z-*.sql

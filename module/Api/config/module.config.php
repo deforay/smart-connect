@@ -121,7 +121,7 @@ return array(
                     ),
                 ),
             ),
-            // /api/receiver/{vl,eid,covid19} removed in 1.2.0: the controllers
+            // /api/receiver/{vl,eid,covid19} removed in 3.1.0: the controllers
             // called saveVLDataFromAPI() / saveEidDataFromAPI() /
             // saveCovid19DataFromAPI(), none of which exist, so every request
             // to them was a fatal. They have no v2 equivalent.

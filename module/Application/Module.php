@@ -82,7 +82,9 @@ class Module
 	}
 	public function onBootstrap(MvcEvent $e)
 	{
-		define("APP_VERSION", "3.1");
+		// composer.json holds the version. Keeping the constant derived from it
+		// stops the footer and the migrator from drifting apart.
+		define("APP_VERSION", \App\Version::app());
 
 		/**
 		 * @var \Laminas\Mvc\Application $application
@@ -931,7 +933,8 @@ class Module
 	{
 		return [
 			'invokables' => [
-				'humanReadableDateFormat' => 'Application\View\Helper\HumanReadableDateFormat'
+				'humanReadableDateFormat' => 'Application\View\Helper\HumanReadableDateFormat',
+				'deployedRef' => 'Application\View\Helper\DeployedRef'
 			],
 			'factories' => [
 				'GetLocaleData' => new class {

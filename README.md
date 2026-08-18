@@ -149,12 +149,23 @@ Schema changes live in `sys/migrations/` as plain SQL files named
 `X.Y.Z-description.sql` and are applied with `php bin/migrate`. The current
 schema version is tracked in the `dash_global_config` table (`db_version`).
 
+The version in `composer.json` is the single source of truth. `bin/migrate`
+stamps it into `dash_global_config` as `app_version`, and the footer renders it
+through the `APP_VERSION` constant. Every version bump needs a migration file
+carrying that version, so `db_version` keeps pace. A release with no schema
+change still gets one, and an empty file is enough.
+
 ```sh
 php bin/migrate              # run pending migrations
 php bin/migrate --status     # show current version and pending files
 php bin/migrate --dry-run    # preview statements without executing
 php bin/migrate --verbose    # also print benign skips
+php bin/check-version-sync   # is the schema at the version the code expects?
 ```
+
+`bin/check-version-sync` exits non-zero when the two versions differ.
+`bin/upgrade.sh` runs it after every migration, and the footer shows the same
+mismatch as a warning next to the version.
 
 Migrations are safe to re-run: common DDL is routed through idempotent
 handlers that check `information_schema` first, and benign errors (duplicate

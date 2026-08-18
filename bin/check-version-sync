@@ -1,0 +1,88 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Verify that the database schema matches the code that is running.
+ *
+ * bin/upgrade.sh runs migrations, but a migration can fail to apply in full: a
+ * bad statement, an aborted run, a schema that drifted by hand. The install
+ * then serves an older schema than the code expects, with nothing to show for
+ * it until a query hits a missing column. This makes that state explicit at the
+ * end of an upgrade.
+ *
+ * Compares composer.json's version against dash_global_config.db_version, which
+ * bin/migrate stamps from the highest migration file that ran.
+ *
+ * Exit codes:
+ *   0  in sync
+ *   1  could not determine (no database, or no version stamped)
+ *   2  code ahead of the database, so migrations are pending or failed
+ *   3  database ahead of the code, so the deployed code is too old
+ */
+
+chdir(dirname(__DIR__));
+require 'vendor/autoload.php';
+
+use App\Version;
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Mvc\Service\ServiceManagerConfig;
+use Laminas\ServiceManager\ServiceManager;
+use Laminas\Stdlib\ArrayUtils;
+
+if (PHP_SAPI !== 'cli') {
+    exit(1);
+}
+
+$appVersion = Version::app();
+if ($appVersion === '') {
+    fwrite(STDERR, "Could not read the version from composer.json.\n");
+    exit(1);
+}
+
+// Same boot as bin/migrate: load modules for config and services, but never
+// bootstrap the MVC application, whose listeners read config tables.
+$appConfig = require 'config/application.config.php';
+if (file_exists('config/development.config.php')) {
+    $appConfig = ArrayUtils::merge($appConfig, require 'config/development.config.php');
+}
+$serviceManager = new ServiceManager();
+(new ServiceManagerConfig($appConfig['service_manager'] ?? []))->configureServiceManager($serviceManager);
+$serviceManager->setService('ApplicationConfig', $appConfig);
+$serviceManager->get('ModuleManager')->loadModules();
+
+try {
+    /** @var Adapter $adapter */
+    $adapter = $serviceManager->get(Adapter::class);
+    $result = $adapter->query(
+        "SELECT `value` FROM dash_global_config WHERE `name` = 'db_version' LIMIT 1",
+        Adapter::QUERY_MODE_EXECUTE
+    )->toArray();
+} catch (Throwable $e) {
+    fwrite(STDERR, "Could not read the schema version: {$e->getMessage()}\n");
+    exit(1);
+}
+
+$dbVersion = trim((string) ($result[0]['value'] ?? ''));
+if ($dbVersion === '') {
+    fwrite(STDERR, "No schema version recorded in dash_global_config. Run: php bin/migrate\n");
+    exit(1);
+}
+
+$comparison = version_compare($appVersion, $dbVersion);
+
+if ($comparison === 0) {
+    echo "Version in sync: {$appVersion}\n";
+    exit(0);
+}
+
+if ($comparison > 0) {
+    echo "VERSION MISMATCH: the code is at {$appVersion} but the database is at {$dbVersion}.\n";
+    echo "Migrations did not fully apply. Re-run php bin/migrate and read the output.\n";
+    exit(2);
+}
+
+echo "VERSION MISMATCH: the database is at {$dbVersion} but the code is at {$appVersion}.\n";
+echo "The deployed code is older than the schema. Deploy the matching code.\n";
+exit(3);

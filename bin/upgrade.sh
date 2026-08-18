@@ -651,16 +651,17 @@ upgrade_instance() {
     as_web php bin/migrate 2>&1 | tee -a "$log_file" ||
         { fail "Migrations failed for ${app_path}. See ${log_file}."; return 1; }
 
-    # --status is the confirmation that the schema reached the code's version. A
-    # migration run can report progress and still leave work pending.
-    local status_output
-    status_output="$(as_web php bin/migrate --status 2>&1)"
-    printf '%s\n' "$status_output" | tee -a "$log_file"
+    # A migration run can report progress and still leave the schema behind the
+    # code. Confirm the two versions match rather than trusting the run.
+    print info "Verifying the schema version..."
+    local version_output version_status
+    version_output="$(as_web php bin/check-version-sync 2>&1)" && version_status=0 || version_status=$?
+    printf '%s\n' "$version_output" | tee -a "$log_file"
 
-    if printf '%s' "$status_output" | grep -qF "up to date"; then
+    if [ "$version_status" -eq 0 ]; then
         say success "Schema is at the version this code expects."
     else
-        say warning "Migrations still pending. Re-run: (cd ${app_path} && sudo -u ${web_user} php bin/migrate)"
+        say warning "Version check failed for ${app_path}. Re-run: (cd ${app_path} && sudo -u ${web_user} php bin/migrate)"
     fi
 
     # --- permissions --------------------------------------------------------
@@ -679,7 +680,7 @@ upgrade_instance() {
     chmod -R u+rwX,g+rwX "$app_path/data" "$app_path/backup" "$app_path/temporary" \
         "$app_path/public/temporary" "$app_path/public/uploads"
     chmod +x "$app_path/cron.sh" "$app_path/bin/migrate" "$app_path/bin/console" \
-        "$app_path/bin/upgrade.sh" 2>/dev/null
+        "$app_path/bin/check-version-sync" "$app_path/bin/upgrade.sh" 2>/dev/null
 
     say success "Ownership set to ${web_user} and runtime directories made writable."
 

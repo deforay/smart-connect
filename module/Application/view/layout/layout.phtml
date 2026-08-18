@@ -627,7 +627,24 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\ApiSyncHistory
 
             <a href="javascript:void(0);" onclick="clearCache();" style="font-size:8px;cursor:pointer;color:#fff;">Clear
                 Cache</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php echo $this->translate("This project is supported by the U.S. President's Emergency Plan for AIDS Relief (PEPFAR) through the U.S.Centers for Disease Control and Prevention (CDC)."); ?>
-            | ver. <?php echo APP_VERSION; ?>
+            | ver. <?php echo $this->escapeHtml(APP_VERSION); ?>
+            <?php $deployedRef = $this->deployedRef();
+            if (!empty($deployedRef)) { ?>
+                <span title="<?php echo $this->translate("Deployed ref"); ?>">(<?php echo $this->escapeHtml($deployedRef); ?>)</span>
+            <?php }
+            // A partly applied migration leaves the schema behind the code and
+            // stays invisible until a query hits a missing column. Say so here
+            // instead, where whoever ran the upgrade sees it.
+            $dbVersion = $config['db_version'] ?? '';
+            if ($dbVersion !== '' && APP_VERSION !== '' && version_compare(APP_VERSION, $dbVersion, '!=')) {
+                $versionDrift = version_compare(APP_VERSION, $dbVersion, '>')
+                    ? $this->translate("database not fully migrated")
+                    : $this->translate("code older than database"); ?>
+                <span style="color:#f3c200;font-weight:bold;margin-left:8px;"
+                    title="<?php echo $this->translate("App version"); ?>: <?php echo $this->escapeHtml(APP_VERSION); ?> &middot; <?php echo $this->translate("DB version"); ?>: <?php echo $this->escapeHtml($dbVersion); ?>">
+                    &#9888; <?php echo $this->translate("DB ver."); ?> <?php echo $this->escapeHtml($dbVersion); ?> (<?php echo $versionDrift; ?>)
+                </span>
+            <?php } ?>
         </div>
         <div class="scroll-to-top">
             <i class="icon-arrow-up"></i>

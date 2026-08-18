@@ -6,7 +6,7 @@ The LIS enrolls itself. Nobody issues it a token by hand. A country runs hundred
 
 ## Prerequisites
 
-- Smart Connect 1.2.0 or above, reachable over HTTPS from the laboratory
+- Smart Connect 3.1.0 or above, reachable over HTTPS from the laboratory
 - InteLIS with the Smart Connect sync scripts in `bin/smart-connect/`
 - Shell access to the Smart Connect server
 - Database access to the Smart Connect database, to run `bin/console`

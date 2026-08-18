@@ -20,7 +20,7 @@
     deployment does not have to invent one.
 
     For what actually shipped, see the [API reference](../api/index.md).
-    The one-time cutover runbook for the pre-1.2.0 endpoints is
+    The one-time cutover runbook for the pre-3.1.0 endpoints is
     [Retire the legacy API](retiring-the-legacy-api.md).
 
 ## Context
@@ -104,7 +104,7 @@ src/
     ReceiveVlHandler.php  ReceiveEidHandler.php  ReceiveCovid19Handler.php
     WeblimsVlHandler.php  ImportVlHandler.php  SourceDataHandler.php
     MetadataHandler.php  FacilitiesHandler.php
-sys/migrations/1.2.0-api-v2.sql   dash_api_clients table (idempotent DDL)
+sys/migrations/3.1.0-api-v2.sql   dash_api_clients table (idempotent DDL)
 docs/api-v2.md                    endpoint reference for LIS integrators
 ```
 
@@ -120,10 +120,10 @@ docs/api-v2.md                    endpoint reference for LIS integrators
 
 ### Phase 2 — enrollment + auth
 
-1. Migration `1.2.0-api-v2.sql`: `dash_api_clients`
+1. Migration `3.1.0-api-v2.sql`: `dash_api_clients`
    (`client_id` PK, `lab_id`/`facility_id`, `instance_uuid`, `token_hash` unique, `label`,
    `status` enum pending/active/revoked, `enrolled_on`, `last_seen`, `enrolled_ip`).
-   Bump composer.json version to 1.2.0.
+   Bump composer.json version to 3.1.0.
 2. Config keys in `config/autoload/custom.global.php` (+ `.dist`):
    `api.enrollment_key` (null disables enrollment), `api.require_enrollment_approval` (bool,
    default false), `api.legacy_sunset` (date|null).

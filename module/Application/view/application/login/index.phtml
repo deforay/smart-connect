@@ -127,7 +127,7 @@ $csrfToken = CommonService::generateCSRF();
 
         <!-- END REGISTRATION FORM -->
     </div>
-    <p style="text-align:center;color:#ddd;position:static;bottom:0;"><?php echo $this->translate("This project is supported by the U.S. President's Emergency Plan for AIDS Relief (PEPFAR) through the U.S.Centers for Disease Control and Prevention (CDC)."); ?> | ver. <?php echo APP_VERSION; ?></p>
+    <p style="text-align:center;color:#ddd;position:static;bottom:0;"><?php echo $this->translate("This project is supported by the U.S. President's Emergency Plan for AIDS Relief (PEPFAR) through the U.S.Centers for Disease Control and Prevention (CDC)."); ?> | ver. <?php echo $this->escapeHtml(APP_VERSION); ?></p>
     <!--<div class="copyright"> </div>-->
     <!--[if lt IE 9]>
 	<script src="<?php echo $this->basePath('assets/global/plugins/respond.min.js'); ?>"></script>

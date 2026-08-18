@@ -1,7 +1,7 @@
 {
     "name": "deforay/smart-connect",
     "description": "National Dashboard for Priory Diseases (Viral Load, EID, Covid-19)",
-    "version": "1.2.0",
+    "version": "3.1.0",
     "type": "project",
     "keywords": [
         "viral load",
@@ -46,6 +46,7 @@
         "housekeeping": "@php bin/console housekeeping",
         "backup": "@php vendor/bin/db-tools backup",
         "migrate": "@php bin/migrate",
+        "check-version": "@php bin/check-version-sync",
         "cron": "crunz schedule:run",
         "cron-list": "crunz schedule:list",
         "post-install-cmd": "@clear-config-cache",
@@ -53,6 +54,7 @@
         "post-update": [
             "php bin/generate-enrollment-key.php || true",
             "php bin/migrate || true",
+            "php bin/check-version-sync || true",
             "php bin/console housekeeping || true"
         ],
         "refresh": [
@@ -70,6 +72,7 @@
         "housekeeping": "Housekeeping — remove old temporary files, uploads, cache files and stale DB rows.",
         "backup": "Back up the database to backup/db using the credentials in config/autoload. Restore with: php vendor/bin/db-tools restore backup/db/NAME.sql.zst",
         "migrate": "Run pending database migrations from sys/migrations (see bin/migrate --help comments for flags).",
+        "check-version": "Check that the schema version in the database matches the version in composer.json. Exits non-zero when they differ.",
         "cron": "Run due scheduled tasks (crunz). Meant to be called every minute from the crontab.",
         "cron-list": "List the scheduled tasks defined in sys/cron.",
         "test": "Run unit tests."

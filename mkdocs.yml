@@ -53,7 +53,7 @@ nav:
 
 # docs/internal holds material written for whoever maintains Smart Connect
 # itself: the original build plan, and the one-time runbook for retiring the
-# pre-1.2.0 endpoints. Country teams operate the dashboard and connect
+# pre-3.1.0 endpoints. Country teams operate the dashboard and connect
 # laboratories to it. They never used the endpoints being retired, so that
 # history is noise on the published site.
 not_in_nav: |

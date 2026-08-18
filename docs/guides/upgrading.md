@@ -90,10 +90,12 @@ The run ends with a summary listing every installation it upgraded and every one
 Confirm the schema reached the version the new code expects:
 
 ```bash
-cd /var/www/smart-connect && sudo -u www-data php bin/migrate --status
+cd /var/www/smart-connect && sudo -u www-data php bin/check-version-sync
 ```
 
-Then open the dashboard in a browser and log in.
+The command prints `Version in sync` and exits 0 when the code and the database agree. Any other output means the migrations did not fully apply. Run `php bin/migrate` again and read the output.
+
+Then open the dashboard in a browser and log in. The footer names the version, and in brackets the ref the installation was deployed from. Quote both when reporting a problem. A warning next to them means the database is behind the code, which is the same fault `bin/check-version-sync` reports.
 
 ## Read the warnings
 
@@ -105,7 +107,7 @@ A run can succeed and still print warnings that need acting on.
 | `custom.global.php was missing` | Fill in the SMTP settings, and check the enrollment key |
 | `global.php was missing. Copied the upstream one` | Check the DSN names this deployment's database |
 | `has settings this deployment does not` | The release added settings. The application uses its built-in defaults until you add them |
-| `Migrations still pending` | Run `php bin/migrate` again and read the error |
+| `Version check failed` | The database is not at the code's version. Run `php bin/migrate` again and read the error |
 | `still has a .git` | Harmless. The deploy ignores git, so that `HEAD` no longer describes the files on disk |
 
 ## When an upgrade fails
