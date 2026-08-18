@@ -11,10 +11,11 @@ foreach ($requestType as $key => $value) {
 $sessionLogin = new Container('credo');
 $role = $sessionLogin->roleCode;
 $acl=$this->layout()->acl;
+// One entry per visible column, in the order the model builds the row.
 if ($acl->isAllowed($role, 'Application\Controller\ApiSyncHistoryController', 'show-params')) {
-    $action = '{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center","bSortable":false}';
+    $action = '{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center","bSortable":false}';
 }else{
-    $action = '{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"}';
+    $action = '{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"},{"sClass":"center"}';
 }
 
 ?>
@@ -83,6 +84,18 @@ if ($acl->isAllowed($role, 'Application\Controller\ApiSyncHistoryController', 's
 												<?php echo $common->generateSelectOptions($requestTypeOption, null, '--Select--'); ?>
 											</select>
 										</td>
+										<td style="width:10%;"><strong>
+											<?php echo $this->translate("Outcome"); ?>&nbsp;:
+											</strong></td>
+										<td style="width:20%;">
+											<select id="outcome" name="outcome" class="form-control" title="<?php echo $this->translate('Filter by how the call ended'); ?>">
+												<option value=""><?php echo $this->translate("-- All --"); ?></option>
+												<option value="failures"><?php echo $this->translate("Failures only"); ?></option>
+												<option value="failed"><?php echo $this->translate("Failed"); ?></option>
+												<option value="partial"><?php echo $this->translate("Partial"); ?></option>
+												<option value="success"><?php echo $this->translate("Success"); ?></option>
+											</select>
+										</td>
 										<td style="width:10%;"><button onclick="oTable.fnDraw();" value="Search" class="btn btn-primary btn-sm"><span>
 													<?php echo $this->translate("Search"); ?>
 												</span></button></td>
@@ -100,6 +113,7 @@ if ($acl->isAllowed($role, 'Application\Controller\ApiSyncHistoryController', 's
 								<th style="width:15%;"><?php echo $this->translate('Number of Records Synced'); ?></th>
 								<th style="width:15%;"><?php echo $this->translate('Sync Type'); ?></th>
 								<th style="width:10%;"><?php echo $this->translate('Test Type'); ?></th>
+								<th style="width:10%;"><?php echo $this->translate('Outcome'); ?></th>
 								<th style="width:15%;"><?php echo $this->translate('URL'); ?></th>
 								<th style="width:15%;"><?php echo $this->translate('Synced On'); ?></th>
 								<?php if ($acl->isAllowed($role, 'Application\Controller\ApiSyncHistoryController', 'show-params')) { ?>
@@ -109,7 +123,7 @@ if ($acl->isAllowed($role, 'Application\Controller\ApiSyncHistoryController', 's
 						</thead>
 						<tbody>
 							<tr>
-								<td colspan="7" class="dataTables_empty">Loading data from server</td>
+								<td colspan="8" class="dataTables_empty">Loading data from server</td>
 							</tr>
 						</tbody>
 					</table>
@@ -168,8 +182,10 @@ if ($acl->isAllowed($role, 'Application\Controller\ApiSyncHistoryController', 's
 				],
 				"firstDay": 1
 			},
-			//"startDate": "11/08/2015",
-			//"endDate": "11/14/2015",
+			// The table holds a year of calls. Opening on all of them makes the
+			// first page slow and tells nobody anything, so start at a month.
+			"startDate": moment().subtract(29, 'days'),
+			"endDate": moment(),
 			opens: "left",
 		}, function(start, end, label) {
 			$('#daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
@@ -195,6 +211,10 @@ if ($acl->isAllowed($role, 'Application\Controller\ApiSyncHistoryController', 's
 				aoData.push({
 					"name": "syncedType",
 					"value": $("#syncedType").val()
+				});
+				aoData.push({
+					"name": "outcome",
+					"value": $("#outcome").val()
 				});
 				$.ajax({
 					"dataType": 'json',

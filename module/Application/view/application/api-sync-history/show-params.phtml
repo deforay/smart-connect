@@ -29,6 +29,34 @@ $response = $common->getJsonFromZip($folder . DIRECTORY_SEPARATOR . 'responses' 
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
+        <?php
+        // The response JSON is below in a tab, but a failure is the reason
+        // anyone opened this window, so it goes above the fold.
+        $outcome = $result['outcome'] ?? null;
+        if (!empty($outcome) && $outcome !== 'success') { ?>
+            <div class="alert <?php echo $outcome === 'partial' ? 'alert-warning' : 'alert-danger'; ?>" style="margin-bottom:10px;">
+                <strong><?php echo $this->escapeHtml(strtoupper((string) $outcome)); ?></strong>
+                <?php if (!empty($result['http_status'])) { ?>
+                    &middot; HTTP <?php echo $this->escapeHtml((string) $result['http_status']); ?>
+                <?php }
+                if (!empty($result['failed_records'])) { ?>
+                    &middot; <?php echo $this->escapeHtml((string) $result['failed_records']); ?> <?php echo $this->translate("record(s) not imported"); ?>
+                <?php }
+                if (!empty($result['duration_ms'])) { ?>
+                    &middot; <?php echo $this->escapeHtml((string) $result['duration_ms']); ?> ms
+                <?php }
+                if (!empty($result['error_message'])) { ?>
+                    <div style="margin-top:6px;"><?php echo $this->escapeHtml((string) $result['error_message']); ?></div>
+                <?php }
+                // Matches the "[api-v2] error_id=..." line in the PHP error log.
+                if (!empty($result['error_id'])) { ?>
+                    <div style="margin-top:6px;">
+                        <?php echo $this->translate("Error ID"); ?>:
+                        <code><?php echo $this->escapeHtml((string) $result['error_id']); ?></code>
+                    </div>
+                <?php } ?>
+            </div>
+        <?php } ?>
         <div class="bs-example bs-example-tabs">
             <div class="tab">
                 <ul id="myTab" class="nav nav-tabs" style="font-size:1.4em;">

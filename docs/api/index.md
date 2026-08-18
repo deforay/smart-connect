@@ -1,6 +1,6 @@
 # Smart Connect API v2 reference
 
-Describes Smart Connect 3.1.0.
+Describes Smart Connect 3.2.0.
 
 Base path: `/api/v2`. All responses use `Content-Type: application/json`.
 

@@ -4,6 +4,16 @@ Records from a laboratory have stopped arriving, or never arrived. This guide fi
 
 Work through the four checks in order. Each one narrows the problem to a single stage, and the sections below cover what to do at each stage.
 
+## Start at the API history screen
+
+Open **API History** in the dashboard and set **Outcome** to `Failures only`. Every call the API rejected appears there, with the HTTP status and the reason.
+
+The screen answers most of what follows without a shell. It records calls that never got past authentication, calls to endpoints that do not exist, and calls where the handler failed. Set the date range to cover when the laboratory says the problem started.
+
+Use the shell checks below when the screen shows nothing, which means the laboratory is not reaching the server at all.
+
+The screen keeps a year of calls. The payloads behind **Show Params** are pruned sooner, at 120 days or 1000 MB of stored payloads, whichever comes first. The reason a call failed is stored on the call itself, so it outlives its payload.
+
 ## Prerequisites
 
 - Shell access to the Smart Connect server
@@ -97,7 +107,9 @@ Any row here is a cloned InteLIS installation. Give one of them a fresh `vlsm_in
 
 `dash_api_receiver_stats` records both counts per sync. A `status` of `partial` means some rows failed to store while the rest succeeded.
 
-A row is counted as failed only when storing it raises a database error. Those errors go to the PHP error log rather than back to the laboratory, so read them there. Use `received_on` from the query above to find the right point in the log.
+Find the call in **API History**. Its outcome reads `PARTIAL`, and **Show Params** names the records that did not store.
+
+A row is counted as failed only when storing it raises a database error. The error itself goes to the PHP error log rather than back to the laboratory, so read it there for the reason. Use `received_on` from the query above to find the right point in the log.
 
 ```bash
 grep -i 'SQLSTATE\|dash_form' /var/log/apache2/error.log | tail -20
@@ -121,7 +133,7 @@ php bin/console rebuild-snapshots
 
 ## The laboratory reports an API error
 
-Match the message the laboratory received.
+Match the message the laboratory received. Every message below is also recorded in **API History**, so the laboratory does not have to quote it accurately.
 
 | Message | HTTP | What to do |
 | --- | --- | --- |
@@ -138,7 +150,11 @@ Match the message the laboratory received.
 
 ## Trace a 500 with its error_id
 
-Every 500 response carries an `error_id`, and the same value is written to the PHP error log with the failure behind it. Ask the laboratory for the value, then search the log.
+Every 500 response carries an `error_id`. The same value is stored against the call in **API History**, and written to the PHP error log with the failure behind it.
+
+Filter **API History** to `Failures only` and open the call. The banner shows the `error_id` without anyone having to ask the laboratory for it.
+
+To read the failure itself, search the log for that value.
 
 ```bash
 grep 'error_id=9f2c1a7b4e01d3a5' /var/log/apache2/error.log
