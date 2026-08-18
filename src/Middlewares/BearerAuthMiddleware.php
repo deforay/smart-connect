@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Middlewares;
 
+use App\Api\CallContext;
 use App\Http\ApiResponse;
 use App\Services\EnrollmentService;
 use App\Services\LaminasBridge;
@@ -36,7 +37,8 @@ final class BearerAuthMiddleware implements MiddlewareInterface
         private readonly ResponseFactoryInterface $responseFactory,
         private readonly EnrollmentService $enrollment,
         private readonly LaminasBridge $bridge,
-        private readonly array $accepts = ['client']
+        private readonly array $accepts = ['client'],
+        private readonly ?CallContext $context = null
     ) {
     }
 
@@ -53,6 +55,10 @@ final class BearerAuthMiddleware implements MiddlewareInterface
         if ($principal === null) {
             return $this->unauthorized('Invalid or revoked token');
         }
+
+        // Recorded even when the type is wrong, because "who was turned away" is
+        // the question a 403 in the log raises.
+        $this->context?->setPrincipal($principal);
 
         if (!in_array($principal['type'], $this->accepts, true)) {
             return ApiResponse::error(

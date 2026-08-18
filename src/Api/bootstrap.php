@@ -14,6 +14,7 @@ declare(strict_types=1);
  * the caller.
  */
 
+use App\Api\CallContext;
 use App\HttpHandlers\V2\AuthLoginHandler;
 use App\HttpHandlers\V2\EnrollHandler;
 use App\HttpHandlers\V2\FacilitiesHandler;
@@ -60,19 +61,26 @@ return static function (string $basePath = ''): void {
             (bool) $c->get(LaminasBridge::class)->configValue('api.debug', false)
         ),
 
+        // One per request, and the container is built per request, so the
+        // tracking middleware can read what the auth middleware learned without
+        // either of them knowing about the other.
+        CallContext::class => static fn(): CallContext => new CallContext(),
+
         // Two configurations of the same middleware, one per audience. Routes
         // reference them by these names.
         'auth.client' => static fn(ContainerInterface $c): BearerAuthMiddleware => new BearerAuthMiddleware(
             $c->get(ResponseFactoryInterface::class),
             $c->get(EnrollmentService::class),
             $c->get(LaminasBridge::class),
-            ['client']
+            ['client'],
+            $c->get(CallContext::class)
         ),
         'auth.user' => static fn(ContainerInterface $c): BearerAuthMiddleware => new BearerAuthMiddleware(
             $c->get(ResponseFactoryInterface::class),
             $c->get(EnrollmentService::class),
             $c->get(LaminasBridge::class),
-            ['user']
+            ['user'],
+            $c->get(CallContext::class)
         ),
 
         RequestTrackingMiddleware::class => autowire(),
@@ -99,10 +107,8 @@ return static function (string $basePath = ''): void {
         $app->setBasePath($basePath);
     }
 
-    $tracking = RequestTrackingMiddleware::class;
-
     // Not a static closure: Slim binds route-group callables to the container.
-    $app->group('/api/v2', function (RouteCollectorProxy $group) use ($tracking): void {
+    $app->group('/api/v2', function (RouteCollectorProxy $group): void {
         // Open: the capability probe LIS clients use to decide between v2 and
         // the legacy paths, so it cannot require a token.
         $group->get('/health', HealthHandler::class);
@@ -114,22 +120,27 @@ return static function (string $basePath = ''): void {
         $group->post('/auth/login', AuthLoginHandler::class);
 
         // LIS ingestion — an enrolled lab client pushing data up.
-        $group->post('/vl', ReceiveVlHandler::class)->add($tracking)->add('auth.client');
-        $group->post('/eid', ReceiveEidHandler::class)->add($tracking)->add('auth.client');
-        $group->post('/covid19', ReceiveCovid19Handler::class)->add($tracking)->add('auth.client');
-        $group->post('/vl/weblims', WeblimsVlHandler::class)->add($tracking)->add('auth.client');
-        $group->post('/vl/import', ImportVlHandler::class)->add($tracking)->add('auth.client');
-        $group->post('/metadata', MetadataHandler::class)->add($tracking)->add('auth.client');
+        $group->post('/vl', ReceiveVlHandler::class)->add('auth.client');
+        $group->post('/eid', ReceiveEidHandler::class)->add('auth.client');
+        $group->post('/covid19', ReceiveCovid19Handler::class)->add('auth.client');
+        $group->post('/vl/weblims', WeblimsVlHandler::class)->add('auth.client');
+        $group->post('/vl/import', ImportVlHandler::class)->add('auth.client');
+        $group->post('/metadata', MetadataHandler::class)->add('auth.client');
 
         // Read-out endpoints — a human-issued api user (dash_users, role 6).
-        $group->post('/vl/source-data', SourceDataHandler::class)->add($tracking)->add('auth.user');
-        $group->post('/facilities', FacilitiesHandler::class)->add($tracking)->add('auth.user');
+        $group->post('/vl/source-data', SourceDataHandler::class)->add('auth.user');
+        $group->post('/facilities', FacilitiesHandler::class)->add('auth.user');
     });
 
     // Added last, so it runs first and nothing escapes as HTML or a stack trace.
     $app->addBodyParsingMiddleware();
     $app->addRoutingMiddleware();
     $app->add(ApiErrorMiddleware::class);
+
+    // Outside the error middleware, so the response it records is the one the
+    // caller received: the 401 from auth, the 404 from routing, or the 500
+    // ApiErrorMiddleware built out of an exception.
+    $app->add(RequestTrackingMiddleware::class);
 
     $app->run();
 };
