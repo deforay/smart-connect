@@ -181,8 +181,11 @@ class DashTrackApiRequestsTable extends BaseTableGateway
      *
      * Rows written before 3.2.0 have no outcome, and calling those a failure
      * would be a lie, so they read as unknown.
+     *
+     * @param array|\ArrayAccess $row A row as the result set yields it, which
+     *                                is an ArrayObject rather than an array.
      */
-    private function outcomeLabel(array $row)
+    private function outcomeLabel($row)
     {
         $outcome = $row['outcome'] ?? null;
         $httpStatus = $row['http_status'] ?? null;
