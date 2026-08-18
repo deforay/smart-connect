@@ -168,12 +168,21 @@ class EidSampleService
             'lab_id'                        => $labId ?? $data['lab_id'],
             'status'                        => $status
         );
+        // The LIS advances its sync watermark only when it reads back
+        // 'success' (vlsm bin/smart-connect/eid.php). Saying 'partial' there
+        // would make it resend the same window on every run when the rejected
+        // rows can never import, so a partial stays a success on the wire and
+        // shows as partial in the API history instead.
         $response =  array(
-            'status'    => 'success',
+            'status'    => $status === 'failed' ? 'failed' : 'success',
             'message'   => $numRows . ' uploaded successfully',
         );
         $apiTrackDb->insert($apiTrackData);
-        $trackApiDb->addApiTracking(CommonService::generateUUID(), 1, $numRows, 'weblims-eid', 'eid', $_SERVER['REQUEST_URI'], $apiData, $response, 'json', $labId ?? $data['lab_id']);
+        $trackApiDb->addApiTracking(CommonService::generateUUID(), 1, $numRows, 'weblims-eid', 'eid', $_SERVER['REQUEST_URI'], $apiData, $response, 'json', $labId ?? $data['lab_id'], [
+            'http_status' => 200,
+            'outcome' => $status,
+            'failed_records' => max(0, $counter - $numRows),
+        ]);
         return $response;
     }
 

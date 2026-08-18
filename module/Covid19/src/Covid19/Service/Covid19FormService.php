@@ -127,18 +127,41 @@ class Covid19FormService
             );
 
             $apiTrackDb->insert($apiTrackData);
+
+            // The LIS advances its sync watermark only when it reads back
+            // 'success' (vlsm bin/smart-connect/covid19.php). Saying 'partial'
+            // there would make it resend the same window on every run when the
+            // rejected rows can never import, so a partial stays a success on
+            // the wire and shows as partial in the API history instead.
             $response = array(
-                'status'    => 'success',
+                'status'    => $status === 'failed' ? 'failed' : 'success',
                 'message'   => $numRows . ' uploaded successfully',
             );
 
-            $trackApiDb->addApiTracking($common->generateUUID(), 1, $numRows, 'weblims-covid19', 'covid19', $_SERVER['REQUEST_URI'], $apiData, $response, 'json', $labId ?? $data['lab_id']);
+            $trackApiDb->addApiTracking($common->generateUUID(), 1, $numRows, 'weblims-covid19', 'covid19', $_SERVER['REQUEST_URI'], $apiData, $response, 'json', $labId ?? $data['lab_id'], [
+                'http_status' => 200,
+                'outcome' => $status,
+                'failed_records' => max(0, $counter - $numRows),
+            ]);
         } catch (Exception $exc) {
             if (is_readable($fileName)) {
                 unlink($fileName);
             }
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
+
+            // Recorded here too. Without this the calls worth looking at are
+            // exactly the ones the API history never hears about.
+            try {
+                $trackApiDb->addApiTracking(CommonService::generateUUID(), 1, 0, 'weblims-covid19', 'covid19', $_SERVER['REQUEST_URI'] ?? null, $apiData ?? null, ['status' => 'error'], 'json', $labId ?? ($data['lab_id'] ?? null), [
+                    'http_status' => 500,
+                    'outcome' => 'failed',
+                    'error_message' => $exc->getMessage(),
+                ]);
+            } catch (\Throwable $trackingFailure) {
+                error_log('[weblims-covid19] tracking the failure failed: ' . $trackingFailure->getMessage());
+            }
+
             return array(
                 'status'    => 'error'
             );

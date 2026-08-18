@@ -1899,10 +1899,34 @@ class SampleService
                 $status = 'failed';
             }
         }
+
+        // Which records were rejected, not just how many. A count on its own
+        // tells whoever reads the API history that something went wrong and
+        // nothing about what to do next.
+        $rejected = [];
+        foreach ($failedImports as $sampleIds) {
+            foreach ((array) $sampleIds as $sampleId) {
+                $rejected[] = $sampleId;
+            }
+        }
+        $rejected = array_values(array_unique($rejected));
+
+        // The LIS advances its sync watermark only when it reads back
+        // 'success' (vlsm bin/smart-connect/vl.php). Saying 'partial' there
+        // would make it resend the same window on every run, forever, whenever
+        // the rejected rows can never import. So a partial stays a success on
+        // the wire and shows as partial in the API history instead. A total
+        // failure does report failed, because then the window genuinely does
+        // need sending again.
         $response = array(
-            'status'    => 'success',
-            'message'   => 'Received ' . $counter . ' records.'
+            'status'    => $status === 'failed' ? 'failed' : 'success',
+            'message'   => $rejected === []
+                ? 'Received ' . $counter . ' records.'
+                : 'Received ' . $counter . ' records, ' . count($rejected) . ' not imported.'
         );
+        if ($rejected !== []) {
+            $response['failed_records'] = $rejected;
+        }
 
         // Track API Records
         $timestampData =  Items::fromString($params, [
@@ -1921,7 +1945,12 @@ class SampleService
         );
         $apiTrackDb->insert($apiTrackData);
         $common = new CommonService();
-        $trackApiDb->addApiTracking($common->generateUUID(), 1, $counter, 'weblims-vl', 'vl', $_SERVER['REQUEST_URI'], $params, $response, 'json', $data['lab_id']);
+        $trackApiDb->addApiTracking($common->generateUUID(), 1, $counter, 'weblims-vl', 'vl', $_SERVER['REQUEST_URI'], $params, $response, 'json', $data['lab_id'], [
+            'http_status' => 202,
+            'outcome' => $status,
+            'failed_records' => count($rejected),
+            'error_message' => $rejected === [] ? null : 'Not imported: ' . implode(', ', array_slice($rejected, 0, 50)),
+        ]);
 
         return $response;
     }
