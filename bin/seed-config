@@ -1,0 +1,93 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Create the deployment-owned config files that git cannot deliver.
+ *
+ * config/autoload/local.php and config/autoload/custom.global.php hold the
+ * database credentials, the SMTP settings and the API enrollment key, so both
+ * are gitignored. A fresh clone therefore has neither, and an instance updated
+ * by hand with `git pull` never receives them.
+ *
+ * The application still boots without custom.global.php. It loses the whole
+ * 'defaults' and 'api' config blocks, and the only symptom is an undefined-key
+ * warning from whichever page reads one first. bin/generate-enrollment-key.php
+ * then refuses to run, which makes the API v2 enrollment impossible on an
+ * install nobody noticed was misconfigured.
+ *
+ * bin/upgrade.sh already seeds both files through its seed_from_dist(). This
+ * covers the other two ways an install arrives at the same state: a fresh
+ * `composer install`, and a `composer post-update` after a hand-managed pull.
+ *
+ * Idempotent. An existing file is never read, rewritten or overwritten, so this
+ * is safe on a configured production install and safe to run repeatedly.
+ *
+ * Exit codes:
+ *   0  every file is present, whether it was seeded now or already there
+ *   1  a file was missing and could not be copied
+ */
+
+chdir(dirname(__DIR__));
+
+if (PHP_SAPI !== 'cli') {
+    exit(1);
+}
+
+/** target => [template, what the reader still has to fill in] */
+const SEEDS = [
+    'config/autoload/local.php' => [
+        'config/autoload/local.php.dist',
+        'Set the database username and password in it.',
+    ],
+    'config/autoload/custom.global.php' => [
+        'config/autoload/custom.global.dist.php',
+        'SMTP settings are empty in it.',
+    ],
+];
+
+$failed = false;
+
+foreach (SEEDS as $target => [$template, $note]) {
+    if (is_file($target)) {
+        continue;
+    }
+
+    if (!is_file($template)) {
+        fwrite(STDERR, "ERROR: $target is missing and its template $template is not there either.\n");
+        $failed = true;
+        continue;
+    }
+
+    /**
+     * Copy to a temporary name and rename into place. A half-written
+     * local.php read by a concurrent request takes down the application, and
+     * rename() within one directory is atomic.
+     */
+    $temporaryPath = $target . '.tmp-' . bin2hex(random_bytes(4));
+
+    if (!copy($template, $temporaryPath)) {
+        fwrite(STDERR, "ERROR: could not copy $template to $temporaryPath\n");
+        $failed = true;
+        continue;
+    }
+
+    // Match the template's permissions. These files hold credentials, so a
+    // world-readable copy is worth avoiding on a shared host.
+    $mode = fileperms($template);
+    if ($mode !== false) {
+        chmod($temporaryPath, $mode & 0777);
+    }
+
+    if (!rename($temporaryPath, $target)) {
+        unlink($temporaryPath);
+        fwrite(STDERR, "ERROR: could not put $target in place\n");
+        $failed = true;
+        continue;
+    }
+
+    fwrite(STDOUT, "$target was missing. Copied it from $template. $note\n");
+}
+
+exit($failed ? 1 : 0);

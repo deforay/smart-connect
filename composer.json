@@ -41,6 +41,7 @@
     },
     "scripts": {
         "clear-config-cache": "php bin/clear-config-cache.php",
+        "seed-config": "@php bin/seed-config",
         "generate-enrollment-key": "@php bin/generate-enrollment-key.php",
         "cs-check": "vendor/bin/phpcs",
         "cs-fix": "vendor/bin/phpcbf",
@@ -50,9 +51,16 @@
         "check-version": "@php bin/check-version-sync",
         "cron": "crunz schedule:run",
         "cron-list": "crunz schedule:list",
-        "post-install-cmd": "@clear-config-cache",
-        "post-update-cmd": "@clear-config-cache",
+        "post-install-cmd": [
+            "@seed-config",
+            "@clear-config-cache"
+        ],
+        "post-update-cmd": [
+            "@seed-config",
+            "@clear-config-cache"
+        ],
         "post-update": [
+            "php bin/seed-config || true",
             "php bin/generate-enrollment-key.php || true",
             "php bin/migrate || true",
             "php bin/check-version-sync || true",
@@ -67,6 +75,7 @@
     },
     "scripts-descriptions": {
         "clear-config-cache": "Clears merged config cache. Required for config changes to be applied.",
+        "seed-config": "Create config/autoload/local.php and custom.global.php from their templates when they are absent. Idempotent; an existing file is never touched.",
         "generate-enrollment-key": "Generate the API v2 enrollment key if one is not already set. Idempotent; --show prints the current key, --force rotates it.",
         "cs-check": "Run coding standards checks.",
         "cs-fix": "Automatically fix coding standard issues.",
