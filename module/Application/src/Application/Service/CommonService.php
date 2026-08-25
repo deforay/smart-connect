@@ -636,6 +636,41 @@ class CommonService
                return strtotime($remoteLastModified) > strtotime($localLastModified);
           };
 
+          // The sender spells this table 'risk'; the table here has always been
+          // named 'rick'. Without the alias the block below never matches, and
+          // hepatitis risk factors sync as a silent no-op on every run.
+          if (is_object($apiData) && isset($apiData->r_hepatitis_risk_factors) && !isset($apiData->r_hepatitis_rick_factors)) {
+               $apiData->r_hepatitis_rick_factors = $apiData->r_hepatitis_risk_factors;
+               unset($apiData->r_hepatitis_risk_factors);
+          }
+
+          // Every table this method knows how to write. A table the sender
+          // includes that is missing from this list has no block below, and used
+          // to be dropped without a word — leaving the sender to read the
+          // resulting 'success' as confirmation the rows had been stored.
+          $handledTables = [
+               'geographical_divisions',
+               'facility_details',
+               'instruments',
+               'instrument_machines',
+               'r_vl_sample_type',
+               'r_vl_test_reasons',
+               'r_vl_art_regimen',
+               'r_vl_sample_rejection_reasons',
+               'r_eid_sample_type',
+               'r_eid_sample_rejection_reasons',
+               'r_covid19_sample_type',
+               'r_covid19_test_reasons',
+               'r_covid19_sample_rejection_reasons',
+               'r_covid19_comorbidities',
+               'r_covid19_symptoms',
+               'r_hepatitis_sample_type',
+               'r_hepatitis_results',
+               'r_hepatitis_test_reasons',
+               'r_hepatitis_rick_factors',
+               'r_hepatitis_sample_rejection_reasons',
+          ];
+
           $syncErrors = [];
 
           /* For update the location details */
@@ -922,6 +957,46 @@ class CommonService
                }
           }
 
+          /* For update the Instrument Details */
+          if (isset($apiData->instruments) && !empty($apiData->instruments)) {
+               try {
+                    $remoteLastModified = $apiData->instruments->lastModifiedTime ?? null;
+                    if ($shouldSync('instruments', $remoteLastModified)) {
+                         $instrumentTemplate = $this->getTableFieldsAsArray('instruments');
+                         foreach ((array)$apiData->instruments->tableData as $row) {
+                              $instrumentData = self::updateMatchingKeysOnly($instrumentTemplate, (array)$row);
+                              // supported_tests, approved_by and reviewed_by are JSON columns and
+                              // arrive decoded. Handing the decoded value to the driver binds an
+                              // array, which is not something MySQL can store.
+                              foreach ($instrumentData as $column => $value) {
+                                   if (is_array($value) || is_object($value)) {
+                                        $instrumentData[$column] = json_encode($value);
+                                   }
+                              }
+                              self::upsert($dbAdapter, 'instruments', $instrumentData);
+                         }
+                    }
+               } catch (Throwable $e) {
+                    $syncErrors['instruments'] = $e->getMessage();
+               }
+          }
+
+          /* For update the VL Sample Type Details */
+          if (isset($apiData->r_vl_sample_type) && !empty($apiData->r_vl_sample_type)) {
+               try {
+                    $remoteLastModified = $apiData->r_vl_sample_type->lastModifiedTime ?? null;
+                    if ($shouldSync('r_vl_sample_type', $remoteLastModified)) {
+                         $vlSampleTypeTemplate = $this->getTableFieldsAsArray('r_vl_sample_type');
+                         foreach ((array)$apiData->r_vl_sample_type->tableData as $row) {
+                              $vlSampleTypeData = self::updateMatchingKeysOnly($vlSampleTypeTemplate, (array)$row);
+                              self::upsert($dbAdapter, 'r_vl_sample_type', $vlSampleTypeData);
+                         }
+                    }
+               } catch (Throwable $e) {
+                    $syncErrors['r_vl_sample_type'] = $e->getMessage();
+               }
+          }
+
           /* For update the EID Sample Type Details */
           if (isset($apiData->r_eid_sample_type) && !empty($apiData->r_eid_sample_type)) {
                try {
@@ -1164,7 +1239,25 @@ class CommonService
                     $syncErrors['r_hepatitis_sample_type'] = $e->getMessage();
                }
           }
-          if ($fileName) {
+
+          // Report anything that arrived with rows but has no block above, so a
+          // table this dashboard cannot store is never mistaken for one it did.
+          if (is_object($apiData)) {
+               foreach (get_object_vars($apiData) as $tableName => $tablePayload) {
+                    if ($tableName === 'forceSync' || in_array($tableName, $handledTables, true)) {
+                         continue;
+                    }
+                    if (empty($tablePayload) || empty($tablePayload->tableData)) {
+                         continue;
+                    }
+                    $syncErrors[$tableName] = 'This dashboard has no handler for this table, so its rows were not stored.';
+               }
+          }
+
+          // file_exists guard: a failed upload leaves $fileName set to a path
+          // that was never created, and the warning that unlink then raises is
+          // written into the response body, where it corrupts the JSON.
+          if ($fileName && file_exists($fileName)) {
                unlink($fileName);
           }
 
