@@ -2,6 +2,8 @@
 
 Open source national dashboard for priority diseases (Viral Load, EID, COVID-19).
 
+![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue)
+
 ## Documentation
 
 Full documentation is at <https://deforay.github.io/smart-connect/>, built from
@@ -172,6 +174,16 @@ handlers that check `information_schema` first, and benign errors (duplicate
 column/key, already-dropped objects) are downgraded to warnings.
 
 `data/alter.sql` is frozen — new schema changes go into `sys/migrations/`.
+
+## Funding and partners
+
+Smart Connect is developed with funding from the United States Government (USG). Over the years, the project has benefited from the support and collaboration of partners including the African Society for Laboratory Medicine (ASLM), the American Society for Microbiology (ASM), the African Field Epidemiology Network (AFENET), Emory University, and the Maryland Global Initiatives Corporation (MGIC), among others.
+
+## License
+
+Smart Connect is free and open-source software released under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+
+Read the full text in [LICENSE.md](LICENSE.md).
 
 ## Who do I talk to?
 

@@ -3,6 +3,7 @@
     "description": "National Dashboard for Priory Diseases (Viral Load, EID, Covid-19)",
     "version": "3.3.0",
     "type": "project",
+    "license": "AGPL-3.0-or-later",
     "keywords": [
         "viral load",
         "eid",
