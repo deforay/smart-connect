@@ -59,7 +59,7 @@ class EidSampleTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $queryStr = $queryStr->where("(sample_collection_date is not null AND sample_collection_date not like '')
-                                        AND DATE(sample_collection_date) BETWEEN '$startMonth'AND '$endMonth' ");
+                                        AND sample_collection_date BETWEEN '$startMonth 00:00:00' AND '$endMonth 23:59:59' ");
         }
 
         $queryStr = $sql->buildSqlString($queryStr);
@@ -104,7 +104,7 @@ class EidSampleTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $sQuery = $sQuery->where("sample_collection_date is not null
-                                        AND DATE(sample_collection_date) BETWEEN '$startMonth' AND '$endMonth'");
+                                        AND sample_collection_date BETWEEN '$startMonth 00:00:00' AND '$endMonth 23:59:59'");
         }
         $queryStr = $sql->buildSqlString($sQuery);
 
@@ -231,8 +231,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -272,8 +272,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -403,8 +403,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -446,8 +446,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -579,8 +579,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(sample_collection_date is not null)
-                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -618,8 +618,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null)
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -691,8 +691,8 @@ class EidSampleTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $sQuery = $sQuery->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
@@ -809,8 +809,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null)
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -849,8 +849,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null)
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -975,8 +975,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null)
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -1015,8 +1015,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null)
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1146,8 +1146,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null)
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -1189,8 +1189,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null)
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1246,8 +1246,8 @@ class EidSampleTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $mostRejectionQuery = $mostRejectionQuery->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $mostRejectionQueryStr = $sql->buildSqlString($mostRejectionQuery);
         $mostRejectionResult = $dbAdapter->query($mostRejectionQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1291,8 +1291,8 @@ class EidSampleTable extends AbstractTableGateway
                     $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
                     $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
                     $rejectionQuery = $rejectionQuery->where("(sample_collection_date is not null)
-                                                AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                                AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                                AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                                AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
                 }
                 if ($mostRejectionReasons[$m] == 0) {
                     $rejectionQuery = $rejectionQuery->where('eid.reason_for_sample_rejection is not null and eid.reason_for_sample_rejection!= "" and eid.reason_for_sample_rejection NOT IN("' . implode('", "', $mostRejectionReasons) . '")');
@@ -1403,8 +1403,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null)
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -1443,8 +1443,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null)
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1559,8 +1559,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -1599,8 +1599,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1717,8 +1717,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -1758,8 +1758,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
-                        AND DATE(eid.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
+                        AND eid.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND eid.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1824,8 +1824,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         $queryContainer->indicatorSummaryQuery = $samplesReceivedSummaryQuery;
@@ -1879,8 +1879,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $eidOutcomesQuery = $eidOutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         $eidOutcomesQueryStr = $sql->buildSqlString($eidOutcomesQuery);
@@ -1938,8 +1938,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $eidOutcomesQuery = $eidOutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         $eidOutcomesQueryStr = $sql->buildSqlString($eidOutcomesQuery);
@@ -2010,8 +2010,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $eidOutcomesQuery = $eidOutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         $eidOutcomesQueryStr = $sql->buildSqlString($eidOutcomesQuery);
@@ -2107,7 +2107,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         if (trim($params['daterange']) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
-                $receivedQuery = $receivedQuery->where(array("DATE(eid.sample_collection_date) <='$splitDate[1]'", "DATE(eid.sample_collection_date) >='$splitDate[0]'"));
+                $receivedQuery = $receivedQuery->where(array("eid.sample_collection_date <= '$splitDate[1] 23:59:59'", "eid.sample_collection_date >= '$splitDate[0] 00:00:00'"));
             }
         } else {
             $receivedQuery = $receivedQuery->where("DATE(sample_collection_date) IN ($qDates)");
@@ -2139,7 +2139,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         if (trim($params['daterange']) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
-                $testedQuery = $testedQuery->where(array("DATE(eid.sample_tested_datetime) <='$splitDate[1]'", "DATE(eid.sample_tested_datetime) >='$splitDate[0]'"));
+                $testedQuery = $testedQuery->where(array("eid.sample_tested_datetime <= '$splitDate[1] 23:59:59'", "eid.sample_tested_datetime >= '$splitDate[0] 00:00:00'"));
             }
         } else {
             $testedQuery = $testedQuery->where("DATE(sample_tested_datetime) IN ($qDates)");
@@ -2170,7 +2170,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         if (trim($params['daterange']) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
-                $rejectedQuery = $rejectedQuery->where(array("DATE(eid.sample_collection_date) <='$splitDate[1]'", "DATE(eid.sample_collection_date) >='$splitDate[0]'"));
+                $rejectedQuery = $rejectedQuery->where(array("eid.sample_collection_date <= '$splitDate[1] 23:59:59'", "eid.sample_collection_date >= '$splitDate[0] 00:00:00'"));
             }
         } else {
             $rejectedQuery = $rejectedQuery->where("DATE(sample_collection_date) IN ($qDates)");
@@ -2211,7 +2211,7 @@ class EidSampleTable extends AbstractTableGateway
                                                                                 ELSE 0 END)"),
                     $this->translator->translate("Total No. of Devices") => new Expression("SUM(CASE WHEN ((icm.poc_device = 'yes')) THEN 1
                                                                                 ELSE 0 END)"),
-                    $this->translator->translate("No. of Devices online in last 7 days") => new Expression("SUM(CASE WHEN ((icm.poc_device = 'yes' AND DATE(sample_tested_datetime) > '" . $lastSevenDay . "')) THEN 1
+                    $this->translator->translate("No. of Devices online in last 7 days") => new Expression("SUM(CASE WHEN ((icm.poc_device = 'yes' AND sample_tested_datetime > '" . $lastSevenDay . " 00:00:00')) THEN 1
                                                                                 ELSE 0 END)"),
                     // $this->translator->translate("Sex Missing") => new Expression("SUM(CASE
                     //                                                                 WHEN ((child_gender IS NULL OR child_gender ='' OR child_gender ='unreported' OR child_gender ='Unreported')) THEN 1
@@ -2277,7 +2277,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         if (trim($params['daterange']) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
-                $receivedQuery = $receivedQuery->where(array("DATE(eid.sample_collection_date) <='$splitDate[1]'", "DATE(eid.sample_collection_date) >='$splitDate[0]'"));
+                $receivedQuery = $receivedQuery->where(array("eid.sample_collection_date <= '$splitDate[1] 23:59:59'", "eid.sample_collection_date >= '$splitDate[0] 00:00:00'"));
             }
         } else {
             $receivedQuery = $receivedQuery->where("DATE(sample_collection_date) IN ($qDates)");
@@ -2309,7 +2309,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         if (trim($params['daterange']) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
-                $testedQuery = $testedQuery->where(array("DATE(eid.sample_tested_datetime) <='$splitDate[1]'", "DATE(eid.sample_tested_datetime) >='$splitDate[0]'"));
+                $testedQuery = $testedQuery->where(array("eid.sample_tested_datetime <= '$splitDate[1] 23:59:59'", "eid.sample_tested_datetime >= '$splitDate[0] 00:00:00'"));
             }
         } else {
             $testedQuery = $testedQuery->where("DATE(sample_tested_datetime) IN ($qDates)");
@@ -2340,7 +2340,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         if (trim($params['daterange']) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
-                $rejectedQuery = $rejectedQuery->where(array("DATE(eid.sample_collection_date) <='$splitDate[1]'", "DATE(eid.sample_collection_date) >='$splitDate[0]'"));
+                $rejectedQuery = $rejectedQuery->where(array("eid.sample_collection_date <= '$splitDate[1] 23:59:59'", "eid.sample_collection_date >= '$splitDate[0] 00:00:00'"));
             }
         } else {
             $rejectedQuery = $rejectedQuery->where("DATE(sample_collection_date) IN ($qDates)");
@@ -2466,8 +2466,8 @@ class EidSampleTable extends AbstractTableGateway
             }
             $queryStr = $queryStr->where("
                         (sample_collection_date is not null AND sample_collection_date not like '')
-                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
 
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));
             $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));
@@ -2618,7 +2618,7 @@ class EidSampleTable extends AbstractTableGateway
             $query->where->addPredicate(new WhereExpression(
                 "(vl.sample_tested_datetime IS NOT NULL AND vl.sample_tested_datetime != '' AND DATE(vl.sample_tested_datetime) NOT IN ('1970-01-01', '0000-00-00'))"
             ));
-            $query->where->addPredicate(new WhereExpression("DATE(vl.sample_tested_datetime) BETWEEN '$startMonth' AND '$endMonth'"));
+            $query->where->addPredicate(new WhereExpression("vl.sample_tested_datetime BETWEEN '$startMonth 00:00:00' AND '$endMonth 23:59:59'"));
             $query->where->addPredicate(new WhereExpression("DATEDIFF(sample_tested_datetime, sample_collection_date) BETWEEN 0 AND $skipDays"));
 
             if (!empty($facilityIdList)) {
@@ -3814,7 +3814,7 @@ class EidSampleTable extends AbstractTableGateway
                     )
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array(), 'left')
-                ->where(array("DATE(vl.sample_collection_date) <='$endMonth'", "DATE(vl.sample_collection_date) >='$startMonth'"));
+                ->where(array("vl.sample_collection_date <= '$endMonth 23:59:59'", "vl.sample_collection_date >= '$startMonth 00:00:00'"));
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $sQuery = $sQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
             } elseif ($loginContainer->role != 1) {
@@ -3918,8 +3918,8 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where(
                 "
                                         (sample_collection_date is not null AND sample_collection_date not like '')
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'"
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'"
             );
 
             if (isset($params['lab']) && trim($params['lab']) != '') {
@@ -4560,8 +4560,8 @@ class EidSampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $eidOutcomesQuery = $eidOutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         $facilityIdList = [];
@@ -4613,8 +4613,8 @@ class EidSampleTable extends AbstractTableGateway
             ))
                 ->join(array('f' => 'facility_details'), 'f.facility_id=eid.lab_id', array('facility_name'))
                 ->where("(sample_collection_date is not null)
-                                    AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                    AND DATE(sample_collection_date) <= '" . $endMonth . "'")
+                                    AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                    AND sample_collection_date <= '" . $endMonth . " 23:59:59'")
                 ->group(array("lab_id", new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")))
                 ->order(array("lab_id", new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")));
 
@@ -4685,7 +4685,7 @@ class EidSampleTable extends AbstractTableGateway
                         "negative" => new Expression("SUM(CASE WHEN ((vl.result like 'negative%' OR vl.result like 'Negative%')) THEN 1 ELSE 0 END)"),
                     )
                 );
-            $squery = $squery->where(array("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'"));
+            $squery = $squery->where(array("vl.sample_collection_date BETWEEN '$startDate 00:00:00' AND '$endDate 23:59:59'"));
 
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $squery = $squery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
@@ -4772,7 +4772,7 @@ class EidSampleTable extends AbstractTableGateway
                         "nsnegative" => new Expression("SUM(CASE WHEN ((vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded' OR vl.child_gender = 'Unreported' OR vl.child_gender = 'unreported') and (vl.result like 'negative%' OR vl.result like 'Negative%' )) THEN 1 ELSE 0 END)"),
                     ]
                 )
-                ->where(new WhereExpression("DATE(vl.sample_collection_date BETWEEN ? AND ? ", [$startDate, $endDate]));
+                ->where(new WhereExpression("vl.sample_collection_date BETWEEN ? AND ? ", [$startDate . ' 00:00:00', $endDate . ' 23:59:59']));
 
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $clinicIds = explode(',', $params['clinicId']);
@@ -4937,7 +4937,7 @@ class EidSampleTable extends AbstractTableGateway
             $rQuery = $sql->select()->from(array('vl' => $this->table))
                 ->columns(array('total' => new Expression('COUNT(*)'), 'monthDate' => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%M-%Y')")))
                 ->join(array('tr' => 'r_eid_test_reasons'), 'tr.test_reason_id=vl.reason_for_eid_test', array('test_reason_name'))
-                ->where(new WhereExpression("DATE(vl.sample_collection_date) >= ? AND DATE(vl.sample_collection_date) <= ? ", [$startDate, $endDate]))
+                ->where(new WhereExpression("vl.sample_collection_date >= ? AND vl.sample_collection_date <= ? ", [$startDate . ' 00:00:00', $endDate . ' 23:59:59']))
                 //->where('vl.facility_id !=0')
                 //->where('vl.reason_for_eid_test="'.$reason['test_reason_id'].'"');
                 ->group('tr.test_reason_id');
@@ -5036,7 +5036,7 @@ class EidSampleTable extends AbstractTableGateway
                         "negative" => new Expression("SUM(CASE WHEN (vl.specimen_type IN(?) AND (vl.result like 'suppressed%' OR vl.result like 'Suppressed%' )) THEN 1 ELSE 0 END)", [$samples]),
                     ]
                 )->join(['st' => 'r_eid_sample_type'], 'vl.specimen_type=st.sample_id', ['sample_name'])
-                ->where(new WhereExpression('DATE(vl.sample_collection_date) BETWEEN ? AND ?', [$startDate, $endDate]));
+                ->where(new WhereExpression('vl.sample_collection_date BETWEEN ? AND ?', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']));
 
 
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
@@ -5196,7 +5196,7 @@ class EidSampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
             ->join(array('r_r_r' => 'r_eid_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
-            $sQuery = $sQuery->where(new WhereExpression("DATE(vl.sample_collection_date) >= ? AND DATE(vl.sample_collection_date) <= ? ", [$startDate, $endDate]));
+            $sQuery = $sQuery->where(new WhereExpression("vl.sample_collection_date >= ? AND vl.sample_collection_date <= ? ", [$startDate . ' 00:00:00', $endDate . ' 23:59:59']));
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
             $sQuery = $sQuery->where(new WhereExpression('vl.facility_id IN ( ? )', [$parameters['clinicId']]));
@@ -5293,7 +5293,7 @@ class EidSampleTable extends AbstractTableGateway
             $iQuery = $iQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
-            $sQuery = $sQuery->where(array("DATE(vl.sample_collection_date) >='$startDate'", "DATE(vl.sample_collection_date) <='$endDate'"));
+            $sQuery = $sQuery->where(array("vl.sample_collection_date >= '$startDate 00:00:00'", "vl.sample_collection_date <= '$endDate 23:59:59'"));
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -5374,7 +5374,7 @@ class EidSampleTable extends AbstractTableGateway
             ->order('total DESC');
         if (trim($params['daterange']) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
-                $lQuery = $lQuery->where(array("DATE(eid.sample_collection_date) <='$splitDate[1]'", "DATE(eid.sample_collection_date) >='$splitDate[0]'"));
+                $lQuery = $lQuery->where(array("eid.sample_collection_date <= '$splitDate[1] 23:59:59'", "eid.sample_collection_date >= '$splitDate[0] 00:00:00'"));
             }
         } else {
             $lQuery = $lQuery->where("DATE(sample_collection_date) IN ($qDates)");
@@ -5440,7 +5440,7 @@ class EidSampleTable extends AbstractTableGateway
 
         if (trim($params['daterange']) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
-                $lQuery = $lQuery->where(array("DATE(eid.sample_collection_date) <='$splitDate[1]'", "DATE(eid.sample_collection_date) >='$splitDate[0]'"));
+                $lQuery = $lQuery->where(array("eid.sample_collection_date <= '$splitDate[1] 23:59:59'", "eid.sample_collection_date >= '$splitDate[0] 00:00:00'"));
             }
         } else {
             $lQuery = $lQuery->where("DATE(sample_collection_date) IN ($qDates)");

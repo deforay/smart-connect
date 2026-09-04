@@ -59,8 +59,8 @@ class Covid19FormTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $queryStr = $queryStr->where("(sample_collection_date is not null AND sample_collection_date not like '')
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         $queryStr = $sql->buildSqlString($queryStr);
@@ -103,8 +103,8 @@ class Covid19FormTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $sQuery = $sQuery->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
 
@@ -226,8 +226,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(sample_collection_date is not null)
-                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -265,8 +265,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -397,8 +397,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -438,8 +438,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -565,8 +565,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -608,8 +608,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -673,8 +673,8 @@ class Covid19FormTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $sQuery = $sQuery->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $sQuery = $sQuery->order(array(new Expression('DATE(sample_collection_date)')));
         $queryStr = $sql->buildSqlString($sQuery);
@@ -792,8 +792,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -832,8 +832,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -958,8 +958,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -998,8 +998,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1129,8 +1129,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -1172,8 +1172,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1229,8 +1229,8 @@ class Covid19FormTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $mostRejectionQuery = $mostRejectionQuery->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $mostRejectionQueryStr = $sql->buildSqlString($mostRejectionQuery);
         $mostRejectionResult = $dbAdapter->query($mostRejectionQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1273,8 +1273,8 @@ class Covid19FormTable extends AbstractTableGateway
                     $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
                     $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
                     $rejectionQuery = $rejectionQuery->where("(sample_collection_date is not null)
-                                                AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                                AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                                AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                                AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
                 }
                 if ($mostRejectionReasons[$m] == 0) {
                     $rejectionQuery = $rejectionQuery->where('covid19.reason_for_sample_rejection is not null and covid19.reason_for_sample_rejection!= "" and covid19.reason_for_sample_rejection NOT IN("' . implode('", "', $mostRejectionReasons) . '")');
@@ -1386,8 +1386,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -1426,8 +1426,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1542,8 +1542,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -1582,8 +1582,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1700,8 +1700,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($sOrder) && $sOrder != "") {
@@ -1741,8 +1741,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
+                        AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND covid19.sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1806,8 +1806,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->order(array(new Expression('DATE(sample_collection_date)')));
@@ -1861,8 +1861,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $covid19OutcomesQuery = $covid19OutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
@@ -1913,8 +1913,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $covid19OutcomesQuery = $covid19OutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
@@ -1984,8 +1984,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $covid19OutcomesQuery = $covid19OutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
         $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
         // echo $covid19OutcomesQueryStr;die;
@@ -2028,7 +2028,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
         if (trim($params['daterange']) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
-                $receivedQuery = $receivedQuery->where(array("DATE(covid19.sample_collection_date) <='$splitDate[1]'", "DATE(covid19.sample_collection_date) >='$splitDate[0]'"));
+                $receivedQuery = $receivedQuery->where(array("covid19.sample_collection_date <= '$splitDate[1] 23:59:59'", "covid19.sample_collection_date >= '$splitDate[0] 00:00:00'"));
             }
         } else {
             $receivedQuery = $receivedQuery->where("DATE(sample_collection_date) IN ($qDates)");
@@ -2056,7 +2056,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
         if (trim($params['daterange']) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
-                $testedQuery = $testedQuery->where(array("DATE(covid19.sample_tested_datetime) <='$splitDate[1]'", "DATE(covid19.sample_tested_datetime) >='$splitDate[0]'"));
+                $testedQuery = $testedQuery->where(array("covid19.sample_tested_datetime <= '$splitDate[1] 23:59:59'", "covid19.sample_tested_datetime >= '$splitDate[0] 00:00:00'"));
             }
         } else {
             $testedQuery = $testedQuery->where("DATE(sample_tested_datetime) IN ($qDates)");
@@ -2084,7 +2084,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
         if (trim($params['daterange']) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
-                $rejectedQuery = $rejectedQuery->where(array("DATE(covid19.sample_collection_date) <='$splitDate[1]'", "DATE(covid19.sample_collection_date) >='$splitDate[0]'"));
+                $rejectedQuery = $rejectedQuery->where(array("covid19.sample_collection_date <= '$splitDate[1] 23:59:59'", "covid19.sample_collection_date >= '$splitDate[0] 00:00:00'"));
             }
         } else {
             $rejectedQuery = $rejectedQuery->where("DATE(sample_collection_date) IN ($qDates)");
@@ -2191,8 +2191,8 @@ class Covid19FormTable extends AbstractTableGateway
 
             $queryStr = $queryStr->where("
                         (sample_collection_date is not null AND sample_collection_date not like '')
-                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
 
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));
             $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));
@@ -2334,7 +2334,7 @@ class Covid19FormTable extends AbstractTableGateway
             // --- Predicates ---
             $query->where->addPredicate(new WhereExpression("covid19.sample_collection_date IS NOT NULL AND covid19.sample_collection_date != '' AND covid19.sample_collection_date NOT IN ('1970-01-01', '0000-00-00')"));
             $query->where->addPredicate(new WhereExpression("covid19.result_approved_datetime IS NOT NULL AND covid19.result_approved_datetime != '' AND covid19.result_approved_datetime NOT IN ('1970-01-01', '0000-00-00')"));
-            $query->where->addPredicate(new WhereExpression("DATE(covid19.result_approved_datetime) BETWEEN '$startMonth' AND '$endMonth'"));
+            $query->where->addPredicate(new WhereExpression("covid19.result_approved_datetime BETWEEN '$startMonth 00:00:00' AND '$endMonth 23:59:59'"));
             $query->where->addPredicate(new WhereExpression("DATEDIFF(covid19.result_approved_datetime, covid19.sample_collection_date) BETWEEN 0 AND $skipDays"));
 
             if (!empty($facilityIdList)) {
@@ -2465,8 +2465,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $covid19OutcomesQuery = $covid19OutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         $facilityIdList = [];
@@ -2512,8 +2512,8 @@ class Covid19FormTable extends AbstractTableGateway
             ))
                 ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array('facility_name'))
                 ->where("(sample_collection_date is not null)
-                                    AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                    AND DATE(sample_collection_date) <= '" . $endMonth . "'")
+                                    AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                    AND sample_collection_date <= '" . $endMonth . " 23:59:59'")
                 ->group(array("lab_id", new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")))
                 ->order(array("lab_id", new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")));
 
@@ -3562,8 +3562,8 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery = $sQuery->where(
                 "
                                         (sample_collection_date is not null AND sample_collection_date not like '')
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'"
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'"
             );
 
             if (isset($params['lab']) && trim($params['lab']) != '') {
@@ -4193,8 +4193,8 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $eidOutcomesQuery = $eidOutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+                                        AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                        AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         $facilityIdList = [];
@@ -4243,8 +4243,8 @@ class Covid19FormTable extends AbstractTableGateway
             ))
                 ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array('facility_name'))
                 ->where("(sample_collection_date is not null)
-                                    AND DATE(sample_collection_date) >= '" . $startMonth . "'
-                                    AND DATE(sample_collection_date) <= '" . $endMonth . "'")
+                                    AND sample_collection_date >= '" . $startMonth . " 00:00:00'
+                                    AND sample_collection_date <= '" . $endMonth . " 23:59:59'")
                 ->group(array("lab_id", new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")))
                 ->order(array("lab_id", new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")));
 

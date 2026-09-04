@@ -103,7 +103,7 @@ class DashTrackApiRequestsTable extends BaseTableGateway
         [$startDate, $endDate] = $common->convertDateRange($parameters['daterange'] ?? '');
 
         if (isset($parameters['daterange']) && trim($parameters['daterange']) != '') {
-            $sQuery->where('DATE(a.requested_on) >= "' . $startDate . '" AND DATE(a.requested_on) <= "' . $endDate . '"');
+            $sQuery->where('a.requested_on >= "' . $startDate . ' 00:00:00" AND a.requested_on <= "' . $endDate . ' 23:59:59"');
         }
 
         if (isset($parameters['syncedType']) && trim($parameters['syncedType']) != '') {

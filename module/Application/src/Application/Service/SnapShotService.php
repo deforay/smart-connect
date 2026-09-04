@@ -37,13 +37,13 @@ class SnapShotService
         // Collection Date
         if (isset($params['collectionDate']) && !empty($params['collectionDate'])) {
             [$from, $to] = CommonService::convertDateRange($params['collectionDate']);
-            $whereConditions[] = new WhereExpression("DATE(sample_collection_date) BETWEEN ? AND ?", [$from, $to]);
+            $whereConditions[] = new WhereExpression("sample_collection_date BETWEEN ? AND ?", [$from . ' 00:00:00', $to . ' 23:59:59']);
         }
 
         // Tested Date
         if (isset($params['testedDate']) && !empty($params['testedDate'])) {
             [$from, $to] = CommonService::convertDateRange($params['testedDate']);
-            $whereConditions[] = new WhereExpression("DATE(sample_tested_datetime) BETWEEN ? AND ?", [$from, $to]);
+            $whereConditions[] = new WhereExpression("sample_tested_datetime BETWEEN ? AND ?", [$from . ' 00:00:00', $to . ' 23:59:59']);
         }
 
         // Province Name
@@ -199,17 +199,17 @@ class SnapShotService
 
                 if (isset($params['collectionDate']) && !empty($params['collectionDate'])) {
                     $date = explode(" to ", $params['collectionDate']);
-                    $quickStatsquery = $quickStatsquery->where(array("DATE(sample_collection_date) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_collection_date) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
-                    $receivedQuery = $receivedQuery->where(array("DATE(sample_collection_date) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_collection_date) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
-                    $testedQuery = $testedQuery->where(array("DATE(sample_collection_date) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_collection_date) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
-                    $rejectedQuery = $rejectedQuery->where(array("DATE(sample_collection_date) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_collection_date) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
+                    $quickStatsquery = $quickStatsquery->where(array("sample_collection_date >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_collection_date <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
+                    $receivedQuery = $receivedQuery->where(array("sample_collection_date >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_collection_date <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
+                    $testedQuery = $testedQuery->where(array("sample_collection_date >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_collection_date <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
+                    $rejectedQuery = $rejectedQuery->where(array("sample_collection_date >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_collection_date <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
                 }
                 if (isset($params['testedDate']) && !empty($params['testedDate'])) {
                     $date = explode(" to ", $params['testedDate']);
-                    $quickStatsquery = $quickStatsquery->where(array("DATE(sample_tested_datetime) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_tested_datetime) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
-                    $receivedQuery = $receivedQuery->where(array("DATE(sample_tested_datetime) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_tested_datetime) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
-                    $testedQuery = $testedQuery->where(array("DATE(sample_tested_datetime) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_tested_datetime) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
-                    $rejectedQuery = $rejectedQuery->where(array("DATE(sample_tested_datetime) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_tested_datetime) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
+                    $quickStatsquery = $quickStatsquery->where(array("sample_tested_datetime >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_tested_datetime <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
+                    $receivedQuery = $receivedQuery->where(array("sample_tested_datetime >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_tested_datetime <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
+                    $testedQuery = $testedQuery->where(array("sample_tested_datetime >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_tested_datetime <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
+                    $rejectedQuery = $rejectedQuery->where(array("sample_tested_datetime >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_tested_datetime <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
                 }
                 if (!empty($params['flag']) && $params['flag'] == 'poc') {
                     $quickStatsquery = $quickStatsquery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
@@ -277,12 +277,12 @@ class SnapShotService
 
         if (isset($params['collectionDate']) && !empty($params['collectionDate'])) {
             [$from, $to] = CommonService::convertDateRange($params['collectionDate']);
-            $whereConditions[] = new WhereExpression("DATE(sample_collection_date) BETWEEN ? AND ?", [$from, $to]);
+            $whereConditions[] = new WhereExpression("sample_collection_date BETWEEN ? AND ?", [$from . ' 00:00:00', $to . ' 23:59:59']);
         }
 
         if (isset($params['testedDate']) && !empty($params['testedDate'])) {
             [$from, $to] = CommonService::convertDateRange($params['testedDate']);
-            $whereConditions[] = new WhereExpression("DATE(sample_tested_datetime) BETWEEN ? AND ?", [$from, $to]);
+            $whereConditions[] = new WhereExpression("sample_tested_datetime BETWEEN ? AND ?", [$from . ' 00:00:00', $to . ' 23:59:59']);
         }
 
         if (isset($params['provinceName']) && !empty($params['provinceName'])) {
