@@ -157,9 +157,20 @@ class Module
 		$response->setStatusCode($statusCode);
 		$event->setResponse($response);
 
-		$message = 'An unexpected error occurred';
+		// The exception message only leaves the server where the deployment
+		// already asks for exception detail. It carries SQL fragments, column
+		// names and absolute file paths, and this listener answers any caller
+		// that sent an Accept of application/json or an XmlHttpRequest header.
+		// Turning display_exceptions off in the view manager did nothing for
+		// this path, so the JSON response kept disclosing what the HTML one no
+		// longer would.
+		// The fallback is the half a person reads, so it goes through the
+		// translator like every other user-visible string. An exception message
+		// is not translated: it is developer text, and it only appears where
+		// the deployment has asked for exception detail.
+		$message = $this->translate($event, 'An unexpected error occurred');
 		$exception = $event->getParam('exception');
-		if ($exception instanceof \Throwable) {
+		if ($exception instanceof \Throwable && $this->displayExceptions($event)) {
 			$message = $exception->getMessage();
 		}
 
@@ -171,6 +182,46 @@ class Module
 		$event->setResult($model);
 
 		return $model;
+	}
+
+	/**
+	 * Whether this deployment asks for exception detail in responses.
+	 *
+	 * Reads the view manager's own setting rather than re-deriving the
+	 * environment, so the HTML error page and the JSON one are governed by a
+	 * single switch. Defaults to false, so a config that cannot be read hides
+	 * the message rather than showing it.
+	 */
+	/**
+	 * Translate a string from a listener, where no view helper is in reach.
+	 *
+	 * Returns the original text when the translator cannot be resolved, so an
+	 * error responder never fails while reporting a failure.
+	 */
+	private function translate(MvcEvent $event, string $message): string
+	{
+		$application = $event->getApplication();
+		if (!$application instanceof Application) {
+			return $message;
+		}
+
+		try {
+			return (string) $application->getServiceManager()->get('translator')->translate($message);
+		} catch (\Throwable) {
+			return $message;
+		}
+	}
+
+	private function displayExceptions(MvcEvent $event): bool
+	{
+		$application = $event->getApplication();
+		if (!$application instanceof Application) {
+			return false;
+		}
+
+		$config = $application->getServiceManager()->get('config');
+
+		return !empty($config['view_manager']['display_exceptions']);
 	}
 
 	private function requestWantsJson($request): bool
@@ -201,12 +252,16 @@ class Module
 		/** @var \Laminas\Http\Request $request */
 		$request = $e->getRequest();
 
-		if ($request->isXmlHttpRequest()) {
+		// A request that matched no route has no controller to authorise. It is
+		// on its way to the 404 handler, and reading the route match here would
+		// fatal before it got there.
+		$routeMatch = $e->getRouteMatch();
+		if ($routeMatch === null) {
 			return;
 		}
 
 		$session = new Container('credo');
-		$shortControllerName = explode('Controller', $e->getRouteMatch()->getParam('controller'));
+		$shortControllerName = explode('Controller', $routeMatch->getParam('controller'));
 		$shortControllerName = substr($shortControllerName[1], 1);
 
 
@@ -224,7 +279,7 @@ class Module
 		$viewModel->acl = $acl;
 		$session->acl = serialize($acl);
 
-		$controllerName = $e->getRouteMatch()->getParam('controller');
+		$controllerName = $routeMatch->getParam('controller');
 		$moduleName = $this->getModuleNameFromController($controllerName);
 
 
@@ -237,16 +292,97 @@ class Module
 			Controller\ClientErrorController::class,
 		], true);
 
-		if ($moduleName == 'Application' && !$isPublic) {
+		// Authentication covers every module. It used to be spelled
+		// `$moduleName == 'Application'`, which left the Eid, Covid19 and
+		// DataManagement controllers answering without a session at all. It also
+		// used to be skipped for every XmlHttpRequest, which meant an
+		// `X-Requested-With` header was the whole of the access control on the
+		// grid, chart and dropdown endpoints. Those endpoints read sample and
+		// patient data.
+		//
+		// The Api module keeps its own credential. v2 authenticates a bearer
+		// token in its own middleware, and v1 is legacy. Gating either here
+		// would reject instances mid-sync.
+		$needsSession = !$isPublic && $moduleName !== 'Api';
 
-			if (empty($session->userId)) {
+		if ($needsSession && empty($session->userId)) {
+			/** @var \Laminas\Http\PhpEnvironment\Response $response */
+			$response = $e->getResponse();
+
+			// A redirect answers an XmlHttpRequest with the login page, which
+			// the caller then renders into a table or parses as JSON. Say
+			// "unauthenticated" in the status line instead.
+			if ($this->requestWantsJson($request)) {
+				$response->setStatusCode(401);
+				$response->getHeaders()->addHeaderLine('Content-Type', 'application/json');
+
+				// `error` stays a fixed token so a caller can branch on it in
+				// any locale. `message` is the half a person reads, so it goes
+				// through the translator like every other user-visible string.
+				$response->setContent(json_encode([
+					'error' => 'not_authenticated',
+					'message' => $diContainer->get('translator')->translate('Not authenticated'),
+				]));
+			} else {
 				$url = $e->getRouter()->assemble([], ['name' => 'login']);
-				/** @var \Laminas\Http\PhpEnvironment\Response $response */
-				$response = $e->getResponse();
 				$response->getHeaders()->addHeaderLine('Location', $url);
 				$response->setStatusCode(302);
 				$response->sendHeaders();
+			}
 
+			$stopCallBack = function ($event) use ($response) {
+				$event->stopPropagation();
+				return $response;
+			};
+			$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+			return $response;
+		}
+
+		// The per-action ACL check stays where it was, on non-XHR requests to
+		// the Application module. Widening it needs a privilege row for every
+		// action reached over XmlHttpRequest, and controllers such as
+		// CommonController have no rows at all, so gating them here would break
+		// the dropdowns rather than secure them. Authentication above is what
+		// closes the hole. Registering those actions is the follow-up.
+		if ($moduleName == 'Application' && !$isPublic && !$request->isXmlHttpRequest()) {
+			// **ACL Permission Check for Controllers/Actions**:
+			// Get controller and action (resource and privilege)
+			$params = $routeMatch->getParams();
+			$resource = $params['controller'];
+			$privilege = $params['action'];
+			$role = $session->roleCode;
+
+			// The home page has no content of its own — it only redirects
+			// (see IndexController::indexAction), so it stays outside the ACL
+			$isHomeRedirect = $resource == Controller\IndexController::class && $privilege == 'index';
+
+			// Check if the ACL allows access to the resource (controller/action)
+			if (!$isHomeRedirect && (!$acl->hasResource($resource) || !$acl->isAllowed($role, $resource, $privilege))) {
+				/** @var \Laminas\Http\PhpEnvironment\Response $response */
+				$response = $e->getResponse();
+				$response->setStatusCode(403);
+
+				$errorModel = new \Laminas\View\Model\ViewModel([
+					'resource' => $resource,
+					'privilege' => $privilege,
+				]);
+				$errorModel->setTemplate('error/403');
+				$response->setContent($diContainer->get('ViewRenderer')->render($errorModel));
+
+				$stopCallBack = function ($event) use ($response) {
+					$event->stopPropagation();
+					return $response;
+				};
+				$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+				return $response;
+			}
+
+			if (($shortControllerName == 'Clinic' || $shortControllerName == 'Hubs') && $session->role == '2') {
+				/** @var \Laminas\Http\PhpEnvironment\Response $response */
+				$response = $e->getResponse();
+				$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
+				$response->setStatusCode(302);
+				$response->sendHeaders();
 				// To avoid additional processing
 				// we can attach a listener for Event Route with a high priority
 				$stopCallBack = function ($event) use ($response) {
@@ -256,135 +392,86 @@ class Module
 				//Attach the "break" as a listener with a high priority
 				$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
 				return $response;
-			} else {
-				// **ACL Permission Check for Controllers/Actions**:
-				// Get controller and action (resource and privilege)
-				$params = $e->getRouteMatch()->getParams();
-				$resource = $params['controller'];
-				$privilege = $params['action'];
-				$role = $session->roleCode;
-
-				// The home page has no content of its own — it only redirects
-				// (see IndexController::indexAction), so it stays outside the ACL
-				$isHomeRedirect = $resource == Controller\IndexController::class && $privilege == 'index';
-
-				// Check if the ACL allows access to the resource (controller/action)
-				if (!$isHomeRedirect && (!$acl->hasResource($resource) || !$acl->isAllowed($role, $resource, $privilege))) {
-					/** @var \Laminas\Http\PhpEnvironment\Response $response */
-					$response = $e->getResponse();
-					$response->setStatusCode(403);
-
-					$errorModel = new \Laminas\View\Model\ViewModel([
-						'resource' => $resource,
-						'privilege' => $privilege,
-					]);
-					$errorModel->setTemplate('error/403');
-					$response->setContent($diContainer->get('ViewRenderer')->render($errorModel));
-
-					$stopCallBack = function ($event) use ($response) {
-						$event->stopPropagation();
-						return $response;
-					};
-					$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+			} elseif (($shortControllerName == 'Laboratory' || $shortControllerName == 'Hubs') && $session->role == '3') {
+				/** @var \Laminas\Http\PhpEnvironment\Response $response */
+				$response = $e->getResponse();
+				$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
+				$response->setStatusCode(302);
+				$response->sendHeaders();
+				// To avoid additional processing
+				// we can attach a listener for Event Route with a high priority
+				$stopCallBack = function ($event) use ($response) {
+					$event->stopPropagation();
 					return $response;
+				};
+				//Attach the "break" as a listener with a high priority
+				$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+				return $response;
+			} elseif (($shortControllerName == 'Laboratory' || $shortControllerName == 'Clinic') && $session->role == '4') {
+				/** @var \Laminas\Http\PhpEnvironment\Response $response */
+				$response = $e->getResponse();
+				$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
+				$response->setStatusCode(302);
+				$response->sendHeaders();
+				// To avoid additional processing
+				// we can attach a listener for Event Route with a high priority
+				$stopCallBack = function ($event) use ($response) {
+					$event->stopPropagation();
+					return $response;
+				};
+				//Attach the "break" as a listener with a high priority
+				$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+				return $response;
+			}
+
+			//clinic/lab dashboard re-direction, in-case of passing invalid url params
+			if ($session->role != 1) {
+				/*$mappedFacilities = (isset($session->mappedFacilities) && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
+				$mappedFacilitiesName = (isset($session->mappedFacilitiesName) && !empty($session->mappedFacilitiesName)) ? $session->mappedFacilitiesName : array();
+				$mappedFacilitiesCode = (isset($session->mappedFacilitiesCode) && !empty($session->mappedFacilitiesCode)) ? $session->mappedFacilitiesCode : array();
+				$lab = [];
+				if (isset($_GET['lab']) && trim($_GET['lab']) != '') {
+					$lab = array_values(array_filter(explode(',', $_GET['lab'])));
 				}
+				$redirect = false;
+				if ($lab !== []) {
+					$counter = count($lab);
+					for ($l = 0; $l < $counter; $l++) {
+						if (!in_array($lab[$l], $mappedFacilities) && !in_array($lab[$l], $mappedFacilitiesName) && !in_array($lab[$l], $mappedFacilitiesCode)) {
+							$redirect = true;
+							break;
+						}
+					}
+				}*/
 
-				if (($shortControllerName == 'Clinic' || $shortControllerName == 'Hubs') && $session->role == '2') {
-					/** @var \Laminas\Http\PhpEnvironment\Response $response */
-					$response = $e->getResponse();
-					$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
-					$response->setStatusCode(302);
-					$response->sendHeaders();
-					// To avoid additional processing
-					// we can attach a listener for Event Route with a high priority
-					$stopCallBack = function ($event) use ($response) {
-						$event->stopPropagation();
-						return $response;
-					};
-					//Attach the "break" as a listener with a high priority
-					$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
-					return $response;
-				} elseif (($shortControllerName == 'Laboratory' || $shortControllerName == 'Hubs') && $session->role == '3') {
-					/** @var \Laminas\Http\PhpEnvironment\Response $response */
-					$response = $e->getResponse();
-					$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
-					$response->setStatusCode(302);
-					$response->sendHeaders();
-					// To avoid additional processing
-					// we can attach a listener for Event Route with a high priority
-					$stopCallBack = function ($event) use ($response) {
-						$event->stopPropagation();
-						return $response;
-					};
-					//Attach the "break" as a listener with a high priority
-					$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
-					return $response;
-				} elseif (($shortControllerName == 'Laboratory' || $shortControllerName == 'Clinic') && $session->role == '4') {
-					/** @var \Laminas\Http\PhpEnvironment\Response $response */
-					$response = $e->getResponse();
-					$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
-					$response->setStatusCode(302);
-					$response->sendHeaders();
-					// To avoid additional processing
-					// we can attach a listener for Event Route with a high priority
-					$stopCallBack = function ($event) use ($response) {
-						$event->stopPropagation();
-						return $response;
-					};
-					//Attach the "break" as a listener with a high priority
-					$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
-					return $response;
+				if ($shortControllerName == 'Users' || $shortControllerName == 'Config' || $shortControllerName == 'Facility' || $shortControllerName == 'Import') {
+					$redirect = true;
 				}
-
-				//clinic/lab dashboard re-direction, in-case of passing invalid url params
-				if ($session->role != 1) {
-					/*$mappedFacilities = (isset($session->mappedFacilities) && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
-					$mappedFacilitiesName = (isset($session->mappedFacilitiesName) && !empty($session->mappedFacilitiesName)) ? $session->mappedFacilitiesName : array();
-					$mappedFacilitiesCode = (isset($session->mappedFacilitiesCode) && !empty($session->mappedFacilitiesCode)) ? $session->mappedFacilitiesCode : array();
-					$lab = [];
-					if (isset($_GET['lab']) && trim($_GET['lab']) != '') {
-						$lab = array_values(array_filter(explode(',', $_GET['lab'])));
+				if ($redirect) {
+					//set redirect path
+					/** @var \Laminas\Http\PhpEnvironment\Response $response */
+					$response = $e->getResponse();
+					if ($session->role == 2) {
+						$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
+					} elseif ($session->role == 3) {
+						$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
+					} elseif ($session->role == 4) {
+						$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
+					} elseif ($session->role == 5) {
+						$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
 					}
-					$redirect = false;
-					if ($lab !== []) {
-						$counter = count($lab);
-						for ($l = 0; $l < $counter; $l++) {
-							if (!in_array($lab[$l], $mappedFacilities) && !in_array($lab[$l], $mappedFacilitiesName) && !in_array($lab[$l], $mappedFacilitiesCode)) {
-								$redirect = true;
-								break;
-							}
-						}
-					}*/
+					$response->setStatusCode(302);
+					$response->sendHeaders();
 
-					if ($shortControllerName == 'Users' || $shortControllerName == 'Config' || $shortControllerName == 'Facility' || $shortControllerName == 'Import') {
-						$redirect = true;
-					}
-					if ($redirect) {
-						//set redirect path
-						/** @var \Laminas\Http\PhpEnvironment\Response $response */
-						$response = $e->getResponse();
-						if ($session->role == 2) {
-							$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
-						} elseif ($session->role == 3) {
-							$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
-						} elseif ($session->role == 4) {
-							$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
-						} elseif ($session->role == 5) {
-							$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
-						}
-						$response->setStatusCode(302);
-						$response->sendHeaders();
-
-						// To avoid additional processing
-						// we can attach a listener for Event Route with a high priority
-						$stopCallBack = function ($event) use ($response) {
-							$event->stopPropagation();
-							return $response;
-						};
-						//Attach the "break" as a listener with a high priority
-						$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					// To avoid additional processing
+					// we can attach a listener for Event Route with a high priority
+					$stopCallBack = function ($event) use ($response) {
+						$event->stopPropagation();
 						return $response;
-					}
+					};
+					//Attach the "break" as a listener with a high priority
+					$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					return $response;
 				}
 			}
 		}

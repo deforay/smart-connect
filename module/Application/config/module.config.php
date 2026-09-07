@@ -14,6 +14,12 @@ use Application\Command\ApiUsage;
 use Application\Command\ApiUsageFactory;
 use Application\I18n\TranslatorFactory;
 
+// The same test the AppCache factory makes. A development checkout carries
+// config/development.config.php, and a deployment can set APPLICATION_ENV
+// instead. Anything else is treated as production.
+$isDevelopment = file_exists(__DIR__ . '/../../../config/development.config.php')
+    || getenv('APPLICATION_ENV') === 'development';
+
 return [
     'router' => [
         'routes' => [
@@ -287,8 +293,16 @@ return [
         ]
     ],
     'view_manager' => [
-        'display_not_found_reason' => true,
-        'display_exceptions'       => true,
+        // Off unless the deployment asks for them. Both of these render the
+        // exception message and stack trace into the page, and
+        // Module::renderJsonErrorForAjax hands the same message to any caller
+        // that asked for JSON. On a national dashboard that means file paths,
+        // SQL fragments and column names reach whoever triggered the error.
+        //
+        // Development turns them back on the same way AppCache decides it is in
+        // development, so there is one switch rather than two.
+        'display_not_found_reason' => $isDevelopment,
+        'display_exceptions'       => $isDevelopment,
         'doctype'                  => 'HTML5',
         'not_found_template'       => 'error/404',
         'exception_template'       => 'error/index',

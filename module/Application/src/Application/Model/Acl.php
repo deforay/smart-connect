@@ -106,8 +106,13 @@ class Acl
             }
         }
 
-        $this->addRole('daemon');
-        $this->allow('daemon');
+        // A 'daemon' role with a blanket allow used to be registered here. No
+        // row in dash_user_roles carries that role_code, and nothing in the
+        // codebase sets it, so it granted nothing to nobody. It stayed
+        // dangerous only in one direction: creating a role with the code
+        // 'daemon' would have handed it every resource in the application
+        // without appearing in dash_roles_privileges_map, where an
+        // administrator would look. Removed rather than left as a trap.
     }
 
     public function hasResource($resource): bool
