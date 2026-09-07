@@ -3,6 +3,7 @@
 namespace Application\Service;
 
 use Laminas\Db\Sql\Sql;
+use Laminas\Db\Sql\Select;
 use Laminas\Db\Sql\Expression;
 use Application\Session\Container;
 use Laminas\Db\Adapter\Adapter;
@@ -23,6 +24,27 @@ class SnapShotService
         $this->adapter = $dbAdapter;
         $this->translator = $this->sm->get('translator');
     }
+    /**
+     * An IN predicate carrying one placeholder per value.
+     *
+     * WhereExpression("lab_id IN (?)", [implode(',', $ids)]) binds the whole
+     * list as a single string. MySQL casts '12, 34, 56' to the integer 12 when
+     * it compares against an integer column, so the predicate matches the first
+     * id and silently discards the rest. A user mapped to three laboratories
+     * saw one of them. Every multi-select filter on the snapshot page carried
+     * the same shape, so selecting four provinces filtered by one.
+     *
+     * Callers guard with !empty(), so the list always holds at least one value
+     * and IN () cannot be generated.
+     */
+    private static function inList(string $column, array $values): WhereExpression
+    {
+        $values = array_values($values);
+        $placeholders = implode(',', array_fill(0, count($values), '?'));
+
+        return new WhereExpression("$column IN ($placeholders)", $values);
+    }
+
     public function getSnapshotData($params)
     {
         $dbAdapter = $this->adapter;
@@ -48,22 +70,22 @@ class SnapShotService
 
         // Province Name
         if (isset($params['provinceName']) && !empty($params['provinceName'])) {
-            $whereConditions[] = new WhereExpression("facility_state_id IN (?)", [implode(",", $params['provinceName'])]);
+            $whereConditions[] = self::inList("facility_state_id", $params['provinceName']);
         }
 
         // District Name
         if (isset($params['districtName']) && !empty($params['districtName'])) {
-            $whereConditions[] = new WhereExpression("facility_district_id IN (?)", [implode(",", $params['districtName'])]);
+            $whereConditions[] = self::inList("facility_district_id", $params['districtName']);
         }
 
         // Clinic ID
         if (isset($params['clinicId']) && !empty($params['clinicId'])) {
-            $whereConditions[] = new WhereExpression("facility_id IN (?)", [implode(",", $params['clinicId'])]);
+            $whereConditions[] = self::inList("facility_id", $params['clinicId']);
         }
 
         // Lab ID
         if (isset($params['labId']) && !empty($params['labId'])) {
-            $whereConditions[] = new WhereExpression("lab_id IN (?)", [implode(",", $params['labId'])]);
+            $whereConditions[] = self::inList("lab_id", $params['labId']);
         }
 
         // POC Flag
@@ -73,7 +95,7 @@ class SnapShotService
 
         // Mapped Facilities
         if (!empty($mappedFacilities)) {
-            $whereConditions[] = new WhereExpression("lab_id IN (?)", [implode(", ", $mappedFacilities)]);
+            $whereConditions[] = self::inList("lab_id", $mappedFacilities);
         }
 
         foreach ($types as $type) {
@@ -86,7 +108,25 @@ class SnapShotService
                     'totalRejected' => new Expression("SUM(CASE WHEN (reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection != '' AND reason_for_sample_rejection != 0) OR (is_sample_rejected LIKE 'yes') AND (sample_collection_date IS NOT NULL AND DATE(sample_collection_date) NOT IN ('1970-01-01', '0000-00-00')) THEN 1 ELSE 0 END)"),
                     'totalPending' => new Expression("SUM(CASE WHEN (sample_collection_date IS NOT NULL AND DATE(sample_collection_date) NOT IN ('1970-01-01', '0000-00-00')) AND (is_sample_rejected LIKE 'yes' OR result IS NULL OR result = '' OR result_status IN (2,4,5,10)) THEN 1 ELSE 0 END)")
                 ])
-                ->join(['f' => 'facility_details'], "$type.lab_id = f.facility_id", ['facility_name']);
+                // LEFT, not INNER. Most historical rows carry no lab_id, because
+                // the sending instances did not populate it before 2022. An inner
+                // join drops every one of them. On the DRC data that put a grid
+                // totalling 1.1M samples directly beneath a quick stats panel
+                // reporting 2.6M for the same filters. Nothing on the page
+                // explained the gap. These rows now group under a null facility
+                // and render as "Unassigned". The two totals reconcile, and the
+                // missing lab_id becomes visible instead of silent.
+                //
+                // NULLIF folds a blank facility_name into the same null the
+                // unmatched rows carry. Without it the grid can show two rows
+                // both labelled "Unassigned", one for samples with no lab and one
+                // for a facility saved with an empty name.
+                ->join(
+                    ['f' => 'facility_details'],
+                    "$type.lab_id = f.facility_id",
+                    ['facility_name' => new Expression("NULLIF(TRIM(f.facility_name), '')")],
+                    Select::JOIN_LEFT
+                );
 
             // Add POC join if needed
             if (!empty($params['flag']) && $params['flag'] == 'poc') {
@@ -286,19 +326,19 @@ class SnapShotService
         }
 
         if (isset($params['provinceName']) && !empty($params['provinceName'])) {
-            $whereConditions[] = new WhereExpression("facility_state_id IN (?)", [implode(",", $params['provinceName'])]);
+            $whereConditions[] = self::inList("facility_state_id", $params['provinceName']);
         }
 
         if (isset($params['districtName']) && !empty($params['districtName'])) {
-            $whereConditions[] = new WhereExpression("facility_district_id IN (?)", [implode(",", $params['districtName'])]);
+            $whereConditions[] = self::inList("facility_district_id", $params['districtName']);
         }
 
         if (isset($params['clinicId']) && !empty($params['clinicId'])) {
-            $whereConditions[] = new WhereExpression("facility_id IN (?)", [implode(",", $params['clinicId'])]);
+            $whereConditions[] = self::inList("facility_id", $params['clinicId']);
         }
 
         if (isset($params['labId']) && !empty($params['labId'])) {
-            $whereConditions[] = new WhereExpression("lab_id IN (?)", [implode(",", $params['labId'])]);
+            $whereConditions[] = self::inList("lab_id", $params['labId']);
         }
 
         if (!empty($params['flag']) && $params['flag'] == 'poc') {
@@ -306,7 +346,7 @@ class SnapShotService
         }
 
         if (!empty($mappedFacilities)) {
-            $whereConditions[] = new WhereExpression("lab_id IN (?)", [implode(", ", $mappedFacilities)]);
+            $whereConditions[] = self::inList("lab_id", $mappedFacilities);
         }
 
         $unionQueries = [];
@@ -318,12 +358,19 @@ class SnapShotService
                 ->from([$tableAlias => "dash_form_$type"])
                 ->columns([
                     'facility_id' => new Expression("$tableAlias.$facilityColumn"),
-                    'facility_name' => new Expression("$facilityAlias.facility_name"),
+                    'facility_name' => new Expression("NULLIF(TRIM($facilityAlias.facility_name), '')"),
                     'received_count' => new Expression("SUM(CASE WHEN $tableAlias.sample_collection_date IS NOT NULL AND DATE($tableAlias.sample_collection_date) NOT IN ('1970-01-01', '0000-00-00') THEN 1 ELSE 0 END)"),
                     'tested_count' => new Expression("SUM(CASE WHEN $tableAlias.sample_tested_datetime IS NOT NULL AND DATE($tableAlias.sample_tested_datetime) NOT IN ('1970-01-01', '0000-00-00') THEN 1 ELSE 0 END)"),
                     'rejected_count' => new Expression("SUM(CASE WHEN (($tableAlias.reason_for_sample_rejection IS NOT NULL AND $tableAlias.reason_for_sample_rejection != '' AND $tableAlias.reason_for_sample_rejection != 0) OR ($tableAlias.is_sample_rejected LIKE 'yes')) AND ($tableAlias.sample_collection_date IS NOT NULL AND DATE($tableAlias.sample_collection_date) NOT IN ('1970-01-01', '0000-00-00')) THEN 1 ELSE 0 END)")
                 ])
-                ->join([$facilityAlias => 'facility_details'], "$tableAlias.$facilityColumn = $facilityAlias.facility_id", []);
+                // LEFT, and without the IS NOT NULL filter that used to sit
+                // below, so this panel counts the same rows as the grid above
+                // it. While it inner-joined and rejected null ids, the grid
+                // reported 2.6M samples and the chart beside it 1.1M under
+                // identical filters. Unassigned samples are also the largest
+                // backlog on the DRC data, so excluding them hid the very thing
+                // a backlog view exists to show.
+                ->join([$facilityAlias => 'facility_details'], "$tableAlias.$facilityColumn = $facilityAlias.facility_id", [], Select::JOIN_LEFT);
 
             if (!empty($params['flag']) && $params['flag'] == 'poc') {
                 $select->join(['icm' => 'instrument_machines'], "$tableAlias.import_machine_name = icm.config_machine_id", []);
@@ -335,7 +382,6 @@ class SnapShotService
                 }
             }
 
-            $select->where(["$tableAlias.$facilityColumn IS NOT NULL"]);
             $select->group(["$tableAlias.$facilityColumn", "$facilityAlias.facility_name"]);
             $unionQueries[] = $sql->buildSqlString($select);
         }
@@ -371,9 +417,18 @@ class SnapShotService
             $pending = max(0, $received - $tested - $rejected);
             $pctTested = ($received > 0) ? round(($tested * 100) / $received, 2) : 0;
 
+            // Samples whose sending instance never supplied a lab_id, and any
+            // id with no matching facility, arrive here with a null name. The
+            // label is resolved in PHP rather than left to the chart, because
+            // this endpoint answers with JSON and has no view to translate in.
+            $name = $row['facility_name'] ?? '';
+            if (trim((string) $name) === '') {
+                $name = $this->translator->translate('Unassigned');
+            }
+
             $perFacility[] = [
                 'id' => $row['facility_id'],
-                'name' => $row['facility_name'],
+                'name' => $name,
                 'received' => $received,
                 'tested' => $tested,
                 'rejected' => $rejected,
