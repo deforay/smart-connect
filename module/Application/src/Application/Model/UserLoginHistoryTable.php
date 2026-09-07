@@ -163,14 +163,30 @@ class UserLoginHistoryTable extends AbstractTableGateway
             "aaData" => array()
         );
 
+        // Every column here is written by whoever made the login attempt.
+        // login_id is the submitted email, browser is the User-Agent, and
+        // ip_address follows X-Forwarded-For. None of it requires a session,
+        // because failed attempts are recorded too. DataTables writes cell
+        // values through innerHTML, so an unescaped value is script running in
+        // an administrator's browser, under the dashboard's origin, at the
+        // moment they open the login history.
+        //
+        // Escaping happens after ucwords so the entities it produces are not
+        // themselves recased.
+        $escape = static fn($value): string => htmlspecialchars(
+            ucwords((string) $value),
+            ENT_QUOTES | ENT_SUBSTITUTE,
+            'UTF-8'
+        );
+
         foreach ($rResult as $aRow) {
             $row = [];
-            $row[] = ucwords($aRow['login_id']);
+            $row[] = $escape($aRow['login_id']);
             $row[] = ucwords(date('d-M-Y H:i:s', strtotime($aRow['login_attempted_datetime'])));
-            $row[] = ucwords($aRow['ip_address']);
-            $row[] = ucwords($aRow['browser']);
-            $row[] = ucwords($aRow['operating_system']);
-            $row[] = ucwords($aRow['login_status']);
+            $row[] = $escape($aRow['ip_address']);
+            $row[] = $escape($aRow['browser']);
+            $row[] = $escape($aRow['operating_system']);
+            $row[] = $escape($aRow['login_status']);
             $output['aaData'][] = $row;
         }
         return $output;
@@ -198,13 +214,19 @@ class UserLoginHistoryTable extends AbstractTableGateway
             $ipaddress = 'UNKNOWN';
         }
 
+        // Every value here except the status comes from the request, and none
+        // of it needs a session, because failed attempts are recorded too.
+        // Under MySQL's default strict mode an oversized value raises
+        // "Data too long" rather than truncating, so a User-Agent longer than
+        // browser's varchar(1000) would turn the login into a 500 and leave no
+        // audit row at all. Cutting each field to its column keeps the record.
         $data = array(
-            'login_id' => $userName,
+            'login_id' => mb_substr((string) $userName, 0, 1000),
             'login_attempted_datetime' => CommonService::getDateTime(),
-            'login_status' => $loginStatus,
-            'ip_address' => $ipaddress,
-            'browser'    => $browserAgent,
-            'operating_system' => $os
+            'login_status' => mb_substr((string) $loginStatus, 0, 256),
+            'ip_address' => mb_substr((string) $ipaddress, 0, 256),
+            'browser'    => mb_substr((string) $browserAgent, 0, 1000),
+            'operating_system' => mb_substr((string) $os, 0, 1000),
         );
         $this->insert($data);
     }

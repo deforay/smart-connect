@@ -51,8 +51,17 @@ class UsersTable extends BaseTableGateway
 
         $container = new Container('alert');
         $loginContainer = new Container('credo');
+
+        // Set before the branch, because both outcomes are timestamped now.
+        // While this lived inside the success branch, a failed attempt was
+        // written with PHP's default timezone and a successful one with the
+        // configured timezone. On a deployment configured for Africa/Kinshasa
+        // and a server defaulting to UTC, the two kinds of row in one table sat
+        // an hour apart, which is the sort of thing nobody notices until they
+        // are reading the table to work out what happened.
+        date_default_timezone_set($this->config['defaults']['time-zone'] ?? 'UTC');
+
         if (!empty($rResult) && $this->passwordVerify($rResult["user_id"], $params['password'], $rResult['password'])) {
-            date_default_timezone_set(isset($this->config['defaults']['time-zone']) ? $this->config['defaults']['time-zone'] : 'UTC');
             // Let us flush the file cache
             $cacheExpiryInMins = isset($this->config['defaults']['cache-expiry']) ? $this->config['defaults']['cache-expiry'] : 120;
             clearstatcache();
@@ -148,6 +157,25 @@ class UsersTable extends BaseTableGateway
                 return 'summary';
             }
         } else {
+            // Record the attempt that failed. user_login_history only ever held
+            // successful logins, because this was the one branch that never
+            // wrote to it. That left the login_status column with a single
+            // value, the grid's status filter with nothing to filter, and the
+            // login_status_attempted_datetime_idx index covering a question no
+            // row could answer. It also meant a run of guesses against an
+            // account left no trace anywhere in the application.
+            //
+            // The submitted email is recorded rather than a user name. A failed
+            // attempt often carries an address that matches no account, and the
+            // address that was tried is the part worth keeping.
+            // The submitted address, not a user name, because a failed attempt
+            // often carries one that matches no account. userHistoryLog bounds
+            // every field to its column, and
+            // UserLoginHistoryTable::fetchAllDetails escapes them on the way
+            // back out, which matters here because this value is
+            // unauthenticated input.
+            $userHistoryTable->userHistoryLog($username, 'failed');
+
             $container = new Container('alert');
             $container->alertMsg = 'Please check your login credentials';
             return 'login';
