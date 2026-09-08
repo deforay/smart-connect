@@ -136,6 +136,8 @@ fi
 # DATE() wrapper on an indexed column is a bug rather than a style choice. Several of these
 # invariants live in code rather than prose, so the pointers name the code.
 CONTEXT="Before reviewing, read these for the rules this codebase is held to:
+- docs/internal/architecture.md — entry points, how a request is authorised, how records
+  arrive, and what the schema does and does not define
 - docs/internal/engineering-standards.md — the bar, and what counts as a finding
 - sys/migrations/ — every schema change belongs here and must replay on a fresh install.
   data/setup.sql is a seed and is never edited to make a schema change. bin/migrate routes
