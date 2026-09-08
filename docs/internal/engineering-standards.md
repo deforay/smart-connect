@@ -1,10 +1,44 @@
 # Engineering standards
 
-The bar this codebase is held to, and the review that enforces it.
+The bar this codebase is held to.
 
-## 1. Adversarial review
+Sections 1 and 2 apply to every change, however it was written and however it was checked.
+They are the rules. Section 3 describes one optional tool for checking them, which some
+people here use and others do not. Reading section 3 is not a condition of contributing, and
+nothing in the repository requires it: there is no hook, no CI job, and no gate.
 
-Run before pushing, not after somebody asks:
+## 1. Standing invariants
+
+These hold whatever else you do. They are listed before any tooling because they are the part
+that matters.
+
+See section 4 for the full list with the reasoning behind each one. In short:
+
+- Schema changes live in `sys/migrations/` and must replay on a fresh install.
+- A controller is unreachable until the ACL knows it.
+- Do not wrap an indexed datetime column in `DATE()` inside a range predicate.
+- `dash_form_vl` is 243 columns wide, so measure before adding a column to an aggregate.
+- `lab_id` is null on most historical rows, so an INNER JOIN silently drops them.
+- Check for an existing index before adding one.
+- An `IN` list needs one placeholder per value.
+- Facility names arrive from remote instances and are not trusted input.
+- Timestamps come from one clock. `App\Timezone` applies it at every entry point.
+
+## 2. What counts as a finding
+
+A defect with a failure scenario. Name concrete inputs or state, and the wrong output or lost
+data that results. "This could be cleaner" is not a finding. A trade-off already recorded in
+these documents is a rebuttal, not a fix.
+
+Address or explicitly rebut anything raised against these invariants before merging, whether
+it came from a colleague or a tool. A rebuttal is a sentence saying why the code is right.
+Silence is not a rebuttal.
+
+## 3. Optional: the adversarial review pass
+
+Skip this section if you do not use an automated reviewer. Nothing depends on it.
+
+For those who do, `bin/dev/review` runs one against the brief below:
 
 ```bash
 bin/dev/review                  # the working branch against master
@@ -35,26 +69,22 @@ The review is a local step, not a CI job. The reviewing CLI is authenticated on 
 **The review brief** — single source of truth, extracted verbatim by the script, so it cannot drift:
 > "You are reviewing a change to Smart Connect, a Laminas PHP national dashboard that ingests viral load, EID and Covid-19 testing data from a fleet of remote InteLIS laboratory instances over an API. One Smart Connect install serves a country. Do not summarize the code. Find: (1) aggregate panels whose filters silently drop rows, especially an INNER JOIN to `facility_details` on `lab_id` or `facility_id` where the column is null on most historical rows, and any two figures on one page that count the same thing over different row sets; (2) a date predicate that wraps an indexed datetime column in `DATE()`, `YEAR()` or `MONTH()`, which puts every index on that column out of reach and turns a range scan into a full scan of a 243-column table, and any new dashboard query with no bound on `sample_collection_date` or `sample_tested_datetime`; (3) SQL built by concatenating request data instead of binding it, which this codebase does widely enough that a new occurrence must be judged on whether the value can reach it from `$_POST` or the route; (4) a query over sample, patient or facility data that ignores the caller's `mappedFacilities` scope from the `credo` session container, where sibling queries in the same service apply it; (5) schema changes made anywhere but `sys/migrations/`, migrations that are not re-runnable on both fresh and upgraded installs, a migration whose version does not match `composer.json`, and `data/setup.sql` edited to make a schema change rather than to seed a fresh install; (6) a new controller or action with no matching rows in `dash_resources`, `dash_privileges` and `dash_roles_privileges_map`, which leaves the route unreachable by every role including the administrator, and the menu entry invisible; (7) user-visible strings that bypass `translate`, and database values echoed into a `.phtml` without `escapeHtml`, remembering that facility and laboratory names arrive from remote instances and are not trusted input; (8) ingestion that trusts a laboratory or instance identifier taken from the request payload where the credential already establishes it; (9) an index added without checking whether an existing index already covers the same columns in the same order, since `dash_form_vl` accumulated ten such duplicates; (10) a multi-value predicate written as `IN (?)` with the values joined into one bound string, which MySQL casts to the first value so the filter silently matches one of them. Rank findings by severity. If you find nothing in a category, say 'clear'. Do not pad."
 
-**Where the second opinion matters most:** the dashboard aggregate queries, every migration, the
-API ingestion path, and anything that changes what a panel counts. Routine CRUD does not need
-double review. Do not ritualize it into overhead.
+**Where a second opinion earns its keep:** the dashboard aggregate queries, every migration,
+the API ingestion path, and anything that changes what a panel counts. Routine CRUD does not.
+Do not ritualize it into overhead.
 
-**Discipline rule:** the same bar applies to every change regardless of how it was written.
-Nothing lands on "it runs".
+A note on what this is worth, from the day the brief was written. Six passes over one day's
+work found, among other things, a migration about to drop the only uniqueness constraint on
+`(sample_code, lab_id)` on fresh installs, a stored XSS introduced while adding failed-login
+auditing, and a service delegator that was registered and silently never ran. All three were
+introduced while fixing something else, and none were caught by the person writing them. That
+is the argument for a second look of some kind. It is not an argument for this particular
+tool.
 
-## 2. What counts as a finding
+## 4. Standing invariants, in full
 
-A defect with a failure scenario. Name concrete inputs or state, and the wrong output or lost
-data that results. "This could be cleaner" is not a finding. A trade-off already recorded in
-these documents is a rebuttal, not a fix.
-
-Address or explicitly rebut every finding before merging. A rebuttal is a sentence saying why
-the code is right. Silence is not a rebuttal.
-
-## 3. Standing invariants
-
-These are the rules the brief is derived from. A change can be checked against them without
-running a review.
+These are the rules section 1 lists, with the reasoning. The brief in section 3 is derived
+from them, not the other way round. A change can be checked against them by reading.
 
 - **Schema changes live in `sys/migrations/`.** `data/setup.sql` seeds a fresh install. Never
   edit it to change the schema. Migrations replay on fresh installs too, so they must be
@@ -96,11 +126,18 @@ running a review.
   predicate matches the first id and drops the rest. Build the placeholders with
   `array_fill(0, count($values), '?')`. `SnapShotService::inList` is the worked example.
 
+- **Timestamps come from one clock.** `App\Timezone` applies `defaults.time-zone` at every
+  entry point, and a delegator puts each database connection on the same offset. Do not call
+  `date_default_timezone_set()` anywhere else. A second one is what produced the original
+  split, where PHP wrote UTC and SQL `NOW()` wrote the system zone into the same table. Note
+  that a delegator has to be keyed on `AdapterInterface`, because `Adapter::class` is an alias
+  and the container resolves an alias before it looks for delegators.
+
 - **Facility names are not trusted input.** They arrive from remote instances over the API.
   Escape them with `escapeHtml` before rendering, and put user-visible strings through
   `translate`.
 
-## 4. Where the numbers in this document come from
+## 5. Where the numbers in this document come from
 
 Every figure here was measured against the DRC production database. Re-measure before citing
 them for another country. The row counts, the null `lab_id` share, and the index sizes are all
