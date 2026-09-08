@@ -52,15 +52,11 @@ class UsersTable extends BaseTableGateway
         $container = new Container('alert');
         $loginContainer = new Container('credo');
 
-        // Set before the branch, because both outcomes are timestamped now.
-        // While this lived inside the success branch, a failed attempt was
-        // written with PHP's default timezone and a successful one with the
-        // configured timezone. On a deployment configured for Africa/Kinshasa
-        // and a server defaulting to UTC, the two kinds of row in one table sat
-        // an hour apart, which is the sort of thing nobody notices until they
-        // are reading the table to work out what happened.
-        date_default_timezone_set($this->config['defaults']['time-zone'] ?? 'UTC');
-
+        // The timezone is applied once at boot now (App\Timezone), so this no
+        // longer sets it per login. It used to live inside the success branch
+        // below, which stamped a failed attempt with PHP's default zone and a
+        // successful one with the configured zone, leaving the two kinds of row
+        // in one table an hour apart on any deployment where they differ.
         if (!empty($rResult) && $this->passwordVerify($rResult["user_id"], $params['password'], $rResult['password'])) {
             // Let us flush the file cache
             $cacheExpiryInMins = isset($this->config['defaults']['cache-expiry']) ? $this->config['defaults']['cache-expiry'] : 120;

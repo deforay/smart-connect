@@ -66,6 +66,11 @@ $serviceManager = new ServiceManager();
 $serviceManager->setService('ApplicationConfig', $appConfig);
 $serviceManager->get('ModuleManager')->loadModules();
 
+// Same reason as bin/console: no MVC bootstrap here, so nothing else applies
+// the deployment timezone. The migrator stamps app_version and db_version with
+// timestamps of its own. See App\Timezone.
+App\Timezone::applyFromConfig($serviceManager->get('config'));
+
 /** @var Adapter $adapter */
 $adapter = $serviceManager->get(Adapter::class);
 

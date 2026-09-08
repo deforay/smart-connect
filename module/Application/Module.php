@@ -87,6 +87,12 @@ class Module
 		// stops the footer and the migrator from drifting apart.
 		define("APP_VERSION", \App\Version::app());
 
+		// Before anything writes a timestamp. Covers web requests only: the v2
+		// API forks in public/index.php before this listener exists, and the
+		// CLI entry points load modules without bootstrapping the MVC
+		// application, so each applies the zone itself.
+		\App\Timezone::applyFromConfig($e->getApplication()->getServiceManager()->get('config'));
+
 		/**
 		 * @var \Laminas\Mvc\Application $application
 		 */
@@ -494,6 +500,27 @@ class Module
 	public function getServiceConfig()
 	{
 		return [
+			// Every connection leaves here on the same clock PHP is on. The
+			// adapter is built once per process and shared, and all four entry
+			// points resolve it through this container -- web, the v2 API via
+			// LaminasBridge, bin/console and bin/migrate -- so one delegator
+			// covers them all. It runs after the entry point has applied the
+			// zone, because that happens before any service is resolved.
+			// Keyed on AdapterInterface, not Adapter. Laminas\Db aliases
+			// Adapter::class to AdapterInterface::class, and the container
+			// resolves an alias to its target before it looks for delegators,
+			// so one registered against the alias is never reached. Everything
+			// here asks for Adapter::class and lands on the interface.
+			'delegators' => [
+				\Laminas\Db\Adapter\AdapterInterface::class => [
+					static function ($container, $name, callable $callback) {
+						$adapter = $callback();
+						\App\Timezone::applyToDatabase($adapter);
+
+						return $adapter;
+					},
+				],
+			],
 			'factories' => [
 				'AppCache' => new class {
 				public function __invoke($diContainer)

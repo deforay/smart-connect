@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Timezone;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Mvc\Service\ServiceManagerConfig;
 use Laminas\ServiceManager\ServiceManager;
@@ -46,7 +47,16 @@ final class LaminasBridge
 
         // Forces the config merge, which is also what defines APPLICATION_PATH,
         // UPLOAD_PATH and TEMP_UPLOAD_PATH (config/autoload/constants.global.php).
-        $serviceManager->get('config');
+        $config = $serviceManager->get('config');
+
+        // The v2 API forks in public/index.php before the MVC application
+        // boots, so Module::onBootstrap never runs for these requests and PHP
+        // keeps whatever php.ini left it on, which is UTC by default. Applied
+        // here rather than in the Slim bootstrap because this is the first
+        // point the merged config exists, and because a request that never
+        // reaches Laminas -- /api/v2/health is most of them -- writes no
+        // timestamp and should not pay for loading every module to set a clock.
+        Timezone::applyFromConfig(is_array($config) ? $config : []);
 
         return $this->serviceManager = $serviceManager;
     }

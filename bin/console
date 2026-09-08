@@ -30,6 +30,13 @@ $serviceManager->get('ModuleManager')->loadModules();
 
 $config = $serviceManager->get('config');
 
+// loadModules() does not run Module::onBootstrap, so the listener that applies
+// the deployment timezone never fires here. Without this, every timestamp a
+// scheduled command writes carries PHP's default zone, which is UTC wherever
+// php.ini leaves date.timezone unset, while MySQL's NOW() follows the system
+// zone. See App\Timezone.
+App\Timezone::applyFromConfig($config);
+
 $cli = new Application('smart-connect');
 foreach ($config['console']['commands'] ?? [] as $serviceName) {
     $cli->addCommand($serviceManager->get($serviceName));
