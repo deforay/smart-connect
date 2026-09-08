@@ -2,6 +2,7 @@
 
 namespace Application\Service;
 
+use App\Log\AppLogger;
 use stdClass;
 use Exception;
 use Throwable;
@@ -1652,6 +1653,80 @@ class CommonService
           }
 
           return $tableFieldsAsArray;
+     }
+
+     /**
+      * Put the credential's laboratory on an incoming record.
+      *
+      * v2 authenticates a bearer token and then ingested every field straight
+      * from the uploaded JSON, lab_id included. The credential established who
+      * the caller was and nothing used it, so an enrolled instance could write
+      * rows attributed to another laboratory. remote_sample_code is UNIQUE
+      * across the whole table, which made that a single field to change.
+      *
+      * The value is overwritten rather than the record rejected. The sending
+      * LIS decides a batch succeeded from the top-level status alone
+      * (SmartConnectService::syncModule) and then advances a watermark, so
+      * rejecting individual records inside a successful response loses them
+      * permanently, and failing the whole batch leaves a lab retrying the same
+      * rows every cron run until somebody edits its config. Coercion keeps the
+      * data and still records that the instance is misconfigured.
+      *
+      * A null $credentialLabId means the caller is not scoped to one
+      * laboratory. That covers v1, which has no credential at all, and an
+      * aggregating instance enrolled without a lab_id, which legitimately
+      * sends on behalf of many. Neither is constrained here.
+      *
+      * A record that arrives with no lab_id is filled in rather than left
+      * alone. That column is null on most rows collected before 2022, and this
+      * is where the next one would otherwise be created.
+      */
+     public static function applyCredentialIdentity(?array $data, ?array $credential, string $context = ''): ?array
+     {
+          if ($data === null || $credential === null) {
+               return $data;
+          }
+
+          $labId = isset($credential['lab_id']) && $credential['lab_id'] !== ''
+               ? (int) $credential['lab_id']
+               : null;
+          $instanceUuid = isset($credential['instance_uuid']) && $credential['instance_uuid'] !== ''
+               ? (string) $credential['instance_uuid']
+               : null;
+
+          $warn = static function (string $field, $sent, $held) use ($context, $data): void {
+               AppLogger::logWarning('API record claimed an identity its credential does not hold', [
+                    'context' => $context,
+                    'field' => $field,
+                    'sent' => (string) $sent,
+                    'credential' => (string) $held,
+                    'sample_code' => (string) ($data['sample_code'] ?? ''),
+                    'remote_sample_code' => (string) ($data['remote_sample_code'] ?? ''),
+               ]);
+          };
+
+          // The laboratory, where the credential names one. A client enrolled
+          // without a lab_id sends on behalf of many and is left alone.
+          if ($labId !== null && array_key_exists('lab_id', $data)) {
+               $sent = $data['lab_id'];
+               if ($sent !== null && trim((string) $sent) !== '' && (int) $sent !== $labId) {
+                    $warn('lab_id', $sent, $labId);
+               }
+               $data['lab_id'] = $labId;
+          }
+
+          // The sending installation, always. Unlike the laboratory this does
+          // not vary with what a batch carries: whoever holds the token is the
+          // installation that sent it, aggregator or not.
+          if ($instanceUuid !== null && array_key_exists('vlsm_instance_id', $data)) {
+               $sent = $data['vlsm_instance_id'];
+               if ($sent !== null && trim((string) $sent) !== '' && (string) $sent !== $instanceUuid) {
+                    $warn('vlsm_instance_id', $sent, $instanceUuid);
+               }
+               $data['vlsm_instance_id'] = $instanceUuid;
+          }
+
+          return $data;
      }
 
      public static function updateMatchingKeysOnly(?array $targetArray, ?array $sourceArray): ?array

@@ -17,8 +17,8 @@ final class ReceiveEidHandler extends AbstractIngestHandler
         return 'vlsm-eid';
     }
 
-    protected function ingest(): mixed
+    protected function ingest(?array $credential): mixed
     {
-        return $this->bridge->get('EidSampleService')->saveFileFromVlsmAPIV2();
+        return $this->bridge->get('EidSampleService')->saveFileFromVlsmAPIV2($credential);
     }
 }

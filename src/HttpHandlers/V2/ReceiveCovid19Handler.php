@@ -17,8 +17,8 @@ final class ReceiveCovid19Handler extends AbstractIngestHandler
         return 'vlsm-covid19';
     }
 
-    protected function ingest(): mixed
+    protected function ingest(?array $credential): mixed
     {
-        return $this->bridge->get('Covid19FormService')->saveFileFromVlsmAPIV2();
+        return $this->bridge->get('Covid19FormService')->saveFileFromVlsmAPIV2($credential);
     }
 }

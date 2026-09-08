@@ -91,7 +91,7 @@ class EidSampleService
 
     // END OF LABS DASHBOARD
 
-    public function saveFileFromVlsmAPIV2()
+    public function saveFileFromVlsmAPIV2(?array $credential = null)
     {
         $apiData = [];
 
@@ -100,7 +100,9 @@ class EidSampleService
         /** @var \Application\Model\DashTrackApiRequestsTable $trackApiDb */
         $trackApiDb = $this->sm->get('DashTrackApiRequestsTable');
         $source = $_POST['source'] ?? 'LIS';
-        $labId = $_POST['labId'] ?? null;
+        // Batch attribution follows the credential too, so the stats and
+        // tracking rows name the same laboratory as the records they count.
+        $labId = $credential['lab_id'] ?? ($_POST['labId'] ?? null);
 
         $this->config = $this->sm->get('Config');
         /** @var CommonService $commonService */
@@ -137,6 +139,7 @@ class EidSampleService
         foreach ($apiData as $rowData) {
             $counter++;
             $data = CommonService::updateMatchingKeysOnly($localDbFieldArray, (array)$rowData);
+            $data = CommonService::applyCredentialIdentity($data, $credential, 'eid');
 
             $id = $sampleDb->insertOrUpdate($data);
             if (isset($id) && !empty($id) && is_numeric($id)) {

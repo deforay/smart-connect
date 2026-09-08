@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpHandlers\V2;
 
 use App\Http\ApiResponse;
+use App\Middlewares\BearerAuthMiddleware;
 use App\Http\LegacyResult;
 use App\Http\UploadGuard;
 use App\Services\LaminasBridge;
@@ -39,8 +40,14 @@ abstract class AbstractIngestHandler
     /** Sub-directory of TEMP_UPLOAD_PATH the service unpacks into. */
     abstract protected function tempFolder(): string;
 
-    /** Invoke the existing service method and return its legacy result array. */
-    abstract protected function ingest(): mixed;
+    /**
+     * Invoke the existing service method and return its legacy result array.
+     *
+     * The authenticated principal is passed down so the service can bind the
+     * identity it establishes onto every record, rather than trusting what the
+     * uploaded JSON claims. Null where the route carries no credential.
+     */
+    abstract protected function ingest(?array $credential): mixed;
 
     public function __invoke(ServerRequestInterface $request): ResponseInterface
     {
@@ -66,6 +73,15 @@ abstract class AbstractIngestHandler
         // never reached.
         UploadGuard::ensureDirectory($this->bridge->tempUploadPath($this->tempFolder()));
 
-        return LegacyResult::toResponse($response, $this->ingest(), 'Records received');
+        // Read from the authenticated principal, never from the payload. The
+        // point of the exercise is that the uploaded JSON does not get to say
+        // which laboratory it belongs to.
+        $principal = $request->getAttribute(BearerAuthMiddleware::ATTRIBUTE);
+
+        return LegacyResult::toResponse(
+            $response,
+            $this->ingest(is_array($principal) ? $principal : null),
+            'Records received'
+        );
     }
 }

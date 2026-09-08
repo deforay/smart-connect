@@ -29,7 +29,7 @@ class Covid19FormService
     }
 
 
-    public function saveFileFromVlsmAPIV2()
+    public function saveFileFromVlsmAPIV2(?array $credential = null)
     {
         ini_set('memory_limit', -1);
         try {
@@ -44,7 +44,9 @@ class Covid19FormService
             $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
 
             $source = $_POST['source'] ?? 'LIS';
-            $labId = $_POST['labId'] ?? null;
+            // Batch attribution follows the credential too, so the stats and
+            // tracking rows name the same laboratory as the records they count.
+            $labId = $credential['lab_id'] ?? ($_POST['labId'] ?? null);
 
             $fileName = $_FILES['covid19File']['name'];
             $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
@@ -82,6 +84,7 @@ class Covid19FormService
                 foreach ($columnList as $colName) {
                     $data[$colName] = isset($rowData[$colName]) ? $rowData[$colName] : null;
                 }
+                $data = CommonService::applyCredentialIdentity($data, $credential, 'covid19');
 
                 try {
 

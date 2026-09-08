@@ -17,8 +17,8 @@ final class ReceiveVlHandler extends AbstractIngestHandler
         return 'vlsm-vl';
     }
 
-    protected function ingest(): mixed
+    protected function ingest(?array $credential): mixed
     {
-        return $this->bridge->get('SampleService')->saveFileFromVlsmAPIV2();
+        return $this->bridge->get('SampleService')->saveFileFromVlsmAPIV2($credential);
     }
 }

@@ -1277,7 +1277,7 @@ class SampleService
     }
 
 
-    public function saveFileFromVlsmAPIV2()
+    public function saveFileFromVlsmAPIV2(?array $credential = null)
     {
         //ini_set("memory_limit", -1);
         try {
@@ -1285,7 +1285,9 @@ class SampleService
             //$this->commonService->errorLog($_POST);
 
             $source = $_POST['source'] ?? 'LIS';
-            $labId = $_POST['labId'] ?? null;
+            // Batch attribution follows the credential too, so the stats and
+            // tracking rows name the same laboratory as the records they count.
+            $labId = $credential['lab_id'] ?? ($_POST['labId'] ?? null);
 
             $removeKeys = [
                 'vl_sample_id'
@@ -1315,6 +1317,7 @@ class SampleService
             foreach ($apiData as $rowData) {
                 $counter++;
                 $data = CommonService::updateMatchingKeysOnly($localDbFieldArray, (array)$rowData);
+                $data = CommonService::applyCredentialIdentity($data, $credential, 'vl');
                 try {
 
                     $id = $sampleDb->insertOrUpdate($data);
