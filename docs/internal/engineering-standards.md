@@ -73,14 +73,6 @@ The review is a local step, not a CI job. The reviewing CLI is authenticated on 
 the API ingestion path, and anything that changes what a panel counts. Routine CRUD does not.
 Do not ritualize it into overhead.
 
-A note on what this is worth, from the day the brief was written. Six passes over one day's
-work found, among other things, a migration about to drop the only uniqueness constraint on
-`(sample_code, lab_id)` on fresh installs, a stored XSS introduced while adding failed-login
-auditing, and a service delegator that was registered and silently never ran. All three were
-introduced while fixing something else, and none were caught by the person writing them. That
-is the argument for a second look of some kind. It is not an argument for this particular
-tool.
-
 ## 4. Standing invariants, in full
 
 These are the rules section 1 lists, with the reasoning. The brief in section 3 is derived
