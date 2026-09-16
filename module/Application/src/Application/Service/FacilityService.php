@@ -17,6 +17,7 @@ class FacilityService
     public function addFacility($params)
     {
         $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter')->getDriver()->getConnection();
+        $eventLogDb = $this->sm->get('ActivityLogTable');
         $adapter->beginTransaction();
         try {
             $db = $this->sm->get('FacilityTable');

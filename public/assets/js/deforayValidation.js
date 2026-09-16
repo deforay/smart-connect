@@ -38,10 +38,10 @@ var deforayValidator = {
 		this.settings = settings;
 		this.form = document.getElementById(this.settings["formId"]);
 		//console.log(this.form);
-		formInputs = jQuery("input[type='text'],input[type='password'],textarea,select");
+		var formInputs = jQuery("input[type='text'],input[type='password'],textarea,select");
 
 		// change color of inputs on focus
-		for(i=0;i<formInputs.length;i++)
+		for(var i=0;i<formInputs.length;i++)
 		{
 			formInputs[i].onfocus = function () {
 				this.style.background = "#FFFFFF";
@@ -56,10 +56,10 @@ var deforayValidator = {
 		}
 	},
 	validate: function () {
-		error = '';
+		var error = '';
 		this.form = document.getElementById(this.settings["formId"]);
-		formInputs = this.form.getElementsByTagName('*');
-                useTitleToShowMessage = true;
+		var formInputs = this.form.getElementsByTagName('*');
+                var useTitleToShowMessage = true;
                 if(this.settings["useTitle"] != 'undefined' && this.settings["useTitle"] != null && this.settings["useTitle"] == false){
                     useTitleToShowMessage = false;
                 }
@@ -185,8 +185,7 @@ function confirmPassword(name){
 function isRequiredCheckBox(name){
     var flag = false;
     var elements = document.getElementsByName(name);
-    size = elements.length;
-    count = 0;
+    var size = elements.length;
 
     for(var i=0;i <size;i++){
         if(elements[i].checked){
@@ -201,7 +200,7 @@ function isRequiredCheckBox(name){
 }
 function findPos(obj) {
 
-var curleft = curtop = 0;
+var curleft = 0, curtop = 0;
 if (obj.offsetParent) {
         curleft = obj.offsetLeft
         curtop = obj.offsetTop
@@ -215,7 +214,8 @@ return [curleft,curtop];
 }
 function deforayValidatorInternal(formInputs, useTitleToShowMessage){
 		// change color of inputs on focus
-	for(i=0;i<formInputs.length;i++){
+	var classes, valid, elementTitle, errorMsg, innerParts;
+	for(var i=0;i<formInputs.length;i++){
 		classes = formInputs[i].className;
 		if(classes == "" || classes== null){
 			valid = true;

@@ -55,10 +55,10 @@ $endDate = date('Y-m');
 
 <!-- <hr style="background: #000 !important;border-color:#ccc;"> -->
 <div class="row" style="padding-top:5px;padding-bottom:20px;">
-    <div class="col-lg-1" id="labHeight">
+    <div class="col-lg-1">
         <p>Lab Name </p>
     </div>
-    <div class="col-lg-4" id="labHeight" style="margin-top: 12px;">
+    <div class="col-lg-4" style="margin-top: 12px;">
         <select name="labName[]" id="labName" class="form-control" onchange="labChange();" title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
             <?php
             foreach ($labName as $lab1) {
