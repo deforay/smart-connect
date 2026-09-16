@@ -51,7 +51,6 @@ class Module
                     {
                         $session = new Container('credo');
                         $mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
-                        $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
                         $covid19SampleTable = property_exists($session, 'covid19SampleTable') && $session->covid19SampleTable !== null ? $session->covid19SampleTable :  'dash_form_covid19';
                         $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
                         $commonService = $diContainer->get('CommonService');
@@ -69,7 +68,6 @@ class Module
                     {
                         $session = new Container('credo');
                         $mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
-                        $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
                         $covid19SampleTable = property_exists($session, 'covid19SampleTable') && $session->covid19SampleTable !== null ? $session->covid19SampleTable :  'dash_form_covid19';
                         $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
                         $commonService = $diContainer->get('CommonService');

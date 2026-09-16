@@ -52,7 +52,7 @@ class RolesController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $result = $this->roleService->updateRoles($params);
+            $this->roleService->updateRoles($params);
             return $this->redirect()->toRoute('roles');
         } else {
             $id = base64_decode($this->params()->fromRoute('id'));

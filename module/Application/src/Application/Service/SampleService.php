@@ -1675,6 +1675,7 @@ class SampleService
                 'status' => 'fail',
                 'message' => 'Missing data in API request',
             ];
+            return $response;
         }
 
         $sampleDb = $this->sm->get('SampleTableWithoutCache');

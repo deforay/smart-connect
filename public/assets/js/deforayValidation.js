@@ -261,7 +261,7 @@ function deforayValidatorInternal(formInputs, useTitleToShowMessage){
 				}
 			}
 			else if(parts[cCount] == "isEmail"){
-				var valu = (formInputs[i].value);
+				valu = (formInputs[i].value);
 				valid = isEmail(valu,required);
 				if(elementTitle != null && elementTitle != "")
 				{

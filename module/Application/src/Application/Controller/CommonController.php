@@ -11,7 +11,6 @@ class CommonController extends AbstractActionController
 {
 
     public $commonService;
-    private $sampleService = null;
     private $configService = null;
 
     public function __construct($commonService, $configService)

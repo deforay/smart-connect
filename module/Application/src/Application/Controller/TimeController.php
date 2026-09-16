@@ -179,8 +179,6 @@ class TimeController extends AbstractActionController
 						'geo_name' => $provinceNames[$i]
 					);
 				}
-			} else {
-				$provinceArray = $this->facilityService->fetchLocationDetails();
 			}
 
 			if (isset($districts) && !empty($districts)) {
