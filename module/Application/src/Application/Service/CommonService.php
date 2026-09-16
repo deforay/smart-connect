@@ -1442,10 +1442,22 @@ class CommonService
           $dates = explode($seperator, $dateRange ?? '');
           $dates = array_map('trim', $dates);
 
-          $startDate = empty($dates[0]) ? '' : self::isoDateFormat($dates[0]);
-          $endDate = empty($dates[1]) ? '' : self::isoDateFormat($dates[1]);
+          $startDate = empty($dates[0]) ? '' : (self::isoDateFormat($dates[0]) ?? '');
+          $endDate = empty($dates[1]) ? '' : (self::isoDateFormat($dates[1]) ?? '');
 
           return [$startDate, $endDate];
+     }
+
+     // Returns the positive integer ids in a comma-separated string or an array,
+     // for use in an IN (...) filter
+     public static function parseIdList(array|string|null $ids): array
+     {
+          if (is_string($ids)) {
+               $ids = explode(',', $ids);
+          }
+          $ids = array_map(fn($id) => trim((string) $id), $ids ?? []);
+          $ids = array_filter($ids, fn($id) => ctype_digit($id) && (int) $id > 0);
+          return array_values(array_map('intval', $ids));
      }
 
      public static function isJSON($string): bool
@@ -1848,6 +1860,15 @@ class CommonService
      {
           // Replace any non-alphanumeric, non-dot, non-dash and non-underscore characters
           return preg_replace('/[^A-Za-z0-9._-]/', '_', $filename);
+     }
+
+     // Returns the lowercase extension of an uploaded image, or null when the
+     // file is not a raster image type. Uploads land under the web root, so
+     // anything else (a .php file, an .svg with script) must not be written.
+     public static function imageUploadExtension(?string $fileName): ?string
+     {
+          $extension = strtolower(pathinfo((string) $fileName, PATHINFO_EXTENSION));
+          return in_array($extension, ['png', 'jpg', 'jpeg', 'gif', 'webp'], true) ? $extension : null;
      }
 
      public static function arrayToObject($array)

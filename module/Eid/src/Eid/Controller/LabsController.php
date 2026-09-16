@@ -317,7 +317,7 @@ class LabsController extends AbstractActionController
             $params = $request->getPost();
 
             $labs = (isset($params['lab']) && !empty($params['lab'])) ? $params['lab'] : array();
-            $dates = explode(" to ", $params['sampleCollectionDate']);
+            $dates = CommonService::convertDateRange($params['sampleCollectionDate']);
             $place = $params['place'];
 
             if ($params['category'] == self::PROVINCE) {
@@ -363,7 +363,7 @@ class LabsController extends AbstractActionController
             $provinceNames = $params['provinceNames'];
             $districtNames = $params['districtNames'];
             $clinicNames = $params['clinicNames'];
-            $dates = explode(" to ", $params['sampleCollectionDate']);
+            $dates = CommonService::convertDateRange($params['sampleCollectionDate']);
             $provinceArray = [];
             $districtArray = [];
             $clinicArray = [];

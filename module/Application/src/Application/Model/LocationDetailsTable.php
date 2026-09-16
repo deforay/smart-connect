@@ -48,7 +48,7 @@ class LocationDetailsTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))->where(array('geo_parent IN(' . implode(",", $locationId) . ')'));
+        $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))->where(['geo_parent' => CommonService::parseIdList($locationId)]);
         $sQueryStr = $sql->buildSqlString($sQuery);
         return $dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->toArray();
     }

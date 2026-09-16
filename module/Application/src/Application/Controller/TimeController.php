@@ -4,6 +4,7 @@ namespace Application\Controller;
 
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
+use Application\Service\CommonService;
 
 
 class TimeController extends AbstractActionController
@@ -95,7 +96,7 @@ class TimeController extends AbstractActionController
 		if ($request->isPost()) {
 			$params = $request->getPost();
 
-			$dates = explode(" to ", $params['sampleCollectionDate']);
+			$dates = CommonService::convertDateRange($params['sampleCollectionDate']);
 			$category = $params['category'];
 			$labs = (isset($params['lab']) && !empty($params['lab'])) ? $params['lab'] : array();
 
@@ -116,7 +117,7 @@ class TimeController extends AbstractActionController
 			$params = $request->getPost();
 
 			$labs = (isset($params['lab']) && !empty($params['lab'])) ? $params['lab'] : array();
-			$dates = explode(" to ", $params['sampleCollectionDate']);
+			$dates = CommonService::convertDateRange($params['sampleCollectionDate']);
 			$category = $params['category'];
 			$place = $params['place'];
 			$facilities = null;
@@ -164,7 +165,7 @@ class TimeController extends AbstractActionController
 			$provinceNames    = $params['provinceNames'];
 			$districtNames    = $params['districtNames'];
 			$clinicNames      = $params['clinicNames'];
-			$dates            = explode(" to ", $params['sampleCollectionDate']);
+			$dates            = CommonService::convertDateRange($params['sampleCollectionDate']);
 			$provinceArray    = [];
 			$districtArray    = [];
 			$clinicArray      = [];

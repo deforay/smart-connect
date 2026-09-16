@@ -50,7 +50,7 @@ class GlobalTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $aColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $aColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -72,9 +72,9 @@ class GlobalTable extends AbstractTableGateway
 
                 for ($i = 0; $i < $colSize; $i++) {
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -88,9 +88,9 @@ class GlobalTable extends AbstractTableGateway
         for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -168,31 +168,31 @@ class GlobalTable extends AbstractTableGateway
     {
         $updateRes = 0;
         //for logo deletion
-        if (isset($params['removedLogoImage']) && trim($params['removedLogoImage']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImage'])) {
-            unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImage']);
+        if (isset($params['removedLogoImage']) && trim($params['removedLogoImage']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . basename($params['removedLogoImage']))) {
+            unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . basename($params['removedLogoImage']));
             $this->update(array('value' => ''), array('name' => 'logo'));
         }
-        if (isset($params['removedLogoImageTop']) && trim($params['removedLogoImageTop']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImageTop'])) {
-            unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImageTop']);
+        if (isset($params['removedLogoImageTop']) && trim($params['removedLogoImageTop']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . basename($params['removedLogoImageTop']))) {
+            unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . basename($params['removedLogoImageTop']));
             $this->update(array('value' => ''), array('name' => 'left_top_logo'));
         }
         //for logo updation
-        if (isset($_FILES['logo']['name']) && $_FILES['logo']['name'] != "") {
+        $extension = CommonService::imageUploadExtension($_FILES['logo']['name'] ?? null);
+        if ($extension !== null) {
             if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo") && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo")) {
                 mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo");
             }
-            $extension = strtolower(pathinfo(UPLOAD_PATH . DIRECTORY_SEPARATOR . $_FILES['logo']['name'], PATHINFO_EXTENSION));
             $string = CommonService::generateRandomString(6) . ".";
             $imageName = "logo-" . $string . $extension;
             if (move_uploaded_file($_FILES["logo"]["tmp_name"], UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $imageName)) {
                 $this->update(array('value' => $imageName), array('name' => 'logo'));
             }
         }
-        if (isset($_FILES['leftTopLogo']['name']) && $_FILES['leftTopLogo']['name'] != "") {
+        $extension = CommonService::imageUploadExtension($_FILES['leftTopLogo']['name'] ?? null);
+        if ($extension !== null) {
             if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo") && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo")) {
                 mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo");
             }
-            $extension = strtolower(pathinfo(UPLOAD_PATH . DIRECTORY_SEPARATOR . $_FILES['leftTopLogo']['name'], PATHINFO_EXTENSION));
             $string = CommonService::generateRandomString(6) . ".";
             $imageName = "logo-" . $string . $extension;
             if (move_uploaded_file($_FILES["leftTopLogo"]["tmp_name"], UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $imageName)) {

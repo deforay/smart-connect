@@ -56,8 +56,8 @@ class Covid19FormTable extends AbstractTableGateway
             ));
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $queryStr = $queryStr->where("(sample_collection_date is not null AND sample_collection_date not like '')
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
                                         AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
@@ -90,18 +90,18 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery = $sQuery->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'));
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $sQuery = $sQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+            $sQuery = $sQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $sQuery = $sQuery->where("(sample_collection_date is not null)
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
                                         AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
@@ -146,7 +146,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -169,9 +169,9 @@ class Covid19FormTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -186,9 +186,9 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -222,8 +222,8 @@ class Covid19FormTable extends AbstractTableGateway
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(sample_collection_date is not null)
                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -261,8 +261,8 @@ class Covid19FormTable extends AbstractTableGateway
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -319,7 +319,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -342,9 +342,9 @@ class Covid19FormTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -359,9 +359,9 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -393,8 +393,8 @@ class Covid19FormTable extends AbstractTableGateway
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -434,8 +434,8 @@ class Covid19FormTable extends AbstractTableGateway
             ->group('f.facility_state_id');
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -486,7 +486,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -509,9 +509,9 @@ class Covid19FormTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -526,9 +526,9 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -561,8 +561,8 @@ class Covid19FormTable extends AbstractTableGateway
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -604,8 +604,8 @@ class Covid19FormTable extends AbstractTableGateway
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -660,18 +660,18 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
 
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $sQuery = $sQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+            $sQuery = $sQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $sQuery = $sQuery->where("(sample_collection_date is not null)
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
                                         AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
@@ -710,7 +710,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -733,9 +733,9 @@ class Covid19FormTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -750,9 +750,9 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -788,8 +788,8 @@ class Covid19FormTable extends AbstractTableGateway
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -828,8 +828,8 @@ class Covid19FormTable extends AbstractTableGateway
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -878,7 +878,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -901,9 +901,9 @@ class Covid19FormTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -918,9 +918,9 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -954,8 +954,8 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->where($sWhere);
         }
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -994,8 +994,8 @@ class Covid19FormTable extends AbstractTableGateway
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -1047,7 +1047,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -1070,9 +1070,9 @@ class Covid19FormTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -1087,9 +1087,9 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -1125,8 +1125,8 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -1168,8 +1168,8 @@ class Covid19FormTable extends AbstractTableGateway
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('covid19.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -1217,17 +1217,17 @@ class Covid19FormTable extends AbstractTableGateway
             $mostRejectionQuery = $mostRejectionQuery->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'));
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $mostRejectionQuery = $mostRejectionQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $mostRejectionQuery = $mostRejectionQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $mostRejectionQuery = $mostRejectionQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $mostRejectionQuery = $mostRejectionQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $mostRejectionQuery = $mostRejectionQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+            $mostRejectionQuery = $mostRejectionQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $mostRejectionQuery = $mostRejectionQuery->where("(sample_collection_date is not null)
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
                                         AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
@@ -1261,17 +1261,17 @@ class Covid19FormTable extends AbstractTableGateway
                     $rejectionQuery = $rejectionQuery->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'));
                 }
                 if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                    $rejectionQuery = $rejectionQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                    $rejectionQuery = $rejectionQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
                 }
                 if (isset($params['districts']) && trim($params['districts']) != '') {
-                    $rejectionQuery = $rejectionQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                    $rejectionQuery = $rejectionQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
                 }
                 if (isset($params['clinics']) && trim($params['clinics']) != '') {
-                    $rejectionQuery = $rejectionQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+                    $rejectionQuery = $rejectionQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinics'])]);
                 }
                 if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-                    $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-                    $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+                    $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+                    $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
                     $rejectionQuery = $rejectionQuery->where("(sample_collection_date is not null)
                                                 AND sample_collection_date >= '" . $startMonth . " 00:00:00'
                                                 AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
@@ -1313,7 +1313,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -1336,9 +1336,9 @@ class Covid19FormTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -1353,9 +1353,9 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -1382,8 +1382,8 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -1422,8 +1422,8 @@ class Covid19FormTable extends AbstractTableGateway
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -1469,7 +1469,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -1492,9 +1492,9 @@ class Covid19FormTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -1509,9 +1509,9 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -1538,8 +1538,8 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -1578,8 +1578,8 @@ class Covid19FormTable extends AbstractTableGateway
             ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '' AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -1626,7 +1626,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -1649,9 +1649,9 @@ class Covid19FormTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -1666,9 +1666,9 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -1696,8 +1696,8 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -1737,8 +1737,8 @@ class Covid19FormTable extends AbstractTableGateway
             ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '' AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND covid19.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -1792,18 +1792,18 @@ class Covid19FormTable extends AbstractTableGateway
             ->group(array(new Expression('YEAR(sample_collection_date)'), new Expression('MONTH(sample_collection_date)')));
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery
                 ->where("(sample_collection_date is not null)
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -1848,17 +1848,17 @@ class Covid19FormTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id = covid19.facility_id', array());
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $covid19OutcomesQuery = $covid19OutcomesQuery
                 ->where("(sample_collection_date is not null)
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -1900,17 +1900,17 @@ class Covid19FormTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id = covid19.facility_id', array());
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $covid19OutcomesQuery = $covid19OutcomesQuery
                 ->where("(sample_collection_date is not null)
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -1941,13 +1941,13 @@ class Covid19FormTable extends AbstractTableGateway
             ->group('f.facility_state_id');
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
 
         $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
@@ -1971,17 +1971,17 @@ class Covid19FormTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id = covid19.facility_id', array());
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $covid19OutcomesQuery = $covid19OutcomesQuery
                 ->where("(sample_collection_date is not null)
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -2007,7 +2007,7 @@ class Covid19FormTable extends AbstractTableGateway
         $tResult = [];
         $rejectedResult = [];
         if (trim($params['daterange']) != '') {
-            $splitDate = explode('to', $params['daterange']);
+            $splitDate = CommonService::convertDateRange($params['daterange']);
         } else {
             $timestamp = time();
             $qDates = [];
@@ -2153,15 +2153,15 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
 
             $facilityIdList = null;
 
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
-                $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+                $fQuery = $fQuery->where(['f.facility_id' => CommonService::parseIdList($params['facilityId'])]);
                 $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
@@ -2220,15 +2220,15 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
 
             $facilityIdList = null;
 
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
-                $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+                $fQuery = $fQuery->where(['f.facility_id' => CommonService::parseIdList($params['facilityId'])]);
                 $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
@@ -2296,7 +2296,7 @@ class Covid19FormTable extends AbstractTableGateway
                 ->where([
                     'f.facility_type' => 2,
                     'f.status' => 'active',
-                    new WhereExpression('f.facility_id IN (' . $params['facilityId'] . ')')
+                    'f.facility_id' => CommonService::parseIdList($params['facilityId'])
                 ]);
             $facilityResult = $dbAdapter->query($sql->buildSqlString($fQuery), $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
@@ -2370,15 +2370,15 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
 
             $facilityIdList = null;
 
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
-                $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+                $fQuery = $fQuery->where(['f.facility_id' => CommonService::parseIdList($params['facilityId'])]);
                 $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
@@ -2452,17 +2452,17 @@ class Covid19FormTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id = covid19.facility_id', array());
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $covid19OutcomesQuery = $covid19OutcomesQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+            $covid19OutcomesQuery = $covid19OutcomesQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $covid19OutcomesQuery = $covid19OutcomesQuery
                 ->where("(sample_collection_date is not null)
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -2473,7 +2473,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
             $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                 ->where('f.facility_type = 2 AND f.status="active"');
-            $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+            $fQuery = $fQuery->where(['f.facility_id' => CommonService::parseIdList($params['facilityId'])]);
             $fQueryStr = $sql->buildSqlString($fQuery);
             $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
@@ -2518,20 +2518,20 @@ class Covid19FormTable extends AbstractTableGateway
                 ->order(array("lab_id", new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")));
 
             if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             }
             if (isset($params['districts']) && trim($params['districts']) != '') {
-                $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             }
             if (isset($params['clinics']) && trim($params['clinics']) != '') {
-                $sQuery = $sQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+                $sQuery = $sQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinics'])]);
             }
 
             $facilityIdList = [];
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
                 $mQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
-                $mQuery = $mQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+                $mQuery = $mQuery->where(['f.facility_id' => CommonService::parseIdList($params['facilityId'])]);
                 $mQueryStr = $sql->buildSqlString($mQuery);
                 $facilityResult = $dbAdapter->query($mQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
@@ -2602,7 +2602,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         if (isset($labs) && !empty($labs)) {
-            $squery = $squery->where('covid19.lab_id IN (' . implode(',', $labs) . ')');
+            $squery = $squery->where(['covid19.lab_id' => CommonService::parseIdList($labs)]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -2655,7 +2655,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         if (isset($labs) && !empty($labs)) {
-            $squery = $squery->where('covid19.lab_id IN (' . implode(',', $labs) . ')');
+            $squery = $squery->where(['covid19.lab_id' => CommonService::parseIdList($labs)]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -2706,7 +2706,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         if (isset($labs) && !empty($labs)) {
-            $squery = $squery->where('covid19.lab_id IN (' . implode(',', $labs) . ')');
+            $squery = $squery->where(['covid19.lab_id' => CommonService::parseIdList($labs)]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -2731,7 +2731,7 @@ class Covid19FormTable extends AbstractTableGateway
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
-            $splitDate = explode('to', $params['daterange']);
+            $splitDate = CommonService::convertDateRange($params['daterange']);
         }
 
         $p = 0;
@@ -2747,19 +2747,19 @@ class Covid19FormTable extends AbstractTableGateway
             ->join(array('p' => 'geographical_divisions'), 'p.geo_id=f.facility_state_id', array('province_name' => 'geo_name', 'geo_id'), 'left')
             ->group('p.geo_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
-            $countQuery = $countQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
+            $countQuery = $countQuery->where(['covid19.lab_id' => CommonService::parseIdList($params['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $countQuery = $countQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('p.geo_id IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where(['p.geo_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-            $countQuery = $countQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+            $countQuery = $countQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinicId'])]);
         }
         if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("covid19.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "covid19.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
@@ -2796,7 +2796,7 @@ class Covid19FormTable extends AbstractTableGateway
             $countQuery = $countQuery->where($where);
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-            $countQuery = $countQuery->where('covid19.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+            $countQuery = $countQuery->where(['covid19.specimen_type' => base64_decode(trim($params['sampleType']))]);
         }
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -2829,7 +2829,7 @@ class Covid19FormTable extends AbstractTableGateway
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
-            $splitDate = explode('to', $params['daterange']);
+            $splitDate = CommonService::convertDateRange($params['daterange']);
         }
 
         $p = 0;
@@ -2846,19 +2846,19 @@ class Covid19FormTable extends AbstractTableGateway
             ->order('total DESC')
             ->group('d.geo_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
-            $countQuery = $countQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
+            $countQuery = $countQuery->where(['covid19.lab_id' => CommonService::parseIdList($params['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $countQuery = $countQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('p.geo_id IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where(['p.geo_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-            $countQuery = $countQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+            $countQuery = $countQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinicId'])]);
         }
         if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("covid19.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "covid19.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
@@ -2895,7 +2895,7 @@ class Covid19FormTable extends AbstractTableGateway
             $countQuery = $countQuery->where($where);
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-            $countQuery = $countQuery->where('covid19.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+            $countQuery = $countQuery->where(['covid19.specimen_type' => base64_decode(trim($params['sampleType']))]);
         }
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -2929,7 +2929,7 @@ class Covid19FormTable extends AbstractTableGateway
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
-            $splitDate = explode('to', $params['daterange']);
+            $splitDate = CommonService::convertDateRange($params['daterange']);
         }
 
         $l = 0;
@@ -2945,19 +2945,19 @@ class Covid19FormTable extends AbstractTableGateway
             ->group(array('covid19.lab_id'));
 
         if (isset($params['lab']) && trim($params['lab']) != '') {
-            $countQuery = $countQuery->where('f.facility_id IN (' . $params['lab'] . ')');
+            $countQuery = $countQuery->where(['f.facility_id' => CommonService::parseIdList($params['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-            $countQuery = $countQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+            $countQuery = $countQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinicId'])]);
         }
         if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("covid19.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "covid19.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
@@ -2994,7 +2994,7 @@ class Covid19FormTable extends AbstractTableGateway
             $countQuery = $countQuery->where($where);
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-            $countQuery = $countQuery->where('covid19.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+            $countQuery = $countQuery->where(['covid19.specimen_type' => base64_decode(trim($params['sampleType']))]);
         }
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -3029,7 +3029,7 @@ class Covid19FormTable extends AbstractTableGateway
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
-            $splitDate = explode('to', $params['daterange']);
+            $splitDate = CommonService::convertDateRange($params['daterange']);
         }
 
         $l = 0;
@@ -3045,19 +3045,19 @@ class Covid19FormTable extends AbstractTableGateway
             ->group(array('covid19.facility_id'));
 
         if (isset($params['lab']) && trim($params['lab']) != '') {
-            $countQuery = $countQuery->where('f.facility_id IN (' . $params['lab'] . ')');
+            $countQuery = $countQuery->where(['f.facility_id' => CommonService::parseIdList($params['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-            $countQuery = $countQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+            $countQuery = $countQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinicId'])]);
         }
         if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("covid19.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "covid19.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
@@ -3094,7 +3094,7 @@ class Covid19FormTable extends AbstractTableGateway
             $countQuery = $countQuery->where($where);
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-            $countQuery = $countQuery->where('covid19.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+            $countQuery = $countQuery->where(['covid19.specimen_type' => base64_decode(trim($params['sampleType']))]);
         }
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -3144,7 +3144,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -3166,9 +3166,9 @@ class Covid19FormTable extends AbstractTableGateway
 
                 for ($i = 0; $i < $colSize; $i++) {
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -3182,16 +3182,16 @@ class Covid19FormTable extends AbstractTableGateway
         for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
 
 
         if (isset($parameters['daterange']) && trim($parameters['daterange']) != '') {
-            $splitDate = explode('to', $parameters['daterange']);
+            $splitDate = CommonService::convertDateRange($parameters['daterange']);
         }
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -3208,19 +3208,19 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery = $sQuery->where("(covid19.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
         }
         if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
-            $sQuery = $sQuery->where('l.facility_state IN (' . $parameters['provinces'] . ')');
+            $sQuery = $sQuery->where(['l.facility_state' => CommonService::parseIdList($parameters['provinces'])]);
         }
         if (isset($parameters['districts']) && trim($parameters['districts']) != '') {
-            $sQuery = $sQuery->where('l.facility_district IN (' . $parameters['districts'] . ')');
+            $sQuery = $sQuery->where(['l.facility_district' => CommonService::parseIdList($parameters['districts'])]);
         }
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
-            $sQuery = $sQuery->where('covid19.lab_id IN (' . $parameters['lab'] . ')');
+            $sQuery = $sQuery->where(['covid19.lab_id' => CommonService::parseIdList($parameters['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
-            $sQuery = $sQuery->where('covid19.facility_id IN (' . $parameters['clinicId'] . ')');
+            $sQuery = $sQuery->where(['covid19.facility_id' => CommonService::parseIdList($parameters['clinicId'])]);
         }
 
         //print_r($parameters['age']);die;
@@ -3342,12 +3342,12 @@ class Covid19FormTable extends AbstractTableGateway
         $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $facilityQuery = $sql->select()->from(array('f' => 'facility_details'))
                 ->where(array('f.facility_type' => 2));
             if (isset($params['lab']) && trim($params['lab']) != '') {
-                $facilityQuery = $facilityQuery->where('f.facility_id IN (' . $params['lab'] . ')');
+                $facilityQuery = $facilityQuery->where(['f.facility_id' => CommonService::parseIdList($params['lab'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $facilityQuery = $facilityQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -3370,13 +3370,13 @@ class Covid19FormTable extends AbstractTableGateway
                     $countQuery = $countQuery->where(array("covid19.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
                 }
                 if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                    $countQuery = $countQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                    $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
                 }
                 if (isset($params['districts']) && trim($params['districts']) != '') {
-                    $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                    $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
                 }
                 if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                    $countQuery = $countQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+                    $countQuery = $countQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinicId'])]);
                 }
 
 
@@ -3440,12 +3440,12 @@ class Covid19FormTable extends AbstractTableGateway
         $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $fQuery = $sql->select()->from(array('f' => 'facility_details'))
                 ->where(array('f.facility_type' => 2));
             if (isset($params['lab']) && trim($params['lab']) != '') {
-                $fQuery = $fQuery->where('f.facility_id IN (' . $params['lab'] . ')');
+                $fQuery = $fQuery->where(['f.facility_id' => CommonService::parseIdList($params['lab'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -3473,13 +3473,13 @@ class Covid19FormTable extends AbstractTableGateway
                     $countQuery = $countQuery->where(array("covid19.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
                 }
                 if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                    $countQuery = $countQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                    $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
                 }
                 if (isset($params['districts']) && trim($params['districts']) != '') {
-                    $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                    $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
                 }
                 if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                    $countQuery = $countQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+                    $countQuery = $countQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinicId'])]);
                 }
 
 
@@ -3543,8 +3543,8 @@ class Covid19FormTable extends AbstractTableGateway
         $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
 
             $sQuery = $sql->select()->from(array('covid19' => $this->table))
                 ->columns(
@@ -3567,19 +3567,19 @@ class Covid19FormTable extends AbstractTableGateway
             );
 
             if (isset($params['lab']) && trim($params['lab']) != '') {
-                $sQuery = $sQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
+                $sQuery = $sQuery->where(['covid19.lab_id' => CommonService::parseIdList($params['lab'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
             if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             }
             if (isset($params['districts']) && trim($params['districts']) != '') {
-                $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             }
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $sQuery = $sQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+                $sQuery = $sQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinicId'])]);
             }
 
 
@@ -3615,7 +3615,7 @@ class Covid19FormTable extends AbstractTableGateway
                 $sQuery = $sQuery->where("covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result >= 1000 AND covid19.result!='Failed' AND covid19.result!='failed' AND covid19.result!='Fail' AND covid19.result!='fail' AND covid19.result!='No Sample' AND covid19.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             }
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $sQuery = $sQuery->where('covid19.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+                $sQuery = $sQuery->where(['covid19.specimen_type' => base64_decode(trim($params['sampleType']))]);
             }
             if (isset($params['gender']) && $params['gender'] == 'F') {
                 $sQuery = $sQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
@@ -3665,7 +3665,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -3687,9 +3687,9 @@ class Covid19FormTable extends AbstractTableGateway
 
                 for ($i = 0; $i < $colSize; $i++) {
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -3703,17 +3703,17 @@ class Covid19FormTable extends AbstractTableGateway
         for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
         }
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -3736,19 +3736,19 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery = $sQuery->where(array("covid19.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
         }
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
-            $sQuery = $sQuery->where('covid19.lab_id IN (' . $parameters['lab'] . ')');
+            $sQuery = $sQuery->where(['covid19.lab_id' => CommonService::parseIdList($parameters['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
-            $sQuery = $sQuery->where('l.facility_state IN (' . $parameters['provinces'] . ')');
+            $sQuery = $sQuery->where(['l.facility_state' => CommonService::parseIdList($parameters['provinces'])]);
         }
         if (isset($parameters['districts']) && trim($parameters['districts']) != '') {
-            $sQuery = $sQuery->where('l.facility_district IN (' . $parameters['districts'] . ')');
+            $sQuery = $sQuery->where(['l.facility_district' => CommonService::parseIdList($parameters['districts'])]);
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
-            $sQuery = $sQuery->where('covid19.facility_id IN (' . $parameters['clinicId'] . ')');
+            $sQuery = $sQuery->where(['covid19.facility_id' => CommonService::parseIdList($parameters['clinicId'])]);
         }
 
 
@@ -3878,7 +3878,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $aColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $aColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -3900,9 +3900,9 @@ class Covid19FormTable extends AbstractTableGateway
 
                 for ($i = 0; $i < $colSize; $i++) {
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -3916,9 +3916,9 @@ class Covid19FormTable extends AbstractTableGateway
         for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -3927,8 +3927,8 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
         }
         $sQuery = $sql->select()->from(array('f' => 'facility_details'))
             ->join(array('covid19' => $this->table), 'covid19.lab_id=f.facility_id', array(
@@ -3940,13 +3940,13 @@ class Covid19FormTable extends AbstractTableGateway
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND covid19.lab_id !=0")
             ->group('covid19.lab_id');
         if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
-            $sQuery = $sQuery->where('f.facility_state_id IN (' . $parameters['provinces'] . ')');
+            $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($parameters['provinces'])]);
         }
         if (isset($parameters['districts']) && trim($parameters['districts']) != '') {
-            $sQuery = $sQuery->where('f.facility_district_id IN (' . $parameters['districts'] . ')');
+            $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($parameters['districts'])]);
         }
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
-            $sQuery = $sQuery->where('covid19.lab_id IN (' . $parameters['lab'] . ')');
+            $sQuery = $sQuery->where(['covid19.lab_id' => CommonService::parseIdList($parameters['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -3955,7 +3955,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery = $sQuery->where(array("covid19.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
-            $sQuery = $sQuery->where('covid19.facility_id IN (' . $parameters['clinicId'] . ')');
+            $sQuery = $sQuery->where(['covid19.facility_id' => CommonService::parseIdList($parameters['clinicId'])]);
         }
 
 
@@ -4068,8 +4068,8 @@ class Covid19FormTable extends AbstractTableGateway
         $vlOutComeResult = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $sQuery = $sql->select()->from(array('covid19' => $this->table))
                 ->columns(
                     array(
@@ -4079,13 +4079,13 @@ class Covid19FormTable extends AbstractTableGateway
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array());
             if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             }
             if (isset($params['districts']) && trim($params['districts']) != '') {
-                $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             }
             if (isset($params['lab']) && trim($params['lab']) != '') {
-                $sQuery = $sQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
+                $sQuery = $sQuery->where(['covid19.lab_id' => CommonService::parseIdList($params['lab'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -4094,7 +4094,7 @@ class Covid19FormTable extends AbstractTableGateway
                 $sQuery = $sQuery->where(array("covid19.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
             }
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $sQuery = $sQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+                $sQuery = $sQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinicId'])]);
             }
 
 
@@ -4180,17 +4180,17 @@ class Covid19FormTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id = covid19.facility_id', array());
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $eidOutcomesQuery = $eidOutcomesQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $eidOutcomesQuery = $eidOutcomesQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $eidOutcomesQuery = $eidOutcomesQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+            $eidOutcomesQuery = $eidOutcomesQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $eidOutcomesQuery = $eidOutcomesQuery
                 ->where("(sample_collection_date is not null)
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -4201,7 +4201,7 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
             $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                 ->where('f.facility_type = 2 AND f.status="active"');
-            $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+            $fQuery = $fQuery->where(['f.facility_id' => CommonService::parseIdList($params['facilityId'])]);
             $fQueryStr = $sql->buildSqlString($fQuery);
             $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
@@ -4249,20 +4249,20 @@ class Covid19FormTable extends AbstractTableGateway
                 ->order(array("lab_id", new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")));
 
             if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             }
             if (isset($params['districts']) && trim($params['districts']) != '') {
-                $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             }
             if (isset($params['clinics']) && trim($params['clinics']) != '') {
-                $sQuery = $sQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+                $sQuery = $sQuery->where(['covid19.facility_id' => CommonService::parseIdList($params['clinics'])]);
             }
 
             $facilityIdList = [];
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
                 $mQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
-                $mQuery = $mQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+                $mQuery = $mQuery->where(['f.facility_id' => CommonService::parseIdList($params['facilityId'])]);
                 $mQueryStr = $sql->buildSqlString($mQuery);
                 $facilityResult = $dbAdapter->query($mQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');

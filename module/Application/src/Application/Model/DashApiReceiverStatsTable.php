@@ -45,7 +45,7 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $aColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $aColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -67,9 +67,9 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
 
                 for ($i = 0; $i < $colSize; $i++) {
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -83,9 +83,9 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -235,17 +235,6 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
 
         $queryContainer->syncStatus = $sql;
         return $dbAdapter->query($sql, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-    }
-
-    public function updateFormAttributes($params, $currentDateTime = null)
-    {
-        $currentDateTime = $currentDateTime ?? CommonService::getDateTime();
-        return $this->adapter->query(
-            "UPDATE " . $params['table'] .
-                " SET form_attributes = JSON_SET(COALESCE(form_attributes, '{}'), '$.lastDashboardHeartBeat', ?) " .
-                " WHERE " . $params['field'] . " IN (?)",
-            [$currentDateTime, $params['id']]
-        );
     }
 
     public function updateFacilityAttributes($facilityId, $currentDateTime = null, $lastUpdateSource = null)

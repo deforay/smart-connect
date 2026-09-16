@@ -95,7 +95,6 @@ class Covid19FormService
                             "field" => "covid19_id",
                             "id" => $id
                         );
-                        //$apiTrackDb->updateFormAttributes($params, $currentDateTime);
                         $apiTrackDb->updateFacilityAttributes($data['facility_id'], $currentDateTime);
                     }
                     $numRows++;

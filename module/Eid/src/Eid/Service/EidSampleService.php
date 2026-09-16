@@ -562,7 +562,7 @@ class EidSampleService
     public function getTATbyProvince($params)
     {
         $labs = (isset($params['lab']) && !empty($params['lab'])) ? $params['lab'] : array();
-        $dates = explode(" to ", $params['sampleCollectionDate']);
+        $dates = CommonService::convertDateRange($params['sampleCollectionDate']);
         $startDate = $dates[0];
         $endDate = $dates[1];
         // set_time_limit(10000);

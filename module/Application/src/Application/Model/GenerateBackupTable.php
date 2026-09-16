@@ -8,6 +8,7 @@ use Laminas\Db\Sql\Sql;
 use Laminas\Db\TableGateway\AbstractTableGateway;
 
 use Application\Session\Container;
+use Application\Service\CommonService;
 
 /**
  * Generate Backup - inititaed in DataManagement/ExportController
@@ -33,7 +34,7 @@ class GenerateBackupTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            $s_c_date = CommonService::convertDateRange($params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
                 $startDate = trim($s_c_date[0]);
             }

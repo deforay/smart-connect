@@ -118,7 +118,7 @@ class SampleTable extends AbstractTableGateway
         $tResult = [];
         $rejectedResult = [];
         if (trim($params['daterange']) != '') {
-            $splitDate = explode('to', $params['daterange']);
+            $splitDate = CommonService::convertDateRange($params['daterange']);
         } else {
             $timestamp = time();
             $qDates = [];
@@ -221,8 +221,8 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
 
 
             $facilityIdList = null;
@@ -230,7 +230,7 @@ class SampleTable extends AbstractTableGateway
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
-                $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+                $fQuery = $fQuery->where(['f.facility_id' => CommonService::parseIdList($params['facilityId'])]);
                 $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
@@ -247,7 +247,7 @@ class SampleTable extends AbstractTableGateway
             $specimenTypes = null;
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
                 $rsQuery = $sql->select()->from(array('rs' => 'r_vl_sample_type'))->columns(array('sample_id'));
-                $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
+                $rsQuery = $rsQuery->where(['rs.sample_id' => base64_decode(trim($params['sampleType']))]);
                 $rsQueryStr = $sql->buildSqlString($rsQuery);
                 //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $specimenTypesResult = $this->commonService->cacheQuery($rsQueryStr, $dbAdapter);
@@ -309,11 +309,11 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $rsQuery = $sql->select()->from(array('tr' => 'r_vl_test_reasons'));
             if (isset($params['testedReason']) && trim($params['testedReason']) != '') {
-                $rsQuery = $rsQuery->where('tr.test_reason_id="' . base64_decode(trim($params['testedReason'])) . '"');
+                $rsQuery = $rsQuery->where(['tr.test_reason_id' => base64_decode(trim($params['testedReason']))]);
             }
             $rsQueryStr = $sql->buildSqlString($rsQuery);
             $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -334,7 +334,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $queryStr = $queryStr->where('vl.lab_id IN (' . $params['facilityId'] . ')');
+                $queryStr = $queryStr->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             }
@@ -372,15 +372,15 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
 
             $facilityIdList = null;
 
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
-                $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+                $fQuery = $fQuery->where(['f.facility_id' => CommonService::parseIdList($params['facilityId'])]);
                 $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
@@ -397,7 +397,7 @@ class SampleTable extends AbstractTableGateway
             $specimenTypes = null;
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
                 $rsQuery = $sql->select()->from(array('rs' => 'r_vl_sample_type'))->columns(array('sample_id'));
-                $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
+                $rsQuery = $rsQuery->where(['rs.sample_id' => base64_decode(trim($params['sampleType']))]);
                 $rsQueryStr = $sql->buildSqlString($rsQuery);
                 //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $specimenTypesResult = $this->commonService->cacheQuery($rsQueryStr, $dbAdapter);
@@ -456,8 +456,8 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $j = 0;
             $lessTotal = 0;
             $greaterTotal = 0;
@@ -482,7 +482,7 @@ class SampleTable extends AbstractTableGateway
                     ]
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where('vl.lab_id IN (' . $params['facilityId'] . ')');
+                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             }
@@ -539,7 +539,7 @@ class SampleTable extends AbstractTableGateway
                 ->where([
                     'f.facility_type' => 2,
                     'f.status' => 'active',
-                    new Expression('f.facility_id IN (' . $params['facilityId'] . ')')
+                    'f.facility_id' => CommonService::parseIdList($params['facilityId'])
                 ]);
 
             $facilityResult = $dbAdapter->query($sql->buildSqlString($fQuery), $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -617,8 +617,8 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $j = 0;
             $lessTotal = 0;
             $greaterTotal = 0;
@@ -648,7 +648,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where('vl.lab_id IN (' . $params['facilityId'] . ')');
+                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             }
@@ -722,8 +722,8 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $j = 0;
             $lessTotal = 0;
             $greaterTotal = 0;
@@ -737,7 +737,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where('vl.lab_id IN (' . $params['facilityId'] . ')');
+                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             }
@@ -774,8 +774,8 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $j = 0;
             $lessTotal = 0;
             $greaterTotal = 0;
@@ -789,7 +789,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where('vl.lab_id IN (' . $params['facilityId'] . ')');
+                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             }
@@ -826,8 +826,8 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $incompleteQuery = "(vl.patient_art_no IS NULL OR vl.patient_art_no='' OR vl.patient_age_in_years IS NULL OR vl.patient_age_in_years ='' OR vl.patient_gender IS NULL OR vl.patient_gender='' OR vl.current_regimen IS NOT NULL OR vl.current_regimen !='')";
             $completeQuery = "vl.patient_art_no IS NOT NULL AND vl.patient_art_no !='' AND vl.patient_age_in_years IS NOT NULL AND vl.patient_age_in_years !='' AND vl.patient_gender IS NOT NULL AND vl.patient_gender !='' AND vl.current_regimen IS NOT NULL AND vl.current_regimen !=''";
             if (isset($params['formFields']) && trim($params['formFields']) != '') {
@@ -861,7 +861,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where('vl.lab_id IN (' . $params['facilityId'] . ')');
+                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             }
@@ -902,12 +902,12 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $fQuery = $sql->select()->from(array('f' => 'facility_details'))
                 ->where('f.facility_type = 2 AND f.status="active"');
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+                $fQuery = $fQuery->where(['f.facility_id' => CommonService::parseIdList($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -948,8 +948,8 @@ class SampleTable extends AbstractTableGateway
         $femaleTestResult = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $query = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
                     array(
@@ -963,7 +963,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where('vl.lab_id IN (' . $params['facilityId'] . ')');
+                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -988,8 +988,8 @@ class SampleTable extends AbstractTableGateway
         $lineOfTreatmentResult = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $query = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
                     array(
@@ -1000,7 +1000,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where('vl.lab_id IN (' . $params['facilityId'] . ')');
+                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -1024,14 +1024,14 @@ class SampleTable extends AbstractTableGateway
         $lResult = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $lQuery = $sql->select()->from(array('vl' => $this->table))->columns(array('lab_id', 'labCount' => new \Laminas\Db\Sql\Expression("COUNT(vl.lab_id)")))
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array('facility_name', 'latitude', 'longitude'))
                 ->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"))
                 ->group('vl.lab_id');
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $lQuery = $lQuery->where('vl.lab_id IN (' . $params['facilityId'] . ')');
+                $lQuery = $lQuery->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $lQuery = $lQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -1074,8 +1074,8 @@ class SampleTable extends AbstractTableGateway
         $result[$k]['field'] = 'Patient Age in Years';
         $result[$l]['field'] = 'Patient Sex';
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
         }
 
         $inCompleteQuery = $sql->select()->from(array('vl' => $this->table))->columns(array('total' => new Expression('COUNT(*)')))
@@ -1084,13 +1084,13 @@ class SampleTable extends AbstractTableGateway
             $inCompleteQuery = $inCompleteQuery->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $inCompleteQuery = $inCompleteQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $inCompleteQuery = $inCompleteQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $inCompleteQuery = $inCompleteQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $inCompleteQuery = $inCompleteQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['lab']) && trim($params['lab']) != '') {
-            $inCompleteQuery = $inCompleteQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
+            $inCompleteQuery = $inCompleteQuery->where(['vl.lab_id' => CommonService::parseIdList($params['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $inCompleteQuery = $inCompleteQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -1137,15 +1137,15 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
         }
         $fQuery = $sql->select()->from(array('f' => 'facility_details'))
             ->join(array('vl' => $this->table), 'vl.lab_id=f.facility_id', array('lab_id', 'specimen_type', 'result'))
             ->where('vl.lab_id !=0')
             ->group('f.facility_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
-            $fQuery = $fQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
+            $fQuery = $fQuery->where(['vl.lab_id' => CommonService::parseIdList($params['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $fQuery = $fQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -1172,10 +1172,10 @@ class SampleTable extends AbstractTableGateway
                 $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
             }
             if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                $countQuery = $countQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             }
             if (isset($params['districts']) && trim($params['districts']) != '') {
-                $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             }
             if (isset($params['gender']) && $params['gender'] == 'F') {
                 $countQuery = $countQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -1221,8 +1221,8 @@ class SampleTable extends AbstractTableGateway
         $vlOutComeResult = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $sQuery = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
                     array(
@@ -1232,13 +1232,13 @@ class SampleTable extends AbstractTableGateway
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array());
             if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             }
             if (isset($params['districts']) && trim($params['districts']) != '') {
-                $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             }
             if (isset($params['lab']) && trim($params['lab']) != '') {
-                $sQuery = $sQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
+                $sQuery = $sQuery->where(['vl.lab_id' => CommonService::parseIdList($params['lab'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -1247,13 +1247,13 @@ class SampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
             }
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+                $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
             }
             if (isset($params['currentRegimen']) && trim($params['currentRegimen']) != '') {
-                $sQuery = $sQuery->where('vl.current_regimen="' . base64_decode(trim($params['currentRegimen'])) . '"');
+                $sQuery = $sQuery->where(['vl.current_regimen' => base64_decode(trim($params['currentRegimen']))]);
             }
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='" . $params['adherence'] . "'"));
+                $sQuery = $sQuery->where(['vl.arv_adherance_percentage' => $params['adherence']]);
             }
             if (isset($params['age']) && is_array($params['age'])) {
                 $params['age'] = implode(',', $params['age']);
@@ -1289,7 +1289,7 @@ class SampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where("vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000");
             }
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+                $sQuery = $sQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
             }
             if (isset($params['gender']) && $params['gender'] == 'F') {
                 $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -1337,7 +1337,7 @@ class SampleTable extends AbstractTableGateway
         $sResult = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            $s_c_date = CommonService::convertDateRange($params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
                 $startDate = trim($s_c_date[0]);
             }
@@ -1375,17 +1375,17 @@ class SampleTable extends AbstractTableGateway
             $squery = $squery->where(array("vl.sample_collection_date BETWEEN '$startDate 00:00:00' AND '$endDate 23:59:59'"));
 
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $squery = $squery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+                $squery = $squery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $squery = $squery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
 
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $squery = $squery->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $squery = $squery->where(['vl.specimen_type' => base64_decode(trim($params['sampleTypeId']))]);
             }
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $squery = $squery->where(array("vl.arv_adherance_percentage ='" . $params['adherence'] . "'"));
+                $squery = $squery->where(['vl.arv_adherance_percentage' => $params['adherence']]);
             }
             //print_r($params['age']);die;
             $ageWhere = '';
@@ -1452,7 +1452,7 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            $s_c_date = CommonService::convertDateRange($params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
                 $startDate = trim($s_c_date[0]);
             }
@@ -1530,7 +1530,7 @@ class SampleTable extends AbstractTableGateway
             }
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
                 $query->where("vl.arv_adherance_percentage = ?", $params['adherence']);
-                //$query = $query->where(array("vl.arv_adherance_percentage = '" . $params['adherence'] . "'"));
+                //$query = $query->where(['vl.arv_adherance_percentage' => $params['adherence']]);
             }
 
             if (isset($params['gender'])) {
@@ -1593,7 +1593,7 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            $s_c_date = CommonService::convertDateRange($params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
                 $startDate = trim($s_c_date[0]);
             }
@@ -1743,7 +1743,7 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            $s_c_date = CommonService::convertDateRange($params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
                 $startDate = trim($s_c_date[0]);
             }
@@ -1854,7 +1854,7 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            $s_c_date = CommonService::convertDateRange($params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
                 $startDate = trim($s_c_date[0]);
             }
@@ -1984,7 +1984,7 @@ class SampleTable extends AbstractTableGateway
         $rResult = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            $s_c_date = CommonService::convertDateRange($params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
                 $startDate = trim($s_c_date[0]);
             }
@@ -2084,7 +2084,7 @@ class SampleTable extends AbstractTableGateway
             }
 
             if (isset($params['testReason']) && trim($params['testReason']) != '') {
-                $rQuery->where(new WhereExpression("vl.reason_for_vl_testing ='" . base64_decode($params['testReason']) . "'"));
+                $rQuery->where(['vl.reason_for_vl_testing' => base64_decode($params['testReason'])]);
             }
 
             $rQueryStr = $sql->buildSqlString($rQuery);
@@ -2147,7 +2147,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -2169,9 +2169,9 @@ class SampleTable extends AbstractTableGateway
 
                 for ($i = 0; $i < $colSize; $i++) {
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -2185,9 +2185,9 @@ class SampleTable extends AbstractTableGateway
         for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -2196,7 +2196,7 @@ class SampleTable extends AbstractTableGateway
         $startDate = '';
         $endDate = '';
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $parameters['sampleCollectionDate']);
+            $s_c_date = CommonService::convertDateRange($parameters['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
                 $startDate = trim($s_c_date[0]);
             }
@@ -2217,7 +2217,7 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where(array("vl.sample_collection_date >= '$startDate 00:00:00'", "vl.sample_collection_date <= '$endDate 23:59:59'"));
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
-            $sQuery = $sQuery->where('vl.facility_id IN (' . $parameters['clinicId'] . ')');
+            $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($parameters['clinicId'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $sQuery = $sQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -2228,7 +2228,7 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where("vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000");
         }
         if (isset($parameters['sampleTypeId']) && trim($parameters['sampleTypeId']) != '') {
-            $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($parameters['sampleTypeId'])) . '"');
+            $sQuery = $sQuery->where(['vl.specimen_type' => base64_decode(trim($parameters['sampleTypeId']))]);
         }
         //print_r($parameters['age']);die;
         if (isset($parameters['age']) && trim($parameters['age']) != '') {
@@ -2257,7 +2257,7 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where($where);
         }
         if (isset($parameters['adherence']) && trim($parameters['adherence']) != '') {
-            $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='" . $parameters['adherence'] . "'"));
+            $sQuery = $sQuery->where(['vl.arv_adherance_percentage' => $parameters['adherence']]);
         }
         if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
             $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -2383,7 +2383,7 @@ class SampleTable extends AbstractTableGateway
 
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            $s_c_date = CommonService::convertDateRange($params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
                 $startDate = trim($s_c_date[0]);
             }
@@ -2523,12 +2523,12 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $facilityQuery = $sql->select()->from(array('f' => 'facility_details'))
                 ->where(array('f.facility_type' => 2));
             if (isset($params['lab']) && trim($params['lab']) != '') {
-                $facilityQuery = $facilityQuery->where('f.facility_id IN (' . $params['lab'] . ')');
+                $facilityQuery = $facilityQuery->where(['f.facility_id' => CommonService::parseIdList($params['lab'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $facilityQuery = $facilityQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -2551,19 +2551,19 @@ class SampleTable extends AbstractTableGateway
                     $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
                 }
                 if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                    $countQuery = $countQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                    $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
                 }
                 if (isset($params['districts']) && trim($params['districts']) != '') {
-                    $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                    $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
                 }
                 if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                    $countQuery = $countQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+                    $countQuery = $countQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
                 }
                 if (isset($params['currentRegimen']) && trim($params['currentRegimen']) != '') {
-                    $countQuery = $countQuery->where('vl.current_regimen="' . base64_decode(trim($params['currentRegimen'])) . '"');
+                    $countQuery = $countQuery->where(['vl.current_regimen' => base64_decode(trim($params['currentRegimen']))]);
                 }
                 if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                    $countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='" . $params['adherence'] . "'"));
+                    $countQuery = $countQuery->where(['vl.arv_adherance_percentage' => $params['adherence']]);
                 }
                 //print_r($params['age']);die;
                 if (isset($params['age']) && trim($params['age']) != '') {
@@ -2597,7 +2597,7 @@ class SampleTable extends AbstractTableGateway
                     $countQuery = $countQuery->where("(vl.vl_result_category like 'not%' OR vl.vl_result_category like 'Not%' or vl.result_value_absolute_decimal >= 1000)");
                 }
                 if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                    $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+                    $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
                 }
                 if (isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested') {
                     $countQuery = $countQuery->where("((vl.vl_result_category IS NOT NULL AND vl.vl_result_category != '' AND vl.vl_result_category != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
@@ -2659,12 +2659,12 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $fQuery = $sql->select()->from(array('f' => 'facility_details'))
                 ->where(array('f.facility_type' => 2));
             if (isset($params['lab']) && trim($params['lab']) != '') {
-                $fQuery = $fQuery->where('f.facility_id IN (' . $params['lab'] . ')');
+                $fQuery = $fQuery->where(['f.facility_id' => CommonService::parseIdList($params['lab'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -2692,19 +2692,19 @@ class SampleTable extends AbstractTableGateway
                     $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
                 }
                 if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                    $countQuery = $countQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                    $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
                 }
                 if (isset($params['districts']) && trim($params['districts']) != '') {
-                    $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                    $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
                 }
                 if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                    $countQuery = $countQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+                    $countQuery = $countQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
                 }
                 if (isset($params['currentRegimen']) && trim($params['currentRegimen']) != '') {
-                    $countQuery = $countQuery->where('vl.current_regimen="' . base64_decode(trim($params['currentRegimen'])) . '"');
+                    $countQuery = $countQuery->where(['vl.current_regimen' => base64_decode(trim($params['currentRegimen']))]);
                 }
                 if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                    $countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='" . $params['adherence'] . "'"));
+                    $countQuery = $countQuery->where(['vl.arv_adherance_percentage' => $params['adherence']]);
                 }
                 //print_r($params['age']);die;
                 if (isset($params['age']) && trim($params['age']) != '') {
@@ -2738,7 +2738,7 @@ class SampleTable extends AbstractTableGateway
                     $countQuery = $countQuery->where("(vl.vl_result_category like 'not%' OR vl.vl_result_category like 'Not%' or vl.result_value_absolute_decimal >= 1000)");
                 }
                 if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                    $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+                    $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
                 }
                 if (isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested') {
                     $countQuery = $countQuery->where("((vl.vl_result_category IS NOT NULL AND vl.vl_result_category != '' AND vl.vl_result_category != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
@@ -2805,7 +2805,7 @@ class SampleTable extends AbstractTableGateway
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = date("Y-m", strtotime(trim($params['fromDate']))) . "-01";
             //$endMonth = date("Y-m", strtotime(trim($params['toDate']))) . "-31";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $sQuery = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
                     array(
@@ -2816,27 +2816,27 @@ class SampleTable extends AbstractTableGateway
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array(), 'left')
                 ->where(array("vl.sample_collection_date <= '$endMonth 23:59:59'", "vl.sample_collection_date >= '$startMonth 00:00:00'"));
             if (isset($params['lab']) && trim($params['lab']) != '') {
-                $sQuery = $sQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
+                $sQuery = $sQuery->where(['vl.lab_id' => CommonService::parseIdList($params['lab'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
             if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             }
             if (isset($params['districts']) && trim($params['districts']) != '') {
-                $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             }
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+                $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
             }
 
             if (isset($params['currentRegimen']) && trim($params['currentRegimen']) != '') {
-                $sQuery = $sQuery->where('vl.current_regimen="' . base64_decode(trim($params['currentRegimen'])) . '"');
+                $sQuery = $sQuery->where(['vl.current_regimen' => base64_decode(trim($params['currentRegimen']))]);
             }
 
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='" . $params['adherence'] . "'"));
+                $sQuery = $sQuery->where(['vl.arv_adherance_percentage' => $params['adherence']]);
             }
 
             if (isset($params['age']) && trim($params['age']) != '') {
@@ -2870,7 +2870,7 @@ class SampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             }
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+                $sQuery = $sQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
             }
             if (isset($params['gender']) && $params['gender'] == 'F') {
                 $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -2916,8 +2916,8 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
 
             $sQuery = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
@@ -2940,25 +2940,25 @@ class SampleTable extends AbstractTableGateway
             );
 
             if (isset($params['lab']) && trim($params['lab']) != '') {
-                $sQuery = $sQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
+                $sQuery = $sQuery->where(['vl.lab_id' => CommonService::parseIdList($params['lab'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
             if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             }
             if (isset($params['districts']) && trim($params['districts']) != '') {
-                $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             }
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+                $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
             }
             if (isset($params['currentRegimen']) && trim($params['currentRegimen']) != '') {
-                $sQuery = $sQuery->where('vl.current_regimen="' . base64_decode(trim($params['currentRegimen'])) . '"');
+                $sQuery = $sQuery->where(['vl.current_regimen' => base64_decode(trim($params['currentRegimen']))]);
             }
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='" . $params['adherence'] . "'"));
+                $sQuery = $sQuery->where(['vl.arv_adherance_percentage' => $params['adherence']]);
             }
             //print_r($params['age']);die;
             if (isset($params['age']) && trim($params['age']) != '') {
@@ -2992,7 +2992,7 @@ class SampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             }
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+                $sQuery = $sQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
             }
             if (isset($params['gender']) && $params['gender'] == 'F') {
                 $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -3036,7 +3036,7 @@ class SampleTable extends AbstractTableGateway
             //                             ->join(array('f'=>'facility_details'),'f.facility_id=vl.lab_id',array(),'left')
             //                             ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
             //     if(isset($params['lab']) && trim($params['lab'])!= ''){
-            //         $sQuery = $sQuery->where('vl.lab_id IN ('.$params['lab'].')');
+            //         $sQuery = $sQuery->where(['vl.lab_id' => CommonService::parseIdList($params['lab'])]);
             //     }else{
             //         if($loginContainer->role!= 1){
             //             $mappedFacilities = (isset($loginContainer->mappedFacilities) && count($loginContainer->mappedFacilities) >0)?$loginContainer->mappedFacilities:[];
@@ -3044,19 +3044,19 @@ class SampleTable extends AbstractTableGateway
             //         }
             //     }
             //     if(isset($params['provinces']) && trim($params['provinces'])!= ''){
-            //         $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'].')');
+            //         $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             //     }
             //     if(isset($params['districts']) && trim($params['districts'])!= ''){
-            //         $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            //         $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             //     }
             //     if(isset($params['clinicId']) && trim($params['clinicId'])!= ''){
-            //         $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+            //         $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
             //     }
             //     if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
-            //         $sQuery = $sQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
+            //         $sQuery = $sQuery->where(['vl.current_regimen' => base64_decode(trim($params['currentRegimen']))]);
             //     }
             //     if(isset($params['adherence']) && trim($params['adherence'])!=''){
-            //         $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'"));
+            //         $sQuery = $sQuery->where(['vl.arv_adherance_percentage' => $params['adherence']]);
             //     }
             //     //print_r($params['age']);die;
             //     if(isset($params['age']) && trim($params['age'])!= ''){
@@ -3087,7 +3087,7 @@ class SampleTable extends AbstractTableGateway
             //         $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             //     }
             //     if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-            //         $sQuery = $sQuery->where('vl.specimen_type="'.base64_decode(trim($params['sampleType'])).'"');
+            //         $sQuery = $sQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
             //     }
             //     if(isset($params['gender']) && $params['gender']=='F'){
             //         $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -3150,7 +3150,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -3172,9 +3172,9 @@ class SampleTable extends AbstractTableGateway
 
                 for ($i = 0; $i < $colSize; $i++) {
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -3188,17 +3188,17 @@ class SampleTable extends AbstractTableGateway
         for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
         }
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -3224,25 +3224,25 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
         }
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
-            $sQuery = $sQuery->where('vl.lab_id IN (' . $parameters['lab'] . ')');
+            $sQuery = $sQuery->where(['vl.lab_id' => CommonService::parseIdList($parameters['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
-            $sQuery = $sQuery->where('l.facility_state IN (' . $parameters['provinces'] . ')');
+            $sQuery = $sQuery->where(['l.facility_state' => CommonService::parseIdList($parameters['provinces'])]);
         }
         if (isset($parameters['districts']) && trim($parameters['districts']) != '') {
-            $sQuery = $sQuery->where('l.facility_district IN (' . $parameters['districts'] . ')');
+            $sQuery = $sQuery->where(['l.facility_district' => CommonService::parseIdList($parameters['districts'])]);
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
-            $sQuery = $sQuery->where('vl.facility_id IN (' . $parameters['clinicId'] . ')');
+            $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($parameters['clinicId'])]);
         }
         if (isset($parameters['currentRegimen']) && trim($parameters['currentRegimen']) != '') {
-            $sQuery = $sQuery->where('vl.current_regimen="' . base64_decode(trim($parameters['currentRegimen'])) . '"');
+            $sQuery = $sQuery->where(['vl.current_regimen' => base64_decode(trim($parameters['currentRegimen']))]);
         }
         if (isset($parameters['adherence']) && trim($parameters['adherence']) != '') {
-            $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='" . $parameters['adherence'] . "'"));
+            $sQuery = $sQuery->where(['vl.arv_adherance_percentage' => $parameters['adherence']]);
         }
         if (isset($parameters['age']) && trim($parameters['age']) != '') {
             $age = explode(',', $parameters['age']);
@@ -3275,7 +3275,7 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
         }
         if (isset($parameters['sampleType']) && trim($parameters['sampleType']) != '') {
-            $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($parameters['sampleType'])) . '"');
+            $sQuery = $sQuery->where(['vl.specimen_type' => base64_decode(trim($parameters['sampleType']))]);
         }
         if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
             $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -3391,7 +3391,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $aColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $aColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -3413,9 +3413,9 @@ class SampleTable extends AbstractTableGateway
 
                 for ($i = 0; $i < $colSize; $i++) {
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -3429,9 +3429,9 @@ class SampleTable extends AbstractTableGateway
         for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -3440,8 +3440,8 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
         }
         $sQuery = $sql->select()->from(array('f' => 'facility_details'))
             ->join(array('vl' => $this->table), 'vl.lab_id=f.facility_id', array(
@@ -3455,13 +3455,13 @@ class SampleTable extends AbstractTableGateway
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND vl.lab_id !=0")
             ->group('vl.lab_id');
         if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
-            $sQuery = $sQuery->where('f.facility_state_id IN (' . $parameters['provinces'] . ')');
+            $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($parameters['provinces'])]);
         }
         if (isset($parameters['districts']) && trim($parameters['districts']) != '') {
-            $sQuery = $sQuery->where('f.facility_district_id IN (' . $parameters['districts'] . ')');
+            $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($parameters['districts'])]);
         }
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
-            $sQuery = $sQuery->where('vl.lab_id IN (' . $parameters['lab'] . ')');
+            $sQuery = $sQuery->where(['vl.lab_id' => CommonService::parseIdList($parameters['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -3470,13 +3470,13 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
-            $sQuery = $sQuery->where('vl.facility_id IN (' . $parameters['clinicId'] . ')');
+            $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($parameters['clinicId'])]);
         }
         if (isset($parameters['currentRegimen']) && trim($parameters['currentRegimen']) != '') {
-            $sQuery = $sQuery->where('vl.current_regimen="' . base64_decode(trim($parameters['currentRegimen'])) . '"');
+            $sQuery = $sQuery->where(['vl.current_regimen' => base64_decode(trim($parameters['currentRegimen']))]);
         }
         if (isset($parameters['adherence']) && trim($parameters['adherence']) != '') {
-            $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='" . $parameters['adherence'] . "'"));
+            $sQuery = $sQuery->where(['vl.arv_adherance_percentage' => $parameters['adherence']]);
         }
         if (isset($parameters['age']) && trim($parameters['age']) != '') {
             $where = '';
@@ -3509,7 +3509,7 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
         }
         if (isset($parameters['sampleType']) && trim($parameters['sampleType']) != '') {
-            $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($parameters['sampleType'])) . '"');
+            $sQuery = $sQuery->where(['vl.specimen_type' => base64_decode(trim($parameters['sampleType']))]);
         }
         if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_tested') {
             $sQuery = $sQuery->where("((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
@@ -3629,7 +3629,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -3651,9 +3651,9 @@ class SampleTable extends AbstractTableGateway
 
                 for ($i = 0; $i < $colSize; $i++) {
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -3667,9 +3667,9 @@ class SampleTable extends AbstractTableGateway
         for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -3696,22 +3696,22 @@ class SampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array(), 'left');
         if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
-            $sQuery = $sQuery->where('f.facility_state_id IN (' . $parameters['provinces'] . ')');
+            $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($parameters['provinces'])]);
         }
         if (isset($parameters['districts']) && trim($parameters['districts']) != '') {
-            $sQuery = $sQuery->where('f.facility_district_id IN (' . $parameters['districts'] . ')');
+            $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($parameters['districts'])]);
         }
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
-            $sQuery = $sQuery->where('vl.lab_id IN (' . $parameters['lab'] . ')');
+            $sQuery = $sQuery->where(['vl.lab_id' => CommonService::parseIdList($parameters['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array();
             $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
-            $sQuery = $sQuery->where('vl.facility_id IN (' . $parameters['clinicId'] . ')');
+            $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($parameters['clinicId'])]);
         }
         if (isset($parameters['sampleType']) && trim($parameters['sampleType']) != '') {
-            $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($parameters['sampleType'])) . '"');
+            $sQuery = $sQuery->where(['vl.specimen_type' => base64_decode(trim($parameters['sampleType']))]);
         }
         if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
             $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -3819,7 +3819,7 @@ class SampleTable extends AbstractTableGateway
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
-            $splitDate = explode('to', $params['daterange']);
+            $splitDate = CommonService::convertDateRange($params['daterange']);
         }
 
         $p = 0;
@@ -3835,19 +3835,19 @@ class SampleTable extends AbstractTableGateway
             ->join(array('p' => 'geographical_divisions'), 'p.geo_id=f.facility_state_id', array('province_name' => 'geo_name', 'geo_id'), 'left')
             ->group('p.geo_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
-            $countQuery = $countQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
+            $countQuery = $countQuery->where(['vl.lab_id' => CommonService::parseIdList($params['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $countQuery = $countQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('p.geo_id IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where(['p.geo_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-            $countQuery = $countQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+            $countQuery = $countQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
         }
         if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "vl.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
@@ -3857,7 +3857,7 @@ class SampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where("(vl.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
         }
         if (isset($params['currentRegimen']) && trim($params['currentRegimen']) != '') {
-            $countQuery = $countQuery->where('vl.current_regimen="' . base64_decode(trim($params['currentRegimen'])) . '"');
+            $countQuery = $countQuery->where(['vl.current_regimen' => base64_decode(trim($params['currentRegimen']))]);
         }
         //print_r($params['age']);die;
         if (isset($params['age']) && trim($params['age']) != '') {
@@ -3886,7 +3886,7 @@ class SampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where($where);
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-            $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+            $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
         }
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -3931,7 +3931,7 @@ class SampleTable extends AbstractTableGateway
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
-            $splitDate = explode('to', $params['daterange']);
+            $splitDate = CommonService::convertDateRange($params['daterange']);
         }
 
         $p = 0;
@@ -3948,19 +3948,19 @@ class SampleTable extends AbstractTableGateway
             ->order('total DESC')
             ->group('d.geo_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
-            $countQuery = $countQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
+            $countQuery = $countQuery->where(['vl.lab_id' => CommonService::parseIdList($params['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $countQuery = $countQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('p.geo_id IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where(['p.geo_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-            $countQuery = $countQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+            $countQuery = $countQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
         }
         if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "vl.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
@@ -3970,7 +3970,7 @@ class SampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where("(vl.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
         }
         if (isset($params['currentRegimen']) && trim($params['currentRegimen']) != '') {
-            $countQuery = $countQuery->where('vl.current_regimen="' . base64_decode(trim($params['currentRegimen'])) . '"');
+            $countQuery = $countQuery->where(['vl.current_regimen' => base64_decode(trim($params['currentRegimen']))]);
         }
         //print_r($params['age']);die;
         if (isset($params['age']) && trim($params['age']) != '') {
@@ -3999,7 +3999,7 @@ class SampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where($where);
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-            $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+            $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
         }
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -4045,7 +4045,7 @@ class SampleTable extends AbstractTableGateway
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
-            $splitDate = explode('to', $params['daterange']);
+            $splitDate = CommonService::convertDateRange($params['daterange']);
         }
 
         $l = 0;
@@ -4061,19 +4061,19 @@ class SampleTable extends AbstractTableGateway
             ->group(array('vl.lab_id'));
 
         if (isset($params['lab']) && trim($params['lab']) != '') {
-            $countQuery = $countQuery->where('f.facility_id IN (' . $params['lab'] . ')');
+            $countQuery = $countQuery->where(['f.facility_id' => CommonService::parseIdList($params['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-            $countQuery = $countQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+            $countQuery = $countQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
         }
         if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "vl.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
@@ -4083,7 +4083,7 @@ class SampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where("(vl.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
         }
         if (isset($params['currentRegimen']) && trim($params['currentRegimen']) != '') {
-            $countQuery = $countQuery->where('vl.current_regimen="' . base64_decode(trim($params['currentRegimen'])) . '"');
+            $countQuery = $countQuery->where(['vl.current_regimen' => base64_decode(trim($params['currentRegimen']))]);
         }
         //print_r($params['age']);die;
         if (isset($params['age']) && trim($params['age']) != '') {
@@ -4112,7 +4112,7 @@ class SampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where($where);
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-            $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+            $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
         }
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -4159,7 +4159,7 @@ class SampleTable extends AbstractTableGateway
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
-            $splitDate = explode('to', $params['daterange']);
+            $splitDate = CommonService::convertDateRange($params['daterange']);
         }
 
         $l = 0;
@@ -4175,19 +4175,19 @@ class SampleTable extends AbstractTableGateway
             ->group(array('vl.facility_id'));
 
         if (isset($params['lab']) && trim($params['lab']) != '') {
-            $countQuery = $countQuery->where('f.facility_id IN (' . $params['lab'] . ')');
+            $countQuery = $countQuery->where(['f.facility_id' => CommonService::parseIdList($params['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-            $countQuery = $countQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+            $countQuery = $countQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
         }
         if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "vl.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
@@ -4197,7 +4197,7 @@ class SampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where("(vl.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
         }
         if (isset($params['currentRegimen']) && trim($params['currentRegimen']) != '') {
-            $countQuery = $countQuery->where('vl.current_regimen="' . base64_decode(trim($params['currentRegimen'])) . '"');
+            $countQuery = $countQuery->where(['vl.current_regimen' => base64_decode(trim($params['currentRegimen']))]);
         }
         //print_r($params['age']);die;
         if (isset($params['age']) && trim($params['age']) != '') {
@@ -4226,7 +4226,7 @@ class SampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where($where);
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-            $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+            $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
         }
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -4288,7 +4288,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -4310,9 +4310,9 @@ class SampleTable extends AbstractTableGateway
 
                 for ($i = 0; $i < $colSize; $i++) {
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -4326,16 +4326,16 @@ class SampleTable extends AbstractTableGateway
         for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
 
 
         if (isset($parameters['daterange']) && trim($parameters['daterange']) != '') {
-            $splitDate = explode('to', $parameters['daterange']);
+            $splitDate = CommonService::convertDateRange($parameters['daterange']);
         }
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -4353,22 +4353,22 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where("(vl.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
         }
         if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
-            $sQuery = $sQuery->where('l.facility_state IN (' . $parameters['provinces'] . ')');
+            $sQuery = $sQuery->where(['l.facility_state' => CommonService::parseIdList($parameters['provinces'])]);
         }
         if (isset($parameters['districts']) && trim($parameters['districts']) != '') {
-            $sQuery = $sQuery->where('l.facility_district IN (' . $parameters['districts'] . ')');
+            $sQuery = $sQuery->where(['l.facility_district' => CommonService::parseIdList($parameters['districts'])]);
         }
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
-            $sQuery = $sQuery->where('vl.lab_id IN (' . $parameters['lab'] . ')');
+            $sQuery = $sQuery->where(['vl.lab_id' => CommonService::parseIdList($parameters['lab'])]);
         } elseif ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
-            $sQuery = $sQuery->where('vl.facility_id IN (' . $parameters['clinicId'] . ')');
+            $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($parameters['clinicId'])]);
         }
         if (isset($parameters['currentRegimen']) && trim($parameters['currentRegimen']) != '') {
-            $sQuery = $sQuery->where('vl.current_regimen="' . base64_decode(trim($parameters['currentRegimen'])) . '"');
+            $sQuery = $sQuery->where(['vl.current_regimen' => base64_decode(trim($parameters['currentRegimen']))]);
         }
         //print_r($parameters['age']);die;
         if (isset($parameters['age']) && trim($parameters['age']) != '') {
@@ -4397,7 +4397,7 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where($where);
         }
         if (isset($parameters['sampleType']) && trim($parameters['sampleType']) != '') {
-            $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($parameters['sampleType'])) . '"');
+            $sQuery = $sQuery->where(['vl.specimen_type' => base64_decode(trim($parameters['sampleType']))]);
         }
 
         if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
@@ -4541,10 +4541,10 @@ class SampleTable extends AbstractTableGateway
             ->group(array(new Expression("DATE_FORMAT(sample_collection_date, '%m %Y')"), 'f.facility_id'));
 
         if (isset($parameters['labID']) && trim($parameters['labID']) != '') {
-            $sQuery = $sQuery->where('vl.lab_id IN (' . $parameters['labID'] . ')');
+            $sQuery = $sQuery->where(['vl.lab_id' => CommonService::parseIdList($parameters['labID'])]);
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
-            $sQuery = $sQuery->where('vl.facility_id IN (' . $parameters['clinicId'] . ')');
+            $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($parameters['clinicId'])]);
         }
         // if (isset($sWhere) && $sWhere != "") {
         //     $sQuery->where($sWhere);
@@ -4601,7 +4601,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -4623,9 +4623,9 @@ class SampleTable extends AbstractTableGateway
 
                 for ($i = 0; $i < $colSize; $i++) {
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -4639,9 +4639,9 @@ class SampleTable extends AbstractTableGateway
         for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -4650,7 +4650,7 @@ class SampleTable extends AbstractTableGateway
         $startDate = '';
         $endDate = '';
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $parameters['sampleCollectionDate']);
+            $s_c_date = CommonService::convertDateRange($parameters['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
                 $startDate = trim($s_c_date[0]);
             }
@@ -4797,8 +4797,8 @@ class SampleTable extends AbstractTableGateway
             ));
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $queryStr = $queryStr->where("(sample_collection_date is not null AND sample_collection_date not like '')
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
                                         AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
@@ -4834,17 +4834,17 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'));
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+            $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $sQuery = $sQuery->where("(sample_collection_date is not null AND sample_collection_date not like '')
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
                                         AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
@@ -4888,7 +4888,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -4911,9 +4911,9 @@ class SampleTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -4928,9 +4928,9 @@ class SampleTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -4965,8 +4965,8 @@ class SampleTable extends AbstractTableGateway
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -5007,8 +5007,8 @@ class SampleTable extends AbstractTableGateway
             ->group('f.facility_state_id');
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -5062,7 +5062,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -5085,9 +5085,9 @@ class SampleTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -5102,9 +5102,9 @@ class SampleTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -5139,8 +5139,8 @@ class SampleTable extends AbstractTableGateway
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -5182,8 +5182,8 @@ class SampleTable extends AbstractTableGateway
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -5237,7 +5237,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -5260,9 +5260,9 @@ class SampleTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -5277,9 +5277,9 @@ class SampleTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -5316,8 +5316,8 @@ class SampleTable extends AbstractTableGateway
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(sample_collection_date is not null AND sample_collection_date not like '')
                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -5356,8 +5356,8 @@ class SampleTable extends AbstractTableGateway
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -5421,18 +5421,18 @@ class SampleTable extends AbstractTableGateway
         }
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
 
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+            $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $sQuery = $sQuery->where("(sample_collection_date is not null AND sample_collection_date not like '')
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
                                         AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
@@ -5471,7 +5471,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -5494,9 +5494,9 @@ class SampleTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -5511,9 +5511,9 @@ class SampleTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -5549,8 +5549,8 @@ class SampleTable extends AbstractTableGateway
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -5589,8 +5589,8 @@ class SampleTable extends AbstractTableGateway
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -5638,7 +5638,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -5661,9 +5661,9 @@ class SampleTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -5678,9 +5678,9 @@ class SampleTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -5714,8 +5714,8 @@ class SampleTable extends AbstractTableGateway
             $sQuery->where($sWhere);
         }
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -5754,8 +5754,8 @@ class SampleTable extends AbstractTableGateway
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -5807,7 +5807,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -5830,9 +5830,9 @@ class SampleTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -5847,9 +5847,9 @@ class SampleTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -5885,8 +5885,8 @@ class SampleTable extends AbstractTableGateway
         }
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -5928,8 +5928,8 @@ class SampleTable extends AbstractTableGateway
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('vl.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -5977,17 +5977,17 @@ class SampleTable extends AbstractTableGateway
             $mostRejectionQuery = $mostRejectionQuery->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'));
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $mostRejectionQuery = $mostRejectionQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $mostRejectionQuery = $mostRejectionQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $mostRejectionQuery = $mostRejectionQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $mostRejectionQuery = $mostRejectionQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $mostRejectionQuery = $mostRejectionQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+            $mostRejectionQuery = $mostRejectionQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $mostRejectionQuery = $mostRejectionQuery->where("(sample_collection_date is not null AND sample_collection_date not like '')
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
                                         AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
@@ -6022,17 +6022,17 @@ class SampleTable extends AbstractTableGateway
                     $rejectionQuery = $rejectionQuery->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'));
                 }
                 if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                    $rejectionQuery = $rejectionQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+                    $rejectionQuery = $rejectionQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
                 }
                 if (isset($params['districts']) && trim($params['districts']) != '') {
-                    $rejectionQuery = $rejectionQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+                    $rejectionQuery = $rejectionQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
                 }
                 if (isset($params['clinics']) && trim($params['clinics']) != '') {
-                    $rejectionQuery = $rejectionQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+                    $rejectionQuery = $rejectionQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinics'])]);
                 }
                 if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-                    $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-                    $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+                    $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+                    $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
                     $rejectionQuery = $rejectionQuery->where("(sample_collection_date is not null AND sample_collection_date not like '')
                                                 AND sample_collection_date >= '" . $startMonth . " 00:00:00'
                                                 AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
@@ -6073,7 +6073,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -6096,9 +6096,9 @@ class SampleTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -6113,9 +6113,9 @@ class SampleTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -6142,8 +6142,8 @@ class SampleTable extends AbstractTableGateway
         }
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -6182,8 +6182,8 @@ class SampleTable extends AbstractTableGateway
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -6229,7 +6229,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -6252,9 +6252,9 @@ class SampleTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -6269,9 +6269,9 @@ class SampleTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -6298,8 +6298,8 @@ class SampleTable extends AbstractTableGateway
         }
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -6338,8 +6338,8 @@ class SampleTable extends AbstractTableGateway
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -6386,7 +6386,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -6409,9 +6409,9 @@ class SampleTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -6426,9 +6426,9 @@ class SampleTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -6456,8 +6456,8 @@ class SampleTable extends AbstractTableGateway
         }
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -6497,8 +6497,8 @@ class SampleTable extends AbstractTableGateway
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -6572,22 +6572,22 @@ class SampleTable extends AbstractTableGateway
             ->order('total_samples_valid DESC')
             ->limit(20);
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $sQuery = $sQuery->where("(sample_collection_date is not null AND sample_collection_date not like '')
                                             AND sample_collection_date >= '" . $startMonth . " 00:00:00'
                                             AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+            $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
@@ -6624,7 +6624,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
                 if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
-                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . (strtolower($parameters['sSortDir_' . $i]) === 'desc' ? 'DESC' : 'ASC') . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -6647,9 +6647,9 @@ class SampleTable extends AbstractTableGateway
                 for ($i = 0; $i < $colSize; $i++) {
 
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $search . '%') . " ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -6664,9 +6664,9 @@ class SampleTable extends AbstractTableGateway
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE " . $this->adapter->getPlatform()->quoteValue('%' . $parameters['sSearch_' . $i] . '%') . " ";
                 }
             }
         }
@@ -6723,8 +6723,8 @@ class SampleTable extends AbstractTableGateway
         }
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -6764,8 +6764,8 @@ class SampleTable extends AbstractTableGateway
             //->where(array('vl.line_of_treatment'=>1))
             ->group('vl.current_regimen');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $parameters['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $parameters['toDate'])));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -6813,8 +6813,8 @@ class SampleTable extends AbstractTableGateway
                 )
             );
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $sQuery = $sQuery->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
                                         AND vl.sample_collection_date <= '" . $endMonth . " 23:59:59'");
@@ -6840,8 +6840,8 @@ class SampleTable extends AbstractTableGateway
                 )
             );
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $sQuery = $sQuery->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                                         AND vl.sample_collection_date >= '" . $startMonth . " 00:00:00'
                                         AND vl.sample_collection_date <= '" . $endMonth . " 23:59:59'");
@@ -6888,17 +6888,17 @@ class SampleTable extends AbstractTableGateway
             ->group(array(new Expression('YEAR(sample_collection_date)'), new Expression('MONTH(sample_collection_date)')));
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
+            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
+            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
-            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
+            $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
             $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery
                 ->where("(sample_collection_date is not null AND sample_collection_date not like '')
                                         AND sample_collection_date >= '" . $startMonth . " 00:00:00'
@@ -6933,7 +6933,7 @@ class SampleTable extends AbstractTableGateway
         $rResult = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            $s_c_date = CommonService::convertDateRange($params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
                 $startDate = trim($s_c_date[0]);
             }
@@ -7065,7 +7065,7 @@ class SampleTable extends AbstractTableGateway
         $rResult = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            $s_c_date = CommonService::convertDateRange($params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
                 $startDate = trim($s_c_date[0]);
             }
@@ -7188,7 +7188,7 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $result = [];
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            $s_c_date = CommonService::convertDateRange($params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
                 $startDate = trim($s_c_date[0]);
             }
@@ -7202,7 +7202,7 @@ class SampleTable extends AbstractTableGateway
                 ->where('vl.facility_id !=0')
                 ->group('vl.facility_id');
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $clinicQuery = $clinicQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+                $clinicQuery = $clinicQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $clinicQuery = $clinicQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -7219,13 +7219,13 @@ class SampleTable extends AbstractTableGateway
                         ->where(array('vl.facility_id' => $clinic['facility_id']))
                         ->where(array("vl.sample_collection_date >= '$startDate 00:00:00'", "vl.sample_collection_date <= '$endDate 23:59:59'"));
                     if (isset($params['testReason']) && trim($params['testReason']) != '') {
-                        $rQuery = $rQuery->where('vl.reason_for_vl_testing IN (' . $params['testReason'] . ')');
+                        $rQuery = $rQuery->where(['vl.reason_for_vl_testing' => CommonService::parseIdList($params['testReason'])]);
                     }
                     if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                        $rQuery = $rQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                        $rQuery = $rQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleTypeId']))]);
                     }
                     if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                        $rQuery = $rQuery->where(array("vl.arv_adherance_percentage ='" . $params['adherence'] . "'"));
+                        $rQuery = $rQuery->where(['vl.arv_adherance_percentage' => $params['adherence']]);
                     }
                     if (isset($params['testResult']) && $params['testResult'] == '<1000') {
                         $rQuery = $rQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
