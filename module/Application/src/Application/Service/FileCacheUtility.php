@@ -4,8 +4,7 @@ namespace Application\Service;
 
 use Exception;
 use FilesystemIterator;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
+use RuntimeException;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
@@ -28,6 +27,14 @@ class FileCacheUtility
     public function __construct(string $cacheDir, bool $enabled = true, int $defaultTtl = 86400)
     {
         $this->cacheDir = rtrim($cacheDir, DIRECTORY_SEPARATOR);
+        if ($enabled) {
+            // Cached query results may contain sensitive data. Web and cron share an owner.
+            if (is_link($this->cacheDir)
+                || (!is_dir($this->cacheDir) && !@mkdir($this->cacheDir, 0700, true) && !is_dir($this->cacheDir))
+                || !@chmod($this->cacheDir, 0700)) {
+                throw new RuntimeException('Cannot secure the application cache directory.');
+            }
+        }
         $this->adapter = $enabled
             ? new FilesystemAdapter('', $defaultTtl, $this->cacheDir)
             : new NullAdapter();
@@ -89,23 +96,18 @@ class FileCacheUtility
 
     public function clear(): bool
     {
-        $ok = false;
+        // Clear without following directory links before resetting Symfony's tag state.
+        // The adapter's own hash-directory scan follows directory symlinks.
+        if (!$this->adapter instanceof NullAdapter && !$this->clearFilesystem()) {
+            return false;
+        }
+
         try {
-            $ok = $this->tagAwareAdapter->clear();
+            return $this->tagAwareAdapter->clear();
         } catch (Exception $e) {
             error_log('Cache adapter clear failed: ' . $e->getMessage());
+            return false;
         }
-
-        // The Symfony adapter's clear() returns false (or throws) if a single
-        // entry can't be unlinked -- a stale/locked file, a read-only entry, or
-        // one left behind with foreign ownership. A cache clear is non-critical,
-        // so fall back to a forceful filesystem sweep that chmods-then-unlinks
-        // whatever it can, instead of letting one stuck file fail the whole clear.
-        if (!$ok) {
-            $ok = $this->forceFilesystemClear();
-        }
-
-        return $ok;
     }
 
     /**
@@ -114,37 +116,41 @@ class FileCacheUtility
      * false if at least one entry survived (e.g. foreign-owned files this
      * process genuinely cannot remove).
      */
-    private function forceFilesystemClear(): bool
+    private function clearFilesystem(): bool
     {
+        if (is_link($this->cacheDir)) {
+            return false;
+        }
         if (!is_dir($this->cacheDir)) {
             return true;
         }
 
         try {
-            $iterator = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($this->cacheDir, RecursiveDirectoryIterator::SKIP_DOTS),
-                RecursiveIteratorIterator::CHILD_FIRST
-            );
-
-            foreach ($iterator as $item) {
-                $path = $item->getPathname();
-                // Make sure the parent dir is traversable/writable before the
-                // unlink/rmdir; some Symfony shards land mode 700.
-                @chmod($item->isDir() ? $path : dirname($path), 0775);
-                if ($item->isDir()) {
-                    @rmdir($path);
-                } else {
-                    @chmod($path, 0664);
-                    @unlink($path);
-                }
-            }
+            return $this->clearDirectory($this->cacheDir);
         } catch (Exception $e) {
             error_log('Cache filesystem clear failed: ' . $e->getMessage());
             return false;
         }
+    }
 
-        // Empty == fully cleared. Anything remaining is something we couldn't remove.
-        return (new FilesystemIterator($this->cacheDir))->valid() === false;
+    private function clearDirectory(string $directory): bool
+    {
+        // Unlink needs write access to the parent, not to the file itself.
+        // Repair access before descending so owner-unreadable shards can be cleared.
+        if (!@chmod($directory, 0700)) {
+            return false;
+        }
+        foreach (new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS) as $item) {
+            $path = $item->getPathname();
+            // Check links first: isDir() and chmod() otherwise follow their targets.
+            if ($item->isLink() || !$item->isDir()) {
+                @unlink($path);
+            } elseif ($this->clearDirectory($path)) {
+                @rmdir($path);
+            }
+        }
+
+        return !(new FilesystemIterator($directory))->valid();
     }
 
     public function invalidateTags(array $tags): bool

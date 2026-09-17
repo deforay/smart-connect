@@ -689,6 +689,8 @@ upgrade_instance() {
     chown -R "$web_user":"$web_user" "$app_path"
     chmod -R u+rwX,g+rwX "$app_path/data" "$app_path/backup" "$app_path/temporary" \
         "$app_path/public/temporary" "$app_path/public/uploads"
+    # Query cache contents are private to the shared web/cron owner.
+    chmod 700 "$app_path/data/cache/app"
     chmod +x "$app_path/cron.sh" "$app_path/bin/migrate" "$app_path/bin/console" \
         "$app_path/bin/check-version-sync" "$app_path/bin/upgrade.sh" 2>/dev/null
 
