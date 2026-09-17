@@ -21,8 +21,9 @@ use Laminas\Db\Adapter\Adapter;
 use Symfony\Component\Mime\Email;
 use Application\Model\TempMailTable;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\MailerInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
@@ -227,78 +228,64 @@ class CommonService
           return $this->tempMailTable->insertTempMailDetails($to, $subject, $message, $fromMail, $fromName, $cc, $bcc);
      }
 
-     public function sendTempMail()
+     public function sendTempMail(?MailerInterface $mailer = null): void
      {
           try {
-               $configResult = $this->sm->get('Config');
+               $config = $this->sm->get('Config');
+               $mailer ??= new Mailer($this->createMailTransport($config['email']));
                $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                $sql = new Sql($dbAdapter);
-               // In my case this data is extracted from the DB
-               $user = $configResult["email"]["config"]["username"];
-               $pass = $configResult["email"]["config"]["password"];
-               $server = $configResult["email"]["host"];
-               $port = $configResult["email"]["config"]["port"];
-
-               // Generate connection configuration
-               $dsn = "smtp://" . $user . ":" . $pass . "@" . $server . ":" . $port;
-               // Setup SMTP transport using LOGIN authentication
-               $symTransport = Transport::fromDsn($dsn);
-               $mailer = new Mailer($symTransport);
-               $limit = '10';
-               $mailQuery = $sql->select()->from(array('tm' => 'temp_mail'))
-                    ->where("status='pending'")
-                    ->limit($limit);
+               $mailQuery = $sql->select()->from('temp_mail')
+                    ->where(['status' => 'pending'])
+                    ->limit(10);
                $mailQueryStr = $sql->buildSqlString($mailQuery);
                $mailResult = $dbAdapter->query($mailQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-               if (count($mailResult) > 0) {
-                    foreach ($mailResult as $result) {
 
-                         $id = $result['id'];
-                         $this->tempMailTable->updateTempMailStatus($id);
-                         $fromEmail = $result['report_email'];
-                         $subject = $result['subject'];
-
+               foreach ($mailResult as $result) {
+                    try {
                          $email = (new Email())
-                              ->from($fromEmail)
-                              ->replyTo($fromEmail)
+                              ->from($result['report_email'])
+                              ->replyTo($result['report_email'])
                               ->priority(Email::PRIORITY_HIGH)
-                              ->subject($subject)
+                              ->subject($result['subject'])
                               ->text('Sending emails is fun again!')
                               ->html($result['text_message']);
 
-                         $toArray = explode(",", $result['to_mail']);
-                         foreach ($toArray as $toId) {
-                              if ($toId != '') {
-                                   $email->To($toId);
-                              }
-                         }
-                         if (isset($result['cc']) && trim($result['cc']) != "") {
-                              $ccArray = explode(",", $result['cc']);
-                              foreach ($ccArray as $ccId) {
-                                   if ($ccId != '') {
-                                        $email->Cc($ccId);
+                         foreach (['to_mail' => 'addTo', 'cc' => 'addCc', 'bcc' => 'addBcc'] as $field => $method) {
+                              foreach (explode(',', $result[$field] ?? '') as $recipient) {
+                                   $recipient = trim($recipient);
+                                   if ($recipient !== '') {
+                                        $email->$method($recipient);
                                    }
                               }
                          }
 
-                         if (isset($result['bcc']) && trim($result['bcc']) != "") {
-                              $bccArray = explode(",", $result['bcc']);
-                              foreach ($bccArray as $bccId) {
-                                   if ($bccId != '') {
-                                        $email->Bcc($bccId);
-                                   }
-                              }
-                         }
-
+                         // Keep failures pending so the next scheduled run can retry them.
+                         // Crunz prevents overlapping scheduled runs of this worker.
                          $mailer->send($email);
-                         $this->tempMailTable->deleteTempMail($id);
+                         $this->tempMailTable->deleteTempMail($result['id']);
+                    } catch (Throwable $e) {
+                         // One malformed message or failed delivery must not stop this batch.
+                         error_log('Queued mail ' . $result['id'] . ' failed: ' . $e->getMessage());
                     }
                }
-          } catch (Exception $e) {
-               error_log($e->getMessage());
-               error_log($e->getTraceAsString());
-               error_log('whoops! Something went wrong in cron/SendMailAlerts.php');
+          } catch (Throwable $e) {
+               error_log('Queued mail batch failed: ' . $e->getMessage());
           }
+     }
+
+     private function createMailTransport(array $emailConfig): EsmtpTransport
+     {
+          $config = $emailConfig['config'];
+          $port = (int) $config['port'];
+          $implicitTls = strtolower((string) ($config['ssl'] ?? '')) === 'ssl' || $port === 465;
+          $transport = new EsmtpTransport($emailConfig['host'], $port, $implicitTls);
+          $transport->setUsername($config['username']);
+          $transport->setPassword($config['password']);
+          // STARTTLS is opportunistic by default. Never send credentials or mail without TLS.
+          $transport->setRequireTls(true);
+
+          return $transport;
      }
 
      public function removeDirectory($dirname)
