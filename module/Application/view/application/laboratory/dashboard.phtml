@@ -1324,7 +1324,7 @@ foreach ($sampleType as $samples) {
 
     function getSummaryIndicators() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Summary of Key Indicators')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing Summary of Key Indicators'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indClinicIdList = ($("#labName").val() == null) ? '' : $('#labName').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());

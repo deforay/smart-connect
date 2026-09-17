@@ -1525,7 +1525,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function getSummaryIndicators() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Summary of Key Indicators')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing Summary of Key Indicators'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
@@ -1543,7 +1543,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function geteidOutcomes() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing EID Outcomes'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
@@ -1561,7 +1561,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function geteidOutcomesByAge() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Age')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing EID Outcomes By Age'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
@@ -1579,7 +1579,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function geteidOutcomesByProvince() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Province')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing EID Outcomes By Province'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
@@ -1597,7 +1597,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function nationalTAT() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Province')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing EID Outcomes By Province'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());

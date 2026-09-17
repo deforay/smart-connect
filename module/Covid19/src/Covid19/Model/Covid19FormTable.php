@@ -3331,6 +3331,9 @@ class Covid19FormTable extends AbstractTableGateway
                 return array('07', '08', '09');
             case 4:
                 return array(10, 11, 12);
+            default:
+                // Preserve the null result for unsupported quarters.
+                return null;
         }
     }
 

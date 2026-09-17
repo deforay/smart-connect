@@ -199,8 +199,8 @@
                                         <div class="col-lg-7">
                                             <select class="form-control isRequired" name="status" id="status" title="<?php echo $this->translate('Please select the status'); ?>">
                                                 <option value="">--<?php echo $this->translate('Select'); ?>--</option>
-                                                <option value="active" "<?php echo ($facility->status == 'active' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Active'); ?></option>
-                                                <option value="inactive" "<?php echo ($facility->status == 'inactive' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Inactive'); ?></option>
+                                                <option value="active" "<?php echo $facility->status == 'active' ? " selected='selected' " : ""; ?>"><?php echo $this->translate('Active'); ?></option>
+                                                <option value="inactive" "<?php echo $facility->status == 'inactive' ? " selected='selected' " : ""; ?>"><?php echo $this->translate('Inactive'); ?></option>
                                             </select>
                                         </div>
                                     </div>

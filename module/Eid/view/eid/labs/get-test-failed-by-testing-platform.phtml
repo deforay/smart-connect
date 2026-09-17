@@ -18,10 +18,12 @@
                                     foreach ($result as $res) {
                                         echo "'" . $res['config_machine_name'] . "',";
                                         // array_push($data, $res['total']);
-                                        if($data)
+                                        if($data) {
                                             $data = $data.','.$res['total'];
-                                        else
+                                        }
+                                        else {
                                             $data = $res['total'];
+                                        }
                                     }
                                 }
                     ?>

@@ -1032,7 +1032,7 @@ $endDate = date('Y-m');
 
     function geteidOutcomesByAge() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Age')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing EID Outcomes By Age'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
 
         var fromDate = formatDate($('#mrp-lowerDate').val());
@@ -1053,7 +1053,7 @@ $endDate = date('Y-m');
 
     function positivityRate() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Positivity Rate')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing Positivity Rate'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
 
         var fromDate = formatDate($('#mrp-lowerDate').val());

@@ -51,7 +51,7 @@
                                                     <select class="form-control" name="type" id="type">
                                                         <option value="">--Select--</option>
                                                         <?php foreach($orgTypes as $ot) { ?>
-                                                        <option value="<?php echo $ot['id'] ?>"  <?php echo ($org['org_type'] == $ot['id'] ? " selected='selected' " : ""); ?>><?php echo $ot['type'] ?></option>
+                                                        <option value="<?php echo $ot['id'] ?>"  <?php echo $org['org_type'] == $ot['id'] ? " selected='selected' " : ""; ?>><?php echo $ot['type'] ?></option>
                                                         <?php } ?>                                                        
                                                         
                                                     </select>
@@ -105,7 +105,7 @@
                                                     <select class="form-control" name="country" id="country">
                                                         <option value="">--Select--</option>
                                                         <?php foreach($countries as $country) { ?>
-                                                        <option value="<?php echo $country['id'] ?>" <?php echo ($org['country'] == $country['id'] ? " selected='selected' " : ""); ?>><?php echo $country['name'] ?></option>
+                                                        <option value="<?php echo $country['id'] ?>" <?php echo $org['country'] == $country['id'] ? " selected='selected' " : ""; ?>><?php echo $country['name'] ?></option>
                                                         <?php } ?>
                                                     </select>
                                                 </div>
@@ -133,8 +133,8 @@
                                                 <div class="col-md-6">
                                                     <select class="form-control" name="status" id="status">
                                                         <option value="">--Select--</option>
-                                                        <option value="active" "<?php echo ($org['status'] == 'active' ? " selected='selected' " : ""); ?>">Active</option>
-                                                        <option value="inactive" "<?php echo ($org['status'] == 'inactive' ? " selected='selected' " : ""); ?>">Inactive</option>
+                                                        <option value="active" "<?php echo $org['status'] == 'active' ? " selected='selected' " : ""; ?>">Active</option>
+                                                        <option value="inactive" "<?php echo $org['status'] == 'inactive' ? " selected='selected' " : ""; ?>">Inactive</option>
                                                     </select>
                                                 </div>
                                             </div>                                            

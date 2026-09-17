@@ -121,7 +121,9 @@ if (isset($result[$params['age']['ageName']]) && !empty($result[$params['age']['
             series: [<?php
                         $age = array($params['age']['ageName']);
                         for ($i = 0; $i < count($age); $i++) {
-                            if (!isset($result[$age[$i]])) continue;
+                            if (!isset($result[$age[$i]])) {
+                                continue;
+                            }
                             foreach ($result[$age[$i]] as $key => $condition) {
                                 $translatedKey = $this->translate($key);
                         ?> {

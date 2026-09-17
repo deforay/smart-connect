@@ -451,15 +451,15 @@ class SnapShotService
                 return ($item['received'] ?? 0) > 0;
             });
             usort($eligible, function ($a, $b) {
-                return ($a['pct_tested'] <=> $b['pct_tested']);
+                return $a['pct_tested'] <=> $b['pct_tested'];
             });
         } elseif ($mode === 'volume') {
             usort($eligible, function ($a, $b) {
-                return ($b['received'] <=> $a['received']);
+                return $b['received'] <=> $a['received'];
             });
         } else {
             usort($eligible, function ($a, $b) {
-                return ($b['pending'] <=> $a['pending']);
+                return $b['pending'] <=> $a['pending'];
             });
         }
         $others = [

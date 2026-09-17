@@ -16,10 +16,11 @@
                         foreach ($result as $res) {
                             echo "'" . $res['eid_test_platform'] . "',";
                             // array_push($data, $res['total']);
-                            if ($data)
+                            if ($data) {
                                 $data = $data . ',' . $res['total'];
-                            else
+                            } else {
                                 $data = $res['total'];
+                            }
                         }
                     }
                     ?>

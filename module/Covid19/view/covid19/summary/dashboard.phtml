@@ -1629,7 +1629,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function getSummaryIndicators() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Summary of Key Indicators')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing Summary of Key Indicators'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
@@ -1651,7 +1651,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function getcovid19Outcomes() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Test Outcomes')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing Test Outcomes'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
@@ -1673,7 +1673,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function getcovid19OutcomesByAge() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Test Outcomes By Age')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing Test Outcomes By Age'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
@@ -1695,7 +1695,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function getcovid19OutcomesByProvince() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Test Outcomes By Province')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing Test Outcomes By Province'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
@@ -1717,7 +1717,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function nationalTAT() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Test Outcomes By Province')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing Test Outcomes By Province'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');

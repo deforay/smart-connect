@@ -19,10 +19,12 @@
           if(!empty($resultProvinces)){  ?>
             getRow('<?php generateTable($resultProvinces,'provinceTable',0,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','provinceTable','provinceChart','<?php echo $this->translate('TAT by Province'); ?>','<?php echo $this->translate('Provinces Chart'); ?>')+
         <?php
-          }if(!empty($resultDistricts)){  ?>
+          }
+          if(!empty($resultDistricts)){  ?>
             getRow('<?php generateTable($resultDistricts,'districtTable',1,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','districtTable','districtChart','<?php echo $this->translate('TAT by District'); ?>','<?php echo $this->translate('Districts Chart'); ?>')+
         <?php
-          }if(!empty($resultClinics)){   ?>
+          }
+          if(!empty($resultClinics)){   ?>
             getRow('<?php generateTable($resultClinics,'clinicTable',2,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','clinicTable','clinicChart','<?php echo $this->translate('TAT by Clinic'); ?>','<?php echo $this->translate('Clinics Chart'); ?>')+
         <?php
           }

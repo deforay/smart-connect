@@ -620,7 +620,7 @@ $endDate = date('Y-m');
 
     function getSummaryIndicators() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Summary of Key Indicators')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing Summary of Key Indicators'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indClinicIdList = ($("#labName").val() == null) ? '' : $('#labName').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
@@ -793,7 +793,7 @@ $endDate = date('Y-m');
 
     function getcovid19OutcomesByAge() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing test outcomes by age')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing test outcomes by age'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
 
         var fromDate = formatDate($('#mrp-lowerDate').val());
@@ -813,7 +813,7 @@ $endDate = date('Y-m');
 
     function positivityRate() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Positivity Rate')); ?> ... </h4>'
+            message: '<h4> <?php echo $this->translate('Processing Positivity Rate'); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
 
         var fromDate = formatDate($('#mrp-lowerDate').val());

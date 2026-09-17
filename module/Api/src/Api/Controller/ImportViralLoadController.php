@@ -8,8 +8,6 @@ class ImportViralLoadController extends AbstractRestfulController
 {
 	use JsonResponseTrait;
 
-	public function __construct() {}
-
 	public function getList()
 	{
 		exit('Nothing to see here');

@@ -85,7 +85,7 @@ ask() {
   local __var=$1 prompt=$2 default=${3:-} raw input rc
   while true; do
     rc=0; raw=""
-    if [ -n "$default" ]; then
+    if [[ -n "$default" ]]; then
       read -r -p "$prompt [$default]: " raw || rc=$?
     else
       read -r -p "$prompt: " raw || rc=$?
@@ -93,9 +93,9 @@ ask() {
     # An empty answer plus a read error means the input ended. Never fall back to
     # the default there: silently choosing an answer nobody gave is how the wrong
     # destination gets configured.
-    [ -z "$raw" ] && [ "$rc" -ne 0 ] && no_more_input
+    [[ -z "$raw" ]] && [[ "$rc" -ne 0 ]] && no_more_input
     input="$(trim "${raw:-$default}")"
-    [ -n "$input" ] && break
+    [[ -n "$input" ]] && break
     print warning "This cannot be left empty. Try again."
   done
   printf -v "$__var" '%s' "$input"
@@ -106,8 +106,8 @@ ask_secret() {
   while true; do
     rc=0
     read -r -s -p "$prompt: " input || rc=$?; echo
-    [ -n "$input" ] && break
-    [ "$rc" -ne 0 ] && no_more_input
+    [[ -n "$input" ]] && break
+    [[ "$rc" -ne 0 ]] && no_more_input
     print warning "This cannot be left empty. Try again."
   done
   printf -v "$__var" '%s' "$input"
@@ -116,13 +116,22 @@ ask_secret() {
 confirm() {
   local prompt=$1 answer rc=0
   read -r -p "$prompt (y/N): " answer || rc=$?
-  [ "$rc" -ne 0 ] && [ -z "$answer" ] && no_more_input
+  [[ "$rc" -ne 0 ]] && [[ -z "$answer" ]] && no_more_input
   [[ "$answer" =~ ^[Yy]$ ]]
+}
+
+# Bash arithmetic accepts expressions and wraps overflowing integers. Validate first,
+# retaining decimal input (including leading zeros) from the previous test builtin.
+is_decimal_integer() {
+  local value=$1 digits LC_ALL=C
+  [[ "$value" =~ ^[0-9]+$ ]] || return 1
+  digits=${value#"${value%%[!0]*}"}
+  [[ ${#digits} -lt 19 || ( ${#digits} -eq 19 && "$digits" < 9223372036854775808 ) ]]
 }
 
 # --- preflight ----------------------------------------------------------------
 
-if [ "$(id -u)" -ne 0 ]; then
+if [[ "$(id -u)" -ne 0 ]]; then
   echo "Need admin privileges. Run with sudo."
   exit 1
 fi
@@ -140,7 +149,7 @@ INSTANCE_NAME=""; APP_PATH=""; DEST_MODE=""
 SSH_USER=""; SSH_HOST=""; SSH_PORT=""
 SMB_HOST=""; SMB_SHARE=""; SMB_USER=""; SMB_VERS=""
 LOCAL_ROOT=""; RETENTION=""; SCHEDULE_CRON=""
-if [ -f "$CONF_FILE" ]; then
+if [[ -f "$CONF_FILE" ]]; then
   # shellcheck disable=SC1090
   . "$CONF_FILE"
   print info "Found an existing configuration at $CONF_FILE. Press Enter to keep each saved answer."
@@ -152,7 +161,7 @@ print header "Smart Connect backup setup"
 
 ask INSTANCE_NAME "Name for this dashboard (country or site)" "${INSTANCE_NAME:-$(hostname -s 2>/dev/null || echo smart-connect)}"
 SANITIZED_NAME=$(printf '%s' "$INSTANCE_NAME" | tr -s '[:space:]' '-' | tr -cd '[:alnum:]-' | sed 's/-*$//;s/^-*//')
-if [ -z "$SANITIZED_NAME" ]; then
+if [[ -z "$SANITIZED_NAME" ]]; then
   print error "That name has no letters or numbers in it. Use something like 'kenya-national'."
   exit 1
 fi
@@ -163,7 +172,7 @@ fi
 # can never overwrite each other.
 
 UUID_IS_NEW=0
-if [ ! -f "$INSTANCE_UUID_FILE" ]; then
+if [[ ! -f "$INSTANCE_UUID_FILE" ]]; then
   INSTANCE_UUID="$(cat /proc/sys/kernel/random/uuid)"
   printf '%s\n' "$INSTANCE_UUID" > "$INSTANCE_UUID_FILE"
   chmod 600 "$INSTANCE_UUID_FILE"
@@ -180,29 +189,29 @@ print info    "Its backups will live in a folder called: ${DEST_FOLDER}"
 # --- installation path --------------------------------------------------------
 
 looks_like_smart_connect() {
-  [ -f "$1/config/autoload/global.php" ] && [ -d "$1/public" ] &&
+  [[ -f "$1/config/autoload/global.php" ]] && [[ -d "$1/public" ]] &&
     grep -q 'deforay/smart-connect' "$1/composer.json" 2>/dev/null
 }
 
 print header "Which installation should be backed up?"
 
-if [ -z "$APP_PATH" ]; then
+if [[ -z "$APP_PATH" ]]; then
   for candidate in /var/www/smart-connect /var/www/smartconnect; do
     if looks_like_smart_connect "$candidate"; then APP_PATH="$candidate"; break; fi
   done
 fi
-if [ -z "$APP_PATH" ]; then
+if [[ -z "$APP_PATH" ]]; then
   for candidate in /var/www/*/; do
     candidate="${candidate%/}"
     if looks_like_smart_connect "$candidate"; then APP_PATH="$candidate"; break; fi
   done
 fi
-[ -n "$APP_PATH" ] && print info "Detected an installation at $APP_PATH"
+[[ -n "$APP_PATH" ]] && print info "Detected an installation at $APP_PATH"
 
 while true; do
   ask APP_PATH "Smart Connect folder path" "${APP_PATH:-/var/www/smart-connect}"
   [[ "$APP_PATH" != /* ]] && APP_PATH="$(realpath "$APP_PATH" 2>/dev/null || printf '%s' "$APP_PATH")"
-  if [ ! -d "$APP_PATH" ]; then
+  if [[ ! -d "$APP_PATH" ]]; then
     print warning "'$APP_PATH' does not exist. Try again."
     APP_PATH=""
     continue
@@ -221,7 +230,7 @@ print success "Backing up: $APP_PATH"
 # rather than at 2am if the credentials are wrong.
 
 PHP_BIN="$(command -v php || true)"
-[ -n "$PHP_BIN" ] || { print error "php is not installed, so the database cannot be dumped."; exit 1; }
+[[ -n "$PHP_BIN" ]] || { print error "php is not installed, so the database cannot be dumped."; exit 1; }
 
 DB_NAME="$("$PHP_BIN" -r '
 $dir = $argv[1] . "/config/autoload";
@@ -236,7 +245,7 @@ $name = preg_match("/dbname=([^;]+)/", $dsn, $m) ? trim($m[1]) : (string) ($db["
 echo $name;
 ' "$APP_PATH" 2>/dev/null || true)"
 
-if [ -z "$DB_NAME" ]; then
+if [[ -z "$DB_NAME" ]]; then
   print warning "Could not read the database name from ${APP_PATH}/config/autoload."
   confirm "Continue anyway? The first backup will show whether it works" || exit 1
 else
@@ -256,6 +265,7 @@ case "$DEST_MODE" in
   ssh)   default_choice=1 ;;
   smb)   default_choice=2 ;;
   local) default_choice=3 ;;
+  *)     default_choice=1 ;; # Unknown saved destinations use the SSH prompt default.
 esac
 
 while true; do
@@ -278,7 +288,7 @@ configure_ssh() {
   print header "Backup server details"
 
   mkdir -p /root/.ssh; chmod 700 /root/.ssh
-  if [ ! -f "$SSH_KEY" ]; then
+  if [[ ! -f "$SSH_KEY" ]]; then
     print info "Creating a dedicated SSH key for backups..."
     ssh-keygen -t ed25519 -C "smart-connect-backup-${SANITIZED_NAME}" -N "" -f "$SSH_KEY" >/dev/null
   fi
@@ -289,7 +299,7 @@ configure_ssh() {
     ask SSH_HOST "Hostname or IP of the backup server" "${SSH_HOST:-}"
     ask SSH_PORT "SSH port" "${SSH_PORT:-22}"
 
-    if ! [[ "$SSH_PORT" =~ ^[0-9]+$ ]] || [ "$SSH_PORT" -lt 1 ] || [ "$SSH_PORT" -gt 65535 ]; then
+    if ! is_decimal_integer "$SSH_PORT" || [[ "10#$SSH_PORT" -lt 1 ]] || [[ "10#$SSH_PORT" -gt 65535 ]]; then
       print warning "'$SSH_PORT' is not a valid port number."
       SSH_PORT=""
       continue
@@ -381,7 +391,7 @@ configure_smb() {
       fi
     done
 
-    if [ "$mounted" -ne 1 ]; then
+    if [[ "$mounted" -ne 1 ]]; then
       print warning "Could not connect to ${unc}."
       print info    "Check the username and password, that the folder is actually shared,"
       print info    "and that File and Printer Sharing is allowed through the Windows firewall."
@@ -426,7 +436,7 @@ configure_local() {
 
   while true; do
     ask LOCAL_ROOT "Folder on the drive to back up into" "${LOCAL_ROOT:-/media/backup}"
-    if [ ! -d "$LOCAL_ROOT" ]; then
+    if [[ ! -d "$LOCAL_ROOT" ]]; then
       print warning "'$LOCAL_ROOT' does not exist. Is the drive plugged in and mounted?"
       LOCAL_ROOT=""
       continue
@@ -437,7 +447,7 @@ configure_local() {
       continue
     fi
     # A backup on the same disk as the original is not a backup.
-    if [ "$(stat -c %d "$LOCAL_ROOT" 2>/dev/null || echo 0)" = "$(stat -c %d "$APP_PATH" 2>/dev/null || echo 1)" ]; then
+    if [[ "$(stat -c %d "$LOCAL_ROOT" 2>/dev/null || echo 0)" = "$(stat -c %d "$APP_PATH" 2>/dev/null || echo 1)" ]]; then
       print warning "'$LOCAL_ROOT' is on the same disk as the installation, so it would not survive a disk failure."
       confirm "Use it anyway?" || { LOCAL_ROOT=""; continue; }
     fi
@@ -453,6 +463,7 @@ case "$DEST_MODE" in
   ssh)   configure_ssh ;;
   smb)   configure_smb ;;
   local) configure_local ;;
+  *) print error "Unsupported backup destination: $DEST_MODE"; exit 1 ;;
 esac
 
 # --- dest_exec ----------------------------------------------------------------
@@ -472,11 +483,11 @@ dest_exec() {
 # new and the destination already holds folders, offer them.
 
 ADOPTED=0
-if [ "$UUID_IS_NEW" -eq 1 ]; then
+if [[ "$UUID_IS_NEW" -eq 1 ]]; then
   q_base="$(printf '%q' "$DEST_BASE")"
   mapfile -t EXISTING < <(dest_exec "ls -1 ${q_base} 2>/dev/null || true" | tr -d '\r' | sed '/^$/d')
 
-  if [ "${#EXISTING[@]}" -gt 0 ]; then
+  if [[ "${#EXISTING[@]}" -gt 0 ]]; then
     print header "There are already backups at this destination"
     print info "This server has no backup identity of its own yet, which is what a"
     print info "rebuilt server looks like."
@@ -496,11 +507,11 @@ if [ "$UUID_IS_NEW" -eq 1 ]; then
     print info "Choose one only if this server is that installation rebuilt."
     ask adopt_choice "Number to take over, or 0 to start a new folder" "0"
 
-    if [[ "$adopt_choice" =~ ^[0-9]+$ ]] && [ "$adopt_choice" -ge 1 ] && [ "$adopt_choice" -le "${#EXISTING[@]}" ]; then
-      DEST_FOLDER="${EXISTING[$((adopt_choice - 1))]}"
+    if is_decimal_integer "$adopt_choice" && [[ "10#$adopt_choice" -ge 1 ]] && [[ "10#$adopt_choice" -le "${#EXISTING[@]}" ]]; then
+      DEST_FOLDER="${EXISTING[$((10#$adopt_choice - 1))]}"
       q_folder="$(printf '%q' "${DEST_BASE}/${DEST_FOLDER}")"
       adopted_uuid="$(dest_exec "awk -F= '/^instance_uuid=/{print \$2}' ${q_folder}/.instance-meta 2>/dev/null || true" | tr -d '\r\n')"
-      if [ -z "$adopted_uuid" ]; then
+      if [[ -z "$adopted_uuid" ]]; then
         print error "The folder ${DEST_FOLDER} carries no identity marker, so it cannot be taken over."
         exit 1
       fi
@@ -520,7 +531,7 @@ DEST_DIR="${DEST_BASE}/${DEST_FOLDER}"
 
 while true; do
   ask RETENTION "How many backups to keep at the destination" "${RETENTION:-14}"
-  [[ "$RETENTION" =~ ^[0-9]+$ ]] && [ "$RETENTION" -ge 1 ] && break
+  is_decimal_integer "$RETENTION" && [[ "10#$RETENTION" -ge 1 ]] && break
   print warning "Enter a whole number of 1 or more."
   RETENTION=""
 done
@@ -538,6 +549,7 @@ case "$SCHEDULE_CRON" in
   "0 */6 * * *")  sched_default=1 ;;
   "0 */12 * * *") sched_default=2 ;;
   "30 2 * * *")   sched_default=3 ;;
+  *)             sched_default=2 ;; # Keep the existing 12-hour prompt default.
 esac
 
 while true; do
@@ -559,7 +571,7 @@ q_meta="$(printf '%q' "${DEST_DIR}/.instance-meta")"
 
 if dest_exec "test -d ${q_dest}" 2>/dev/null; then
   remote_uuid="$(dest_exec "awk -F= '/^instance_uuid=/{print \$2}' ${q_meta} 2>/dev/null || true" | tr -d '\r\n')"
-  if [ -n "$remote_uuid" ] && [ "$remote_uuid" != "$INSTANCE_UUID" ]; then
+  if [[ -n "$remote_uuid" ]] && [[ "$remote_uuid" != "$INSTANCE_UUID" ]]; then
     # Effectively unreachable now that folders carry the UUID, but a wrong answer
     # here would overwrite another dashboard's backup, so refuse rather than guess.
     print error "The folder ${DEST_FOLDER} already belongs to a different installation."
@@ -1414,9 +1426,9 @@ print success "Backups will run ${SCHEDULE_TEXT}"
 # Backing up first would store this server's empty database over a retention
 # slot. What a rebuilt server needs is the traffic in the other direction.
 
-if [ "$ADOPTED" -eq 1 ]; then
+if [[ "$ADOPTED" -eq 1 ]]; then
   held="$(dest_exec "ls -1 ${q_dest} 2>/dev/null | grep -E '^[0-9]{8}-[0-9]{6}$' | wc -l" | tr -d '\r\n ')"
-  if [ "${held:-0}" -gt 0 ]; then
+  if [[ "${held:-0}" -gt 0 ]]; then
     print header "This installation has ${held} backup(s) stored"
     print info "This server was set up as a rebuild of ${DEST_FOLDER}."
     echo
@@ -1464,6 +1476,7 @@ case "$DEST_MODE" in
   ssh)   print info "Destination    : ${SSH_USER}@${SSH_HOST}:${DEST_DIR}" ;;
   smb)   print info "Destination    : //${SMB_HOST}/${SMB_SHARE} -> ${DEST_DIR}" ;;
   local) print info "Destination    : ${DEST_DIR}" ;;
+  *) print error "Unsupported backup destination: $DEST_MODE"; exit 1 ;;
 esac
 print info "Schedule       : ${SCHEDULE_TEXT}, keeping the last ${RETENTION}"
 echo

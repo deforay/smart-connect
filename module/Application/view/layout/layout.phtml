@@ -449,7 +449,7 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\LogsController
                     <?php } ?>
                     <!-- <?php if (isset($loginContainer->accessType) && $loginContainer->accessType == '4') { ?>
 
-                        <li class="nav-item <?php echo ($activeTab == 'admin' ? " active open " : ""); ?> ">
+                        <li class="nav-item <?php echo $activeTab == 'admin' ? " active open " : ""; ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-settings"></i>
                                 <span class="title">Admin</span>
@@ -457,32 +457,32 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\LogsController
                             </a>
                             <ul class="sub-menu">
 
-                                <li class="nav-item  <?php echo ($activeMenu == 'organizations' ? " active open " : ""); ?>  ">
+                                <li class="nav-item  <?php echo $activeMenu == 'organizations' ? " active open " : ""; ?>  ">
                                     <a href="/organizations" class="nav-link ">
                                         <i class="fa fa-angle-right"></i> <span class="title">Manage Facilities</span>
                                     </a>
                                 </li>
-                                <li class="nav-item  <?php echo ($activeMenu == 'users' ? " active open " : ""); ?>  ">
+                                <li class="nav-item  <?php echo $activeMenu == 'users' ? " active open " : ""; ?>  ">
                                     <a href="/users" class="nav-link ">
                                         <i class="fa fa-angle-right"></i> <span class="title">Manage Users</span>
                                     </a>
                                 </li>
-                                <li class="nav-item  <?php echo ($activeMenu == 'config-email' ? " active open " : ""); ?>  ">
+                                <li class="nav-item  <?php echo $activeMenu == 'config-email' ? " active open " : ""; ?>  ">
                                     <a href="javascript:;" class="nav-link ">
                                         <i class="fa fa-angle-right"></i> <span class="title">Configure Email</span>
                                     </a>
                                 </li>
-                                <li class="nav-item  <?php echo ($activeMenu == 'config-sms' ? " active open " : ""); ?>  ">
+                                <li class="nav-item  <?php echo $activeMenu == 'config-sms' ? " active open " : ""; ?>  ">
                                     <a href="javascript:;" class="nav-link ">
                                         <i class="fa fa-angle-right"></i> <span class="title">Configure SMS</span>
                                     </a>
                                 </li>
-                                <li class="nav-item  <?php echo ($activeMenu == 'config-general' ? " active open " : ""); ?>  ">
+                                <li class="nav-item  <?php echo $activeMenu == 'config-general' ? " active open " : ""; ?>  ">
                                     <a href="javascript:;" class="nav-link ">
                                         <i class="fa fa-angle-right"></i> <span class="title">General Config</span>
                                     </a>
                                 </li>
-                                <li class="nav-item  <?php echo ($activeMenu == 'source' ? " active open " : ""); ?>  ">
+                                <li class="nav-item  <?php echo $activeMenu == 'source' ? " active open " : ""; ?>  ">
                                     <a href="<?php echo $this->url('source', array('action' => 'index')); ?>" class="nav-link ">
                                         <i class="fa fa-angle-right"></i> <span class="title">Sources</span>
                                     </a>
@@ -492,7 +492,7 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\LogsController
 
                     <?php } ?>
                     <?php if (isset($loginContainer->accessType) && ($loginContainer->accessType == '1' || $loginContainer->accessType == '4')) { ?>
-                        <li class="nav-item <?php echo ($activeTab == 'clinic' ? " active open " : ""); ?> ">
+                        <li class="nav-item <?php echo $activeTab == 'clinic' ? " active open " : ""; ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-settings"></i>
                                 <span class="title">Clinic</span>
@@ -535,7 +535,7 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\LogsController
                         </li>
                     <?php } ?>
                     <?php if (isset($loginContainer->accessType) && ($loginContainer->accessType == '2' || $loginContainer->accessType == '4')) { ?>
-                        <li class="nav-item <?php echo ($activeTab == 'clinic' ? " active open " : ""); ?> ">
+                        <li class="nav-item <?php echo $activeTab == 'clinic' ? " active open " : ""; ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-settings"></i>
                                 <span class="title">Hub</span>
@@ -573,7 +573,7 @@ if (isset($acl) && $acl->isAllowed($role, 'Application\Controller\LogsController
                         </li>
                     <?php } ?>
                     <?php if (isset($loginContainer->accessType) && ($loginContainer->accessType == '3' || $loginContainer->accessType == '4')) { ?>
-                        <li class="nav-item <?php echo ($activeTab == 'laboratory' ? " active open " : ""); ?> ">
+                        <li class="nav-item <?php echo $activeTab == 'laboratory' ? " active open " : ""; ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-settings"></i>
                                 <span class="title">Laboratory</span>

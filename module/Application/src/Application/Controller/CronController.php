@@ -16,6 +16,7 @@ class CronController extends AbstractActionController
 
     public function indexAction()
     {
+        // The base cron route does no work. Jobs use the named actions or CLI commands.
     }
 
     public function importVlAction()

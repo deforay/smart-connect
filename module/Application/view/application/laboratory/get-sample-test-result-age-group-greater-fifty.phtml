@@ -122,7 +122,9 @@ if (isset($result['Age > 50']) && count($result['Age > 50']) > 0) {
             series: [<?php
                         $age = array('Age > 50');
                         for ($i = 0; $i < count($age); $i++) {
-                            if (!isset($result[$age[$i]])) continue;
+                            if (!isset($result[$age[$i]])) {
+                                continue;
+                            }
                             foreach ($result[$age[$i]] as $key => $condition) {
                                 if ($key != 'VL Not Detected') {
                                     $range = substr($key, 4, 6);

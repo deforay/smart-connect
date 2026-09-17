@@ -1522,6 +1522,9 @@ class SampleTable extends AbstractTableGateway
                         case 'unknown':
                             $ageConditions[] = "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
                             break;
+                        default:
+                            // Ignore unsupported age filters, as for an empty selection.
+                            break;
                     }
                 }
                 if (!empty($ageConditions)) {
@@ -1663,6 +1666,9 @@ class SampleTable extends AbstractTableGateway
                             break;
                         case 'unknown':
                             $ageConditions[] = "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
+                            break;
+                        default:
+                            // Ignore unsupported age filters, as for an empty selection.
                             break;
                     }
                 }
@@ -2042,6 +2048,9 @@ class SampleTable extends AbstractTableGateway
                             break;
                         case 'unknown':
                             $ageConditions[] = "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
+                            break;
+                        default:
+                            // Ignore unsupported age filters, as for an empty selection.
                             break;
                     }
                 }
@@ -2452,6 +2461,9 @@ class SampleTable extends AbstractTableGateway
                             break;
                         case 'unknown':
                             $ageConditions[] = "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
+                            break;
+                        default:
+                            // Ignore unsupported age filters, as for an empty selection.
                             break;
                     }
                 }
@@ -4493,6 +4505,9 @@ class SampleTable extends AbstractTableGateway
                 return array('07', '08', '09');
             case 4:
                 return array(10, 11, 12);
+            default:
+                // Preserve the null result for unsupported quarters.
+                return null;
         }
     }
 
@@ -7007,6 +7022,9 @@ class SampleTable extends AbstractTableGateway
                         case 'unknown':
                             $ageConditions[] = "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
                             break;
+                        default:
+                            // Ignore unsupported age filters, as for an empty selection.
+                            break;
                     }
                 }
                 if (!empty($ageConditions)) {
@@ -7133,6 +7151,9 @@ class SampleTable extends AbstractTableGateway
                             break;
                         case 'unknown':
                             $ageConditions[] = "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
+                            break;
+                        default:
+                            // Ignore unsupported age filters, as for an empty selection.
                             break;
                     }
                 }

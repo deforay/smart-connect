@@ -56,7 +56,7 @@
                                                             foreach ($roles as $r) {
                                                                 // $options[$r['access_type_name']][$r['id']] = $r['role_name'];
                                                             ?>
-                                                                <option value="<?php echo $r['role_id']; ?>" <?php echo ($user->role == $r['role_id'] ? " selected='selected' " : ""); ?>><?php echo ucwords($r['role_name']); ?></option>
+                                                                <option value="<?php echo $r['role_id']; ?>" <?php echo $user->role == $r['role_id'] ? " selected='selected' " : ""; ?>><?php echo ucwords($r['role_name']); ?></option>
                                                             <?php
                                                             }
                                                             ?>
@@ -100,8 +100,8 @@
                                                     <div class="col-md-6">
                                                         <select class="form-control isRequired" name="status" id="status" title="<?php echo $this->translate('Please select the status'); ?>">
                                                             <option value="">--<?php echo $this->translate('Select'); ?>--</option>
-                                                            <option value="active" "<?php echo ($user->status == 'active' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Active'); ?></option>
-                                                            <option value="inactive" "<?php echo ($user->status == 'inactive' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Inactive'); ?></option>
+                                                            <option value="active" "<?php echo $user->status == 'active' ? " selected='selected' " : ""; ?>"><?php echo $this->translate('Active'); ?></option>
+                                                            <option value="inactive" "<?php echo $user->status == 'inactive' ? " selected='selected' " : ""; ?>"><?php echo $this->translate('Inactive'); ?></option>
                                                         </select>
                                                     </div>
                                                 </div>

@@ -190,8 +190,8 @@ if (isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts'])
                     <label class="control-label"><?php echo $this->translate('Test Result'); ?>&nbsp;</label>
                     <select class="form-control" name="testResult" id="testResult" title="<?php echo $this->translate('Please choose result'); ?>">
                         <option value=""><?php echo $this->translate('All'); ?></option>
-                        <option value=">=1000" <?php echo ((isset($searchRange) && $searchRange == '>1000') ? "selected='selected'" : "") ?>><?php echo $this->translate('>= 1000 cp/ml'); ?></option>
-                        <option value="<1000" <?php echo ((isset($searchRange) && $searchRange == '<1000') ? "selected='selected'" : "") ?>><?php echo $this->translate('< 1000 cp/ml'); ?></option>
+                        <option value=">=1000" <?php echo (isset($searchRange) && $searchRange == '>1000') ? "selected='selected'" : "" ?>><?php echo $this->translate('>= 1000 cp/ml'); ?></option>
+                        <option value="<1000" <?php echo (isset($searchRange) && $searchRange == '<1000') ? "selected='selected'" : "" ?>><?php echo $this->translate('< 1000 cp/ml'); ?></option>
                     </select>
                 </div>
             </div>
