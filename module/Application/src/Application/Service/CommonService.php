@@ -551,716 +551,275 @@ class CommonService
 
      public function saveVlsmMetadataFromAPI($params)
      {
-
-          $testReasonDb = $this->sm->get('TestReasonTable');
-          $covid19TestReasonDb = $this->sm->get('Covid19TestReasonsTable');
-          $artCodeDb = $this->sm->get('ArtCodeTable');
-          $sampleRejectionReasonDb = $this->sm->get('SampleRejectionReasonTable');
-          $eidSampleRejectionReasonDb = $this->sm->get('EidSampleRejectionReasonTable');
-          $covid19SampleRejectionDb = $this->sm->get('Covid19SampleRejectionReasonsTable');
-          $eidSampleTypeDb = $this->sm->get('EidSampleTypeTable');
-          $covid19SampleTypeDb = $this->sm->get('Covid19SampleTypeTable');
-          $covid19ComorbiditiesDb = $this->sm->get('Covid19ComorbiditiesTable');
-          $covid19SymptomsDb = $this->sm->get('Covid19SymptomsTable');
-          /** @var \Application\Model\FacilityTable $facilityDb */
-          $facilityDb = $this->sm->get('FacilityTableWithoutCache');
-          $locationDb = $this->sm->get('LocationDetailsTable');
-          $importConfigDb = $this->sm->get('ImportConfigMachineTable');
-          $hepatitisSampleTypeDb = $this->sm->get('HepatitisSampleTypeTable');
-          $hepatitisSampleRejectionDb = $this->sm->get('HepatitisSampleRejectionReasonTable');
-          $hepatitisResultsDb = $this->sm->get('HepatitisResultsTable');
-          $hepatitisRiskFactorDb = $this->sm->get('HepatitisRiskFactorTable');
-          $hepatitisTestReasonsDb = $this->sm->get('HepatitisTestReasonsTable');
-
+          $gateways = [
+               'TestReasonTable' => $this->sm->get('TestReasonTable'),
+               'Covid19TestReasonsTable' => $this->sm->get('Covid19TestReasonsTable'),
+               'ArtCodeTable' => $this->sm->get('ArtCodeTable'),
+               'SampleRejectionReasonTable' => $this->sm->get('SampleRejectionReasonTable'),
+               'EidSampleRejectionReasonTable' => $this->sm->get('EidSampleRejectionReasonTable'),
+               'Covid19SampleRejectionReasonsTable' => $this->sm->get('Covid19SampleRejectionReasonsTable'),
+               'EidSampleTypeTable' => $this->sm->get('EidSampleTypeTable'),
+               'Covid19SampleTypeTable' => $this->sm->get('Covid19SampleTypeTable'),
+               'Covid19ComorbiditiesTable' => $this->sm->get('Covid19ComorbiditiesTable'),
+               'Covid19SymptomsTable' => $this->sm->get('Covid19SymptomsTable'),
+               'FacilityTableWithoutCache' => $this->sm->get('FacilityTableWithoutCache'),
+               'LocationDetailsTable' => $this->sm->get('LocationDetailsTable'),
+               'ImportConfigMachineTable' => $this->sm->get('ImportConfigMachineTable'),
+               'HepatitisSampleTypeTable' => $this->sm->get('HepatitisSampleTypeTable'),
+               'HepatitisSampleRejectionReasonTable' => $this->sm->get('HepatitisSampleRejectionReasonTable'),
+               'HepatitisResultsTable' => $this->sm->get('HepatitisResultsTable'),
+               'HepatitisRiskFactorTable' => $this->sm->get('HepatitisRiskFactorTable'),
+               'HepatitisTestReasonsTable' => $this->sm->get('HepatitisTestReasonsTable'),
+          ];
           $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
-          $sql = new Sql($dbAdapter);
-
-
-          if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference")) {
-               mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference", 0777, true);
+          [$apiData, $fileName] = $this->readMetadataUpload();
+          $result = $this->syncMetadataPayload($apiData, $gateways, $dbAdapter);
+          if ($fileName && file_exists($fileName)) {
+               unlink($fileName);
           }
+          return $result;
+     }
 
+     /** @return array{0: object|array, 1: string} */
+     private function readMetadataUpload(): array
+     {
+          $directory = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . 'vlsm-reference';
+          if (!file_exists($directory) && !is_dir($directory)) {
+               mkdir($directory, 0777, true);
+          }
           $extension = strtolower(pathinfo($_FILES['referenceFile']['name'], PATHINFO_EXTENSION));
-          $newFileName = self::generateRandomString(12) . "." . $extension;
-          $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference" . DIRECTORY_SEPARATOR . $newFileName;
-
-          if (move_uploaded_file($_FILES['referenceFile']['tmp_name'], $fileName)) {
-               // Check if the file is readable after being moved
-               if (is_readable($fileName)) {
-                    // Process the file. We preserve keys so metadata maps correctly (forceSync, table names).
-                    [$apiData, $timestamp] = self::processJsonFile($fileName, true, true, true);
-                    if ($apiData !== null && self::isTraversable($apiData)) {
-                         $apiData = is_array($apiData) ? $apiData : iterator_to_array($apiData, true);
-                         $apiData = self::arrayToObject($apiData);
-                    } else {
-                         $apiData = [];
-                    }
-
-               } else {
-                    // Log an error if the file is not readable
-                    error_log("File $fileName not readable after move");
-                    exit(0);
-               }
-          } else {
-               // Log an error if the file move operation fails
+          $fileName = $directory . DIRECTORY_SEPARATOR . self::generateRandomString(12) . '.' . $extension;
+          if (!move_uploaded_file($_FILES['referenceFile']['tmp_name'], $fileName)) {
                error_log("Failed to move uploaded file to $fileName");
                exit(0);
           }
+          if (!is_readable($fileName)) {
+               error_log("File $fileName not readable after move");
+               exit(0);
+          }
 
+          // Preserve table names and forceSync while consuming the streamed JSON payload.
+          [$apiData] = self::processJsonFile($fileName, true, true, true);
+          if ($apiData === null || !self::isTraversable($apiData)) {
+               return [[], $fileName];
+          }
+          $apiData = is_array($apiData) ? $apiData : iterator_to_array($apiData, true);
+          return [self::arrayToObject($apiData), $fileName];
+     }
 
+     private function metadataTableDefinitions(): array
+     {
+          // Order matters: geography is available before facility rows are resolved.
+          return [
+               'geographical_divisions' => [],
+               'facility_details' => [],
+               'r_vl_test_reasons' => ['service' => 'TestReasonTable'],
+               'r_covid19_test_reasons' => ['service' => 'Covid19TestReasonsTable', 'name' => 'test_reason_name', 'id' => 'test_reason_id'],
+               'r_vl_art_regimen' => ['service' => 'ArtCodeTable', 'exclude' => ['data_sync']],
+               'r_vl_sample_rejection_reasons' => ['service' => 'SampleRejectionReasonTable', 'exclude' => ['data_sync']],
+               'r_eid_sample_rejection_reasons' => ['service' => 'EidSampleRejectionReasonTable', 'name' => 'rejection_reason_name', 'id' => 'rejection_reason_id'],
+               'r_covid19_sample_rejection_reasons' => ['service' => 'Covid19SampleRejectionReasonsTable', 'name' => 'rejection_reason_name', 'id' => 'rejection_reason_id'],
+               'instrument_machines' => ['service' => 'ImportConfigMachineTable', 'name' => 'config_machine_name', 'id' => 'config_machine_id'],
+               'instruments' => ['sqlUpsert' => true, 'encodeJson' => true],
+               'r_vl_sample_type' => ['sqlUpsert' => true],
+               'r_eid_sample_type' => ['service' => 'EidSampleTypeTable', 'name' => 'sample_name', 'id' => 'sample_id'],
+               'r_covid19_sample_type' => ['service' => 'Covid19SampleTypeTable', 'name' => 'sample_name', 'id' => 'sample_id'],
+               'r_covid19_comorbidities' => ['service' => 'Covid19ComorbiditiesTable', 'name' => 'comorbidity_name', 'id' => 'comorbidity_id'],
+               'r_covid19_symptoms' => ['service' => 'Covid19SymptomsTable', 'name' => 'symptom_name', 'id' => 'symptom_id'],
+               'r_hepatitis_sample_rejection_reasons' => ['service' => 'HepatitisSampleRejectionReasonTable', 'name' => 'rejection_reason_name', 'id' => 'rejection_reason_id'],
+               'r_hepatitis_rick_factors' => ['service' => 'HepatitisRiskFactorTable', 'name' => 'riskfactor_name', 'id' => 'riskfactor_id'],
+               'r_hepatitis_test_reasons' => ['service' => 'HepatitisTestReasonsTable', 'name' => 'test_reason_name', 'id' => 'test_reason_id'],
+               'r_hepatitis_results' => ['service' => 'HepatitisResultsTable', 'name' => 'result', 'id' => 'result_id', 'quotedId' => true],
+               'r_hepatitis_sample_type' => ['service' => 'HepatitisSampleTypeTable', 'name' => 'sample_name', 'id' => 'sample_id', 'quotedId' => true],
+          ];
+     }
+
+     private function syncMetadataPayload(object|array $apiData, array $gateways, Adapter $dbAdapter): array
+     {
           $forceSync = !empty($apiData->forceSync);
-          // Compare remote vs local timestamps so one newer local row doesn't block all remote updates.
-          $shouldSync = function (string $tableName, ?string $remoteLastModified, string $modifiedDateTimeColName = 'updated_datetime') use ($forceSync) {
-               if ($forceSync) {
-                    return true;
-               }
-               if (empty($remoteLastModified)) {
-                    return true;
-               }
-               $localLastModified = $this->getLastModifiedDateTime($tableName, $modifiedDateTimeColName);
-               if (empty($localLastModified)) {
-                    return true;
-               }
-               return strtotime($remoteLastModified) > strtotime($localLastModified);
-          };
-
-          // The sender spells this table 'risk'; the table here has always been
-          // named 'rick'. Without the alias the block below never matches, and
-          // hepatitis risk factors sync as a silent no-op on every run.
-          if (is_object($apiData) && isset($apiData->r_hepatitis_risk_factors) && !isset($apiData->r_hepatitis_rick_factors)) {
+          // The sender uses "risk", while the local schema retains the historical "rick" name.
+          if (isset($apiData->r_hepatitis_risk_factors) && !isset($apiData->r_hepatitis_rick_factors)) {
                $apiData->r_hepatitis_rick_factors = $apiData->r_hepatitis_risk_factors;
                unset($apiData->r_hepatitis_risk_factors);
           }
 
-          // Every table this method knows how to write. A table the sender
-          // includes that is missing from this list has no block below, and used
-          // to be dropped without a word — leaving the sender to read the
-          // resulting 'success' as confirmation the rows had been stored.
-          $handledTables = [
-               'geographical_divisions',
-               'facility_details',
-               'instruments',
-               'instrument_machines',
-               'r_vl_sample_type',
-               'r_vl_test_reasons',
-               'r_vl_art_regimen',
-               'r_vl_sample_rejection_reasons',
-               'r_eid_sample_type',
-               'r_eid_sample_rejection_reasons',
-               'r_covid19_sample_type',
-               'r_covid19_test_reasons',
-               'r_covid19_sample_rejection_reasons',
-               'r_covid19_comorbidities',
-               'r_covid19_symptoms',
-               'r_hepatitis_sample_type',
-               'r_hepatitis_results',
-               'r_hepatitis_test_reasons',
-               'r_hepatitis_rick_factors',
-               'r_hepatitis_sample_rejection_reasons',
-          ];
-
+          $definitions = $this->metadataTableDefinitions();
           $syncErrors = [];
-
-          /* For update the location details */
-          if (isset($apiData->geographical_divisions) && !empty($apiData->geographical_divisions)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->geographical_divisions->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->geographical_divisions->lastModifiedTime ?? null;
-                    if ($shouldSync('geographical_divisions', $remoteLastModified)) {
-                         $rQueryStr = 'SET FOREIGN_KEY_CHECKS=0; ALTER TABLE `geographical_divisions` DISABLE KEYS';
-                         $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         $dbAdapter->query('TRUNCATE TABLE `geographical_divisions`', $dbAdapter::QUERY_MODE_EXECUTE);
-
-                         foreach ((array)$apiData->geographical_divisions->tableData as $row) {
-                              $lData = (array)$row;
-                              $locationData = [
-                                   'geo_id' => $lData['geo_id'],
-                                   'geo_parent' => $lData['geo_parent'],
-                                   'geo_name' => $lData['geo_name'],
-                                   'geo_code' => $lData['geo_code'],
-                                   'geo_status' => $lData['geo_status'],
-                                   'updated_datetime' => $lData['updated_datetime']
-                              ];
-                              // WHY: Prevent duplicate errors on (geo_name, geo_parent) while keeping data current.
-                              self::upsert($dbAdapter, 'geographical_divisions', $locationData);
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['geographical_divisions'] = $e->getMessage();
+          foreach ($definitions as $table => $definition) {
+               if (empty($apiData->$table)) {
+                    continue;
                }
-          }
-
-          /* For update the Facility Details */
-          if (isset($apiData->facility_details) && !empty($apiData->facility_details)) {
                try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->facility_details->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->facility_details->lastModifiedTime ?? null;
-                    if ($shouldSync('facility_details', $remoteLastModified)) {
-                         if ($forceSync) {
-                              // WHY: Force sync should fully replace the table to avoid stale/partial rows.
-                              $dbAdapter->query('TRUNCATE TABLE `facility_details`', $dbAdapter::QUERY_MODE_EXECUTE);
-                         }
-                         $facilityTemplate = $this->getTableFieldsAsArray('facility_details', ['data_sync']);
-                         $facilityRowErrors = 0;
-                         $facilityRowErrorSample = null;
-                         $facilityRowsTotal = 0;
-                         $facilityRowsInserted = 0;
-                         foreach ((array)$apiData->facility_details->tableData as $row) {
-                              $facilityRowsTotal++;
-                              try {
-                                   $facilityData = (array)$row;
-                                   $facilityStateId = $facilityData['facility_state_id'] ?? null;
-                                   $facilityDistrictId = $facilityData['facility_district_id'] ?? null;
-                                   unset($facilityData['data_sync']);
-                                   unset($facilityData['facility_state_id']);
-                                   unset($facilityData['facility_district_id']);
-                                   if (trim($facilityData['facility_state']) != '' || !empty($facilityStateId)) {
-                                        if (!empty($facilityStateId)) {
-                                             $facilityData['facility_state'] = $facilityStateId;
-                                        }
-                                        $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($facilityData['facility_state']), 0);
-                                        if ($sQueryResult) {
-                                             $facilityData['facility_state'] = $sQueryResult['geo_id'];
-                                        } else {
-                                             // WHY: Avoid duplicate insert errors; upsert and re-fetch ID.
-                                             $locationDb->insertOrUpdate([
-                                                  'geo_parent' => 0,
-                                                  'geo_name' => trim($facilityData['facility_state'])
-                                             ]);
-                                             $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($facilityData['facility_state']), 0);
-                                             $facilityData['facility_state'] = $sQueryResult['geo_id'] ?? null;
-                                        }
-                                   }
-                                   if (trim($facilityData['facility_district']) != '' || !empty($facilityDistrictId)) {
-                                        if (!empty($facilityDistrictId)) {
-                                             $facilityData['facility_district'] = $facilityDistrictId;
-                                        }
-                                        $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($facilityData['facility_district']), $facilityData['facility_state']);
-                                        if ($sQueryResult) {
-                                             $facilityData['facility_district'] = $sQueryResult['geo_id'];
-                                        } else {
-                                             // WHY: Avoid duplicate insert errors; upsert and re-fetch ID.
-                                             $locationDb->insertOrUpdate([
-                                                  'geo_parent' => $facilityData['facility_state'],
-                                                  'geo_name' => trim($facilityData['facility_district'])
-                                             ]);
-                                             $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($facilityData['facility_district']), $facilityData['facility_state']);
-                                             $facilityData['facility_district'] = $sQueryResult['geo_id'] ?? null;
-                                        }
-                                   }
-
-                                   $facilityData = self::updateMatchingKeysOnly($facilityTemplate, $facilityData);
-                                   $id = $facilityDb->insertOrUpdate($facilityData);
-                                   if (!empty($id)) {
-                                        $facilityRowsInserted++;
-                                   }
-                              } catch (Throwable $e) {
-                                   $facilityRowErrors++;
-                                   if ($facilityRowErrorSample === null) {
-                                        $facilityRowErrorSample = $e->getMessage();
-                                   }
-                              }
-                         }
-                         if ($facilityRowErrors > 0 || $facilityRowsInserted !== $facilityRowsTotal) {
-                              $syncErrors['facility_details'] = "Rows total: {$facilityRowsTotal}, inserted: {$facilityRowsInserted}, errors: {$facilityRowErrors}. Sample: {$facilityRowErrorSample}";
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['facility_details'] = $e->getMessage();
-               }
-          }
-
-          /* For update the Test Reasons */
-          if (isset($apiData->r_vl_test_reasons) && !empty($apiData->r_vl_test_reasons)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_vl_test_reasons->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_vl_test_reasons->lastModifiedTime ?? null;
-                    if ($shouldSync('r_vl_test_reasons', $remoteLastModified)) {
-                         $vlTestReasonsTemplate = $this->getTableFieldsAsArray('r_vl_test_reasons');
-                         foreach ((array)$apiData->r_vl_test_reasons->tableData as $row) {
-                              $testReasonData = self::updateMatchingKeysOnly($vlTestReasonsTemplate, (array)$row);
-                              $testReasonDb->insertOrUpdate($testReasonData);
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_vl_test_reasons'] = $e->getMessage();
-               }
-          }
-
-          /* For update the Covid19 Test Reasons */
-          if (isset($apiData->r_covid19_test_reasons) && !empty($apiData->r_covid19_test_reasons)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_covid19_test_reasons->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_covid19_test_reasons->lastModifiedTime ?? null;
-                    if ($shouldSync('r_covid19_test_reasons', $remoteLastModified)) {
-                         $covid19TestReasonsTemplate = $this->getTableFieldsAsArray('r_covid19_test_reasons');
-                         foreach ((array)$apiData->r_covid19_test_reasons->tableData as $row) {
-                              $covid19TestReasonData = self::updateMatchingKeysOnly($covid19TestReasonsTemplate, (array)$row);
-                              $rQuery = $sql->select()->from('r_covid19_test_reasons')->where(array('test_reason_name LIKE "%' . $covid19TestReasonData['test_reason_name'] . '%" OR test_reason_id = ' . $covid19TestReasonData['test_reason_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $covid19TestReasonDb->update($covid19TestReasonData, array('test_reason_id' => $covid19TestReasonData['test_reason_id']));
-                              } else {
-                                   $covid19TestReasonDb->insert($covid19TestReasonData);
-                              }
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_covid19_test_reasons'] = $e->getMessage();
-               }
-          }
-
-          /* For update the Art Code Details */
-          if (isset($apiData->r_vl_art_regimen) && !empty($apiData->r_vl_art_regimen)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_vl_art_regimen->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_vl_art_regimen->lastModifiedTime ?? null;
-                    if ($shouldSync('r_vl_art_regimen', $remoteLastModified)) {
-                         $vlArtRegimenTemplate = $this->getTableFieldsAsArray('r_vl_art_regimen', ['data_sync']);
-                         foreach ((array)$apiData->r_vl_art_regimen->tableData as $row) {
-                              $artCodeData = self::updateMatchingKeysOnly($vlArtRegimenTemplate, (array)$row);
-                              $artCodeDb->insertOrUpdate($artCodeData);
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_vl_art_regimen'] = $e->getMessage();
-               }
-          }
-
-          /* For update the Sample Rejection Reason Details */
-          if (isset($apiData->r_vl_sample_rejection_reasons) && !empty($apiData->r_vl_sample_rejection_reasons)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_vl_sample_rejection_reasons->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_vl_sample_rejection_reasons->lastModifiedTime ?? null;
-                    if ($shouldSync('r_vl_sample_rejection_reasons', $remoteLastModified)) {
-                         $vlSampleRejectionTemplate = $this->getTableFieldsAsArray('r_vl_sample_rejection_reasons', ['data_sync']);
-                         foreach ((array)$apiData->r_vl_sample_rejection_reasons->tableData as $row) {
-                              $sampleRejectionReasonData = self::updateMatchingKeysOnly($vlSampleRejectionTemplate, (array)$row);
-                              $sampleRejectionReasonDb->insertOrUpdate($sampleRejectionReasonData);
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_vl_sample_rejection_reasons'] = $e->getMessage();
-               }
-          }
-
-          /* For update the EID Sample Rejection Reason Details */
-          if (isset($apiData->r_eid_sample_rejection_reasons) && !empty($apiData->r_eid_sample_rejection_reasons)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_eid_sample_rejection_reasons->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_eid_sample_rejection_reasons->lastModifiedTime ?? null;
-                    if ($shouldSync('r_eid_sample_rejection_reasons', $remoteLastModified)) {
-                         $eidSampleRejectionTemplate = $this->getTableFieldsAsArray('r_eid_sample_rejection_reasons');
-                         foreach ((array)$apiData->r_eid_sample_rejection_reasons->tableData as $row) {
-                              $eidSampleRejectionReasonData = self::updateMatchingKeysOnly($eidSampleRejectionTemplate, (array)$row);
-                              $rQuery = $sql->select()->from('r_eid_sample_rejection_reasons')->where(array('rejection_reason_name LIKE "%' . $eidSampleRejectionReasonData['rejection_reason_name'] . '%" OR rejection_reason_id = ' . $eidSampleRejectionReasonData['rejection_reason_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $eidSampleRejectionReasonDb->update($eidSampleRejectionReasonData, array('rejection_reason_id' => $eidSampleRejectionReasonData['rejection_reason_id']));
-                              } else {
-                                   $eidSampleRejectionReasonDb->insert($eidSampleRejectionReasonData);
-                              }
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_eid_sample_rejection_reasons'] = $e->getMessage();
-               }
-          }
-
-          /* For update the Covid19 Sample Rejection Reason Details */
-          if (isset($apiData->r_covid19_sample_rejection_reasons) && !empty($apiData->r_covid19_sample_rejection_reasons)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_covid19_sample_rejection_reasons->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_covid19_sample_rejection_reasons->lastModifiedTime ?? null;
-                    if ($shouldSync('r_covid19_sample_rejection_reasons', $remoteLastModified)) {
-                         $covid19SampleRejectionTemplate = $this->getTableFieldsAsArray('r_covid19_sample_rejection_reasons');
-                         foreach ((array)$apiData->r_covid19_sample_rejection_reasons->tableData as $row) {
-                              $covid19SampleRejectionData = self::updateMatchingKeysOnly($covid19SampleRejectionTemplate, (array)$row);
-                              $rQuery = $sql->select()->from('r_covid19_sample_rejection_reasons')->where(array('rejection_reason_name LIKE "%' . $covid19SampleRejectionData['rejection_reason_name'] . '%" OR rejection_reason_id = ' . $covid19SampleRejectionData['rejection_reason_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $covid19SampleRejectionDb->update($covid19SampleRejectionData, array('rejection_reason_id' => $covid19SampleRejectionData['rejection_reason_id']));
-                              } else {
-                                   $covid19SampleRejectionDb->insert($covid19SampleRejectionData);
-                              }
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_covid19_sample_rejection_reasons'] = $e->getMessage();
-               }
-          }
-
-          /* For update the  Import Config Machine */
-          if (isset($apiData->instrument_machines) && !empty($apiData->instrument_machines)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_covid19_symptoms->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->instrument_machines->lastModifiedTime ?? null;
-                    if ($shouldSync('instrument_machines', $remoteLastModified)) {
-                         $instrumentMachinesTemplate = $this->getTableFieldsAsArray('instrument_machines');
-                         foreach ((array)$apiData->instrument_machines->tableData as $row) {
-                              $importConfigMachData = self::updateMatchingKeysOnly($instrumentMachinesTemplate, (array)$row);
-                              // print_r($importConfigMachData);die;
-                              $rQuery = $sql->select()->from('instrument_machines')->where(array('config_machine_name LIKE "%' . $importConfigMachData['config_machine_name'] . '%" OR config_machine_id = ' . $importConfigMachData['config_machine_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $importConfigDb->update($importConfigMachData, array('config_machine_id' => $importConfigMachData['config_machine_id']));
-                              } else {
-                                   $importConfigDb->insert($importConfigMachData);
-                              }
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['instrument_machines'] = $e->getMessage();
-               }
-          }
-
-          /* For update the Instrument Details */
-          if (isset($apiData->instruments) && !empty($apiData->instruments)) {
-               try {
-                    $remoteLastModified = $apiData->instruments->lastModifiedTime ?? null;
-                    if ($shouldSync('instruments', $remoteLastModified)) {
-                         $instrumentTemplate = $this->getTableFieldsAsArray('instruments');
-                         foreach ((array)$apiData->instruments->tableData as $row) {
-                              $instrumentData = self::updateMatchingKeysOnly($instrumentTemplate, (array)$row);
-                              // supported_tests, approved_by and reviewed_by are JSON columns and
-                              // arrive decoded. Handing the decoded value to the driver binds an
-                              // array, which is not something MySQL can store.
-                              foreach ($instrumentData as $column => $value) {
-                                   if (is_array($value) || is_object($value)) {
-                                        $instrumentData[$column] = json_encode($value);
-                                   }
-                              }
-                              self::upsert($dbAdapter, 'instruments', $instrumentData);
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['instruments'] = $e->getMessage();
-               }
-          }
-
-          /* For update the VL Sample Type Details */
-          if (isset($apiData->r_vl_sample_type) && !empty($apiData->r_vl_sample_type)) {
-               try {
-                    $remoteLastModified = $apiData->r_vl_sample_type->lastModifiedTime ?? null;
-                    if ($shouldSync('r_vl_sample_type', $remoteLastModified)) {
-                         $vlSampleTypeTemplate = $this->getTableFieldsAsArray('r_vl_sample_type');
-                         foreach ((array)$apiData->r_vl_sample_type->tableData as $row) {
-                              $vlSampleTypeData = self::updateMatchingKeysOnly($vlSampleTypeTemplate, (array)$row);
-                              self::upsert($dbAdapter, 'r_vl_sample_type', $vlSampleTypeData);
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_vl_sample_type'] = $e->getMessage();
-               }
-          }
-
-          /* For update the EID Sample Type Details */
-          if (isset($apiData->r_eid_sample_type) && !empty($apiData->r_eid_sample_type)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_eid_sample_type->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_eid_sample_type->lastModifiedTime ?? null;
-                    if ($shouldSync('r_eid_sample_type', $remoteLastModified)) {
-                         $eidSampleTypeTemplate = $this->getTableFieldsAsArray('r_eid_sample_type');
-                         foreach ((array)$apiData->r_eid_sample_type->tableData as $row) {
-                              $eidSampleTypeData = self::updateMatchingKeysOnly($eidSampleTypeTemplate, (array)$row);
-                              $rQuery = $sql->select()->from('r_eid_sample_type')->where(array('sample_name LIKE "%' . $eidSampleTypeData['sample_name'] . '%" OR sample_id = ' . $eidSampleTypeData['sample_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $eidSampleTypeDb->update($eidSampleTypeData, array('sample_id' => $eidSampleTypeData['sample_id']));
-                              } else {
-                                   $eidSampleTypeDb->insert($eidSampleTypeData);
-                              }
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_eid_sample_type'] = $e->getMessage();
-               }
-          }
-
-          /* For update the Covid19 Sample Type Details */
-          if (isset($apiData->r_covid19_sample_type) && !empty($apiData->r_covid19_sample_type)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_covid19_sample_type->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_covid19_sample_type->lastModifiedTime ?? null;
-                    if ($shouldSync('r_covid19_sample_type', $remoteLastModified)) {
-                         $covid19SampleTypeTemplate = $this->getTableFieldsAsArray('r_covid19_sample_type');
-                         foreach ((array)$apiData->r_covid19_sample_type->tableData as $row) {
-                              $covid19SampleTypeData = self::updateMatchingKeysOnly($covid19SampleTypeTemplate, (array)$row);
-                              $rQuery = $sql->select()->from('r_covid19_sample_type')->where(array('sample_name LIKE "%' . $covid19SampleTypeData['sample_name'] . '%" OR sample_id = ' . $covid19SampleTypeData['sample_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $covid19SampleTypeDb->update($covid19SampleTypeData, array('sample_id' => $covid19SampleTypeData['sample_id']));
-                              } else {
-                                   $covid19SampleTypeDb->insert($covid19SampleTypeData);
-                              }
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_covid19_sample_type'] = $e->getMessage();
-               }
-          }
-
-          /* For update the  Covid19 Comorbidities */
-          if (isset($apiData->r_covid19_comorbidities) && !empty($apiData->r_covid19_comorbidities)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_covid19_comorbidities->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_covid19_comorbidities->lastModifiedTime ?? null;
-                    if ($shouldSync('r_covid19_comorbidities', $remoteLastModified)) {
-                         $covid19ComorbiditiesTemplate = $this->getTableFieldsAsArray('r_covid19_comorbidities');
-                         foreach ((array)$apiData->r_covid19_comorbidities->tableData as $row) {
-                              $covid19ComorbiditiesData = self::updateMatchingKeysOnly($covid19ComorbiditiesTemplate, (array)$row);
-                              $rQuery = $sql->select()->from('r_covid19_comorbidities')->where(array('comorbidity_name LIKE "%' . $covid19ComorbiditiesData['comorbidity_name'] . '%" OR comorbidity_id = ' . $covid19ComorbiditiesData['comorbidity_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $covid19ComorbiditiesDb->update($covid19ComorbiditiesData, array('comorbidity_id' => $covid19ComorbiditiesData['comorbidity_id']));
-                              } else {
-                                   $covid19ComorbiditiesDb->insert($covid19ComorbiditiesData);
-                              }
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_covid19_comorbidities'] = $e->getMessage();
-               }
-          }
-
-          /* For update the  Covid19 Symptoms */
-          if (isset($apiData->r_covid19_symptoms) && !empty($apiData->r_covid19_symptoms)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_covid19_symptoms->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_covid19_symptoms->lastModifiedTime ?? null;
-                    if ($shouldSync('r_covid19_symptoms', $remoteLastModified)) {
-                         $covid19SymptomsTemplate = $this->getTableFieldsAsArray('r_covid19_symptoms');
-                         foreach ((array)$apiData->r_covid19_symptoms->tableData as $row) {
-                              $covid19SymptomsData = self::updateMatchingKeysOnly($covid19SymptomsTemplate, (array)$row);
-                              $rQuery = $sql->select()->from('r_covid19_symptoms')->where(array('symptom_name LIKE "%' . $covid19SymptomsData['symptom_name'] . '%" OR symptom_id = ' . $covid19SymptomsData['symptom_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $covid19SymptomsDb->update($covid19SymptomsData, array('symptom_id' => $covid19SymptomsData['symptom_id']));
-                              } else {
-                                   $covid19SymptomsDb->insert($covid19SymptomsData);
-                              }
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_covid19_symptoms'] = $e->getMessage();
-               }
-          }
-
-          /* For update the Hepatitis Sample Rejection Reasons Details */
-          if (isset($apiData->r_hepatitis_sample_rejection_reasons) && !empty($apiData->r_hepatitis_sample_rejection_reasons)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_hepatitis_sample_rejection_reasons->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_hepatitis_sample_rejection_reasons->lastModifiedTime ?? null;
-                    if ($shouldSync('r_hepatitis_sample_rejection_reasons', $remoteLastModified)) {
-                         $hepatitisSampleRejectionTemplate = $this->getTableFieldsAsArray('r_hepatitis_sample_rejection_reasons');
-                         foreach ((array)$apiData->r_hepatitis_sample_rejection_reasons->tableData as $row) {
-                              $hepatitisSampleRejectionData = self::updateMatchingKeysOnly($hepatitisSampleRejectionTemplate, (array)$row);
-                              $rQuery = $sql->select()->from('r_hepatitis_sample_rejection_reasons')->where(array('rejection_reason_name LIKE "%' . $hepatitisSampleRejectionData['rejection_reason_name'] . '%" OR rejection_reason_id = ' . $hepatitisSampleRejectionData['rejection_reason_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $hepatitisSampleRejectionDb->update($hepatitisSampleRejectionData, array('rejection_reason_id' => $hepatitisSampleRejectionData['rejection_reason_id']));
-                              } else {
-                                   $hepatitisSampleRejectionDb->insert($hepatitisSampleRejectionData);
-                              }
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_hepatitis_sample_rejection_reasons'] = $e->getMessage();
-               }
-          }
-
-          /* For update the Hepatitis Risk Factor Details */
-          if (isset($apiData->r_hepatitis_rick_factors) && !empty($apiData->r_hepatitis_rick_factors)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_hepatitis_rick_factors->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_hepatitis_rick_factors->lastModifiedTime ?? null;
-                    if ($shouldSync('r_hepatitis_rick_factors', $remoteLastModified)) {
-                         $hepatitisRiskTemplate = $this->getTableFieldsAsArray('r_hepatitis_rick_factors');
-                         foreach ((array)$apiData->r_hepatitis_rick_factors->tableData as $row) {
-                              $hepatitisRiskData = self::updateMatchingKeysOnly($hepatitisRiskTemplate, (array)$row);
-                              $rQuery = $sql->select()->from('r_hepatitis_rick_factors')->where(array('riskfactor_name LIKE "%' . $hepatitisRiskData['riskfactor_name'] . '%" OR riskfactor_id = ' . $hepatitisRiskData['riskfactor_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $hepatitisRiskFactorDb->update($hepatitisRiskData, array('riskfactor_id' => $hepatitisRiskData['riskfactor_id']));
-                              } else {
-                                   $hepatitisRiskFactorDb->insert($hepatitisRiskData);
-                              }
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_hepatitis_rick_factors'] = $e->getMessage();
-               }
-          }
-
-          /* For update the Hepatitis Results Details */
-          if (isset($apiData->r_hepatitis_test_reasons) && !empty($apiData->r_hepatitis_test_reasons)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_hepatitis_test_reasons->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_hepatitis_test_reasons->lastModifiedTime ?? null;
-                    if ($shouldSync('r_hepatitis_test_reasons', $remoteLastModified)) {
-                         $hepatitisTestReasonsTemplate = $this->getTableFieldsAsArray('r_hepatitis_test_reasons');
-                         foreach ((array)$apiData->r_hepatitis_test_reasons->tableData as $row) {
-                              $hepatitisTestReasonData = self::updateMatchingKeysOnly($hepatitisTestReasonsTemplate, (array)$row);
-                              $rQuery = $sql->select()->from('r_hepatitis_test_reasons')->where(array('test_reason_name LIKE "%' . $hepatitisTestReasonData['test_reason_name'] . '%" OR test_reason_id = ' . $hepatitisTestReasonData['test_reason_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $hepatitisTestReasonsDb->update($hepatitisTestReasonData, array('test_reason_id' => $hepatitisTestReasonData['test_reason_id']));
-                              } else {
-                                   $hepatitisTestReasonsDb->insert($hepatitisTestReasonData);
-                              }
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_hepatitis_test_reasons'] = $e->getMessage();
-               }
-          }
-
-          /* For update the Hepatitis Results Details */
-          if (isset($apiData->r_hepatitis_results) && !empty($apiData->r_hepatitis_results)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_hepatitis_results->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_hepatitis_results->lastModifiedTime ?? null;
-                    if ($shouldSync('r_hepatitis_results', $remoteLastModified)) {
-                         $hepatitisResultsTemplate = $this->getTableFieldsAsArray('r_hepatitis_results');
-                         foreach ((array)$apiData->r_hepatitis_results->tableData as $row) {
-                              $hepatitisResultData = self::updateMatchingKeysOnly($hepatitisResultsTemplate, (array)$row);
-                              $rQuery = $sql->select()->from('r_hepatitis_results')->where(array('result LIKE "%' . $hepatitisResultData['result'] . '%" OR result_id = "' . $hepatitisResultData['result_id'] . '" '));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $hepatitisResultsDb->update($hepatitisResultData, array('result_id' => $hepatitisResultData['result_id']));
-                              } else {
-                                   $hepatitisResultsDb->insert($hepatitisResultData);
-                              }
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_hepatitis_results'] = $e->getMessage();
-               }
-          }
-
-          /* For update the Hepatitis Sample Type Details */
-          if (isset($apiData->r_hepatitis_sample_type) && !empty($apiData->r_hepatitis_sample_type)) {
-               try {
-                    /* if($apiData->forceSync){
-                              $rQueryStr = $apiData->r_hepatitis_sample_type->tableStructure;
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         } */
-                    $remoteLastModified = $apiData->r_hepatitis_sample_type->lastModifiedTime ?? null;
-                    if ($shouldSync('r_hepatitis_sample_type', $remoteLastModified)) {
-                         $hepatitisSampleTypeTemplate = $this->getTableFieldsAsArray('r_hepatitis_sample_type');
-                         foreach ((array)$apiData->r_hepatitis_sample_type->tableData as $row) {
-                              $hepatitisSampleTypeData = self::updateMatchingKeysOnly($hepatitisSampleTypeTemplate, (array)$row);
-                              $rQuery = $sql->select()->from('r_hepatitis_sample_type')->where(array('sample_name LIKE "%' . $hepatitisSampleTypeData['sample_name'] . '%" OR sample_id = "' . $hepatitisSampleTypeData['sample_id'] . '" '));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $hepatitisSampleTypeDb->update($hepatitisSampleTypeData, array('sample_id' => $hepatitisSampleTypeData['sample_id']));
-                              } else {
-                                   $hepatitisSampleTypeDb->insert($hepatitisSampleTypeData);
-                              }
-                         }
-                    }
-               } catch (Throwable $e) {
-                    $syncErrors['r_hepatitis_sample_type'] = $e->getMessage();
-               }
-          }
-
-          // Report anything that arrived with rows but has no block above, so a
-          // table this dashboard cannot store is never mistaken for one it did.
-          if (is_object($apiData)) {
-               foreach (get_object_vars($apiData) as $tableName => $tablePayload) {
-                    if ($tableName === 'forceSync' || in_array($tableName, $handledTables, true)) {
+                    $payload = $apiData->$table;
+                    if (!$this->shouldSyncMetadata($table, $payload->lastModifiedTime ?? null, $forceSync)) {
                          continue;
                     }
-                    if (empty($tablePayload) || empty($tablePayload->tableData)) {
-                         continue;
-                    }
-                    $syncErrors[$tableName] = 'This dashboard has no handler for this table, so its rows were not stored.';
+                    $this->syncMetadataTable($table, $payload, $definition, $gateways, $dbAdapter, $forceSync);
+               } catch (Throwable $e) {
+                    // A table failure must not prevent independent reference tables from syncing.
+                    $syncErrors[$table] = $e->getMessage();
                }
           }
-
-          // file_exists guard: a failed upload leaves $fileName set to a path
-          // that was never created, and the warning that unlink then raises is
-          // written into the response body, where it corrupts the JSON.
-          if ($fileName && file_exists($fileName)) {
-               unlink($fileName);
+          $syncErrors += $this->unknownMetadataTables($apiData, $definitions);
+          if ($syncErrors !== []) {
+               return ['status' => 'partial', 'message' => 'Reference tables synced with errors', 'errors' => $syncErrors];
           }
+          return ['status' => 'success', 'message' => 'All reference tables synced'];
+     }
 
-          if (!empty($syncErrors)) {
-               return array(
-                    'status' => 'partial',
-                    'message' => 'Reference tables synced with errors',
-                    'errors' => $syncErrors
-               );
+     private function shouldSyncMetadata(string $table, ?string $remoteTimestamp, bool $forceSync): bool
+     {
+          if ($forceSync || empty($remoteTimestamp)) {
+               return true;
           }
+          $localTimestamp = $this->getLastModifiedDateTime($table, 'updated_datetime');
+          return empty($localTimestamp) || strtotime($remoteTimestamp) > strtotime($localTimestamp);
+     }
 
-          return array(
-               'status' => 'success',
-               'message' => 'All reference tables synced'
-          );
+     private function unknownMetadataTables(object|array $apiData, array $definitions): array
+     {
+          $errors = [];
+          foreach ((array) $apiData as $table => $payload) {
+               if ($table === 'forceSync' || isset($definitions[$table]) || empty($payload->tableData)) {
+                    continue;
+               }
+               $errors[$table] = 'This dashboard has no handler for this table, so its rows were not stored.';
+          }
+          return $errors;
+     }
+
+     private function syncMetadataTable(string $table, object $payload, array $definition, array $gateways, Adapter $dbAdapter, bool $forceSync): void
+     {
+          if ($table === 'geographical_divisions') {
+               $this->syncMetadataGeography($payload, $dbAdapter);
+               return;
+          }
+          if ($table === 'facility_details') {
+               $this->syncMetadataFacilities($payload, $gateways, $dbAdapter, $forceSync);
+               return;
+          }
+          $template = $this->getTableFieldsAsArray($table, $definition['exclude'] ?? []);
+          foreach ((array) $payload->tableData as $row) {
+               $data = self::updateMatchingKeysOnly($template, (array) $row);
+               if (!empty($definition['encodeJson'])) {
+                    $data = $this->encodeMetadataJsonColumns($data);
+               }
+               $this->writeMetadataRow($table, $data, $definition, $gateways, $dbAdapter);
+          }
+     }
+
+     private function encodeMetadataJsonColumns(array $data): array
+     {
+          // Instrument JSON columns arrive decoded and cannot be bound as PHP arrays.
+          foreach ($data as $column => $value) {
+               if (is_array($value) || is_object($value)) {
+                    $data[$column] = json_encode($value);
+               }
+          }
+          return $data;
+     }
+
+     private function writeMetadataRow(string $table, array $data, array $definition, array $gateways, Adapter $dbAdapter): void
+     {
+          if (!empty($definition['sqlUpsert'])) {
+               self::upsert($dbAdapter, $table, $data);
+               return;
+          }
+          $gateway = $gateways[$definition['service']];
+          if (!isset($definition['id'])) {
+               $gateway->insertOrUpdate($data);
+               return;
+          }
+          $id = $definition['id'];
+          $name = $definition['name'];
+          // Preserve the legacy name-or-ID match and update-by-ID behavior.
+          $idValue = !empty($definition['quotedId']) ? '"' . $data[$id] . '" ' : $data[$id];
+          $condition = $name . ' LIKE "%' . $data[$name] . '%" OR ' . $id . ' = ' . $idValue;
+          $sql = new Sql($dbAdapter);
+          $query = $sql->select()->from($table)->where([$condition]);
+          $existing = $dbAdapter->query($sql->buildSqlString($query), $dbAdapter::QUERY_MODE_EXECUTE)->current();
+          if ($existing) {
+               $gateway->update($data, [$id => $data[$id]]);
+          } else {
+               $gateway->insert($data);
+          }
+     }
+
+     private function syncMetadataGeography(object $payload, Adapter $dbAdapter): void
+     {
+          $rQueryStr = 'SET FOREIGN_KEY_CHECKS=0; ALTER TABLE `geographical_divisions` DISABLE KEYS';
+          $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+          $dbAdapter->query('TRUNCATE TABLE `geographical_divisions`', $dbAdapter::QUERY_MODE_EXECUTE);
+
+          foreach ((array)$payload->tableData as $row) {
+               $lData = (array)$row;
+               $locationData = [
+                    'geo_id' => $lData['geo_id'],
+                    'geo_parent' => $lData['geo_parent'],
+                    'geo_name' => $lData['geo_name'],
+                    'geo_code' => $lData['geo_code'],
+                    'geo_status' => $lData['geo_status'],
+                    'updated_datetime' => $lData['updated_datetime']
+               ];
+               // WHY: Prevent duplicate errors on (geo_name, geo_parent) while keeping data current.
+               self::upsert($dbAdapter, 'geographical_divisions', $locationData);
+          }
+     }
+
+     private function syncMetadataFacilities(object $payload, array $gateways, Adapter $dbAdapter, bool $forceSync): void
+     {
+          if ($forceSync) {
+               // WHY: Force sync should fully replace the table to avoid stale/partial rows.
+               $dbAdapter->query('TRUNCATE TABLE `facility_details`', $dbAdapter::QUERY_MODE_EXECUTE);
+          }
+          $facilityTemplate = $this->getTableFieldsAsArray('facility_details', ['data_sync']);
+          $facilityRowErrors = 0;
+          $facilityRowErrorSample = null;
+          $facilityRowsTotal = 0;
+          $facilityRowsInserted = 0;
+          foreach ((array)$payload->tableData as $row) {
+               $facilityRowsTotal++;
+               try {
+                    $facilityData = $this->prepareMetadataFacility((array) $row, $gateways['LocationDetailsTable']);
+                    $facilityData = self::updateMatchingKeysOnly($facilityTemplate, $facilityData);
+                    $id = $gateways['FacilityTableWithoutCache']->insertOrUpdate($facilityData);
+                    if (!empty($id)) {
+                         $facilityRowsInserted++;
+                    }
+               } catch (Throwable $e) {
+                    $facilityRowErrors++;
+                    $facilityRowErrorSample ??= $e->getMessage();
+               }
+          }
+          if ($facilityRowErrors > 0 || $facilityRowsInserted !== $facilityRowsTotal) {
+               throw new RuntimeException("Rows total: {$facilityRowsTotal}, inserted: {$facilityRowsInserted}, errors: {$facilityRowErrors}. Sample: {$facilityRowErrorSample}");
+          }
+     }
+
+     private function prepareMetadataFacility(array $data, object $locationDb): array
+     {
+          $stateId = $data['facility_state_id'] ?? null;
+          $districtId = $data['facility_district_id'] ?? null;
+          unset($data['data_sync'], $data['facility_state_id'], $data['facility_district_id']);
+          $data['facility_state'] = $this->resolveMetadataLocation($data['facility_state'], $stateId, 0, $locationDb);
+          $data['facility_district'] = $this->resolveMetadataLocation($data['facility_district'], $districtId, $data['facility_state'], $locationDb);
+          return $data;
+     }
+
+     private function resolveMetadataLocation(mixed $name, mixed $id, mixed $parent, object $locationDb): mixed
+     {
+          if (trim($name) === '' && empty($id)) {
+               return $name;
+          }
+          $location = !empty($id) ? $id : $name;
+          $existing = $this->checkFacilityStateDistrictDetails(trim($location), $parent);
+          if ($existing) {
+               return $existing['geo_id'];
+          }
+          // Upsert before looking up the ID to tolerate an existing name/parent pair.
+          $locationDb->insertOrUpdate(['geo_parent' => $parent, 'geo_name' => trim($location)]);
+          $existing = $this->checkFacilityStateDistrictDetails(trim($location), $parent);
+          return $existing['geo_id'] ?? null;
      }
 
      public function checkFacilityStateDistrictDetails($location, $parent)
