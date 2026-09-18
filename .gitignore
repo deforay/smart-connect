@@ -17,6 +17,8 @@ public/uploads/*
 public/temporary/*
 !public/temporary/index.php
 vendor/
+.venv-docs/
+site/
 error_log
 .DS_Store
 
