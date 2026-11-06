@@ -128,7 +128,7 @@ prepare_system
 
 print header "Smart Connect setup"
 print info "Installation folder: ${app_path}"
-print info "Web address: http://${server_name}"
+print info "Web address: ${server_name}"
 print info "Database: ${db_name}"
 [ -n "$db_dump" ] && print info "Importing: ${db_dump}"
 
@@ -308,6 +308,6 @@ else
 fi
 
 print header "Smart Connect is installed"
-print info "Open http://${server_name} and log in as ${admin_email}."
+print info "Open ${server_name} in a browser and log in as ${admin_email}."
 print info "The enrollment key, which each LIS needs: sudo -u ${web_user} php ${app_path}/bin/generate-enrollment-key.php --show"
 print info "Log: ${log_file}"
