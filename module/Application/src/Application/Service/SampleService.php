@@ -1194,12 +1194,11 @@ class SampleService
         $resultSet = $this->sampleTable->getTATbyProvince($labs, $startDate, $endDate, $params);
         foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $key['facility_name'],
-                "facility_id"        => $key['facility_id'],
+                "facility"           => $key['geo_name'],
+                "facility_id"        => $key['geo_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
-                "receive_register"   => $key['Receive_Register'],
-                "register_analysis"  => $key['Register_Analysis'],
+                "receive_analysis"   => $key['Receive_Analysis'],
                 "analysis_authorise" => $key['Analysis_Authorise'],
                 "total" => $key['total']
             );
@@ -1220,8 +1219,7 @@ class SampleService
                 "facility_id"        => $key['geo_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
-                "receive_register"   => $key['Receive_Register'],
-                "register_analysis"  => $key['Register_Analysis'],
+                "receive_analysis"   => $key['Receive_Analysis'],
                 "analysis_authorise" => $key['Analysis_Authorise'],
                 "total" => $key['total']
             );
@@ -1241,8 +1239,7 @@ class SampleService
                 "facility_id"        => $key['facility_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
-                "receive_register"   => $key['Receive_Register'],
-                "register_analysis"  => $key['Register_Analysis'],
+                "receive_analysis"   => $key['Receive_Analysis'],
                 "analysis_authorise" => $key['Analysis_Authorise'],
                 "total" => $key['total']
             );
@@ -1459,11 +1456,9 @@ class SampleService
 
 
                     $sampleCollectionDate = (trim($row['sample_collection_date']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_collection_date']))) : null);
-                    $sampleReceivedAtLab = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
                     $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
                     $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
                     $sampleTestedDateTime = (trim($row['sample_tested_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_tested_datetime']))) : null);
-                    $sampleRegisteredAtLabDateTime = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
 
                     $data = array(
                         'sample_code'                           => $sampleCode,
@@ -1473,7 +1468,6 @@ class SampleService
                         'patient_gender'                        => (trim($row['patient_gender']) != '' ? trim($row['patient_gender']) : NULL),
                         'patient_age_in_years'                  => (trim($row['patient_age_in_years']) != '' ? trim($row['patient_age_in_years']) : NULL),
                         'sample_collection_date'                => $sampleCollectionDate,
-                        //'sample_registered_at_lab'              => $sampleReceivedAtLab,
                         'line_of_treatment'                     => (trim($row['line_of_treatment']) != '' ? trim($row['line_of_treatment']) : NULL),
                         'is_sample_rejected'                    => (trim($row['is_sample_rejected']) != '' ? trim($row['is_sample_rejected']) : NULL),
                         'is_patient_pregnant'                   => (trim($row['is_patient_pregnant']) != '' ? trim($row['is_patient_pregnant']) : NULL),
@@ -1490,8 +1484,7 @@ class SampleService
                         //'result_value_absolute_decimal'         => (trim($row['result_value_absolute_decimal']) != '' ? trim($row['result_value_absolute_decimal']) : NULL),
                         'result'                                => (trim($row['result']) != '' ? trim($row['result']) : NULL),
                         'result_value_absolute_decimal'                            =>   $result_value_absolute_decimal,
-                        'vl_result_category'                 =>   $vl_result_category,
-                        'sample_registered_at_lab'              => $sampleRegisteredAtLabDateTime
+                        'vl_result_category'                 =>   $vl_result_category
                     );
 
 
@@ -1756,7 +1749,6 @@ class SampleService
                 $dob = ((trim($row['BirthDate']) != '' && $row['BirthDate'] != "T") ? trim(str_replace("T", " ", $row['BirthDate'])) : null);
                 $resultApprovedDateTime = ((trim($row['SampleDateApprovedDateTime']) != '' && $row['SampleDateApprovedDateTime'] != "T") ? trim(str_replace("T", " ", $row['SampleDateApprovedDateTime'])) : null);
                 $dateOfInitiationOfRegimen = ((trim($row['DateInitiaitonCurrentRegiment']) != '' && $row['DateInitiaitonCurrentRegiment'] != "T") ? trim(str_replace("T", " ", $row['DateInitiaitonCurrentRegiment'])) : null);
-                $sampleRegisteredAtLabDateTime = ((trim($row['SampleRegisteredAtLabDate']) != '' && $row['SampleRegisteredAtLabDate'] != "T") ? trim(str_replace("T", " ", $row['SampleRegisteredAtLabDate'])) : null);
                 $resultPrinterDateTime = ((trim($row['Result']['ResultReturnDate']) != '' && $row['Result']['ResultReturnDate'] != "T") ? trim(str_replace("T", " ", $row['Result']['ResultReturnDate'])) : null);
 
                 $data = array(
@@ -1790,8 +1782,7 @@ class SampleService
                     'result'                                => (trim($row['Result']['Copies']) != '' ? trim($row['Result']['Copies']) : NULL),
                     'result_approved_by'                    => (trim($row['ApprovedBy']) != '' ? $userDb->checkExistUser($row['ApprovedBy']) : NULL),
                     'result_value_absolute_decimal'         => $result_value_absolute_decimal,
-                    'vl_result_category'                    => $vl_result_category,
-                    'sample_registered_at_lab'              => $sampleRegisteredAtLabDateTime
+                    'vl_result_category'                    => $vl_result_category
                 );
 
 

@@ -8,6 +8,7 @@ use Laminas\Db\Sql\Expression;
 use Application\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use Application\Service\CommonService;
+use Application\Service\TurnaroundTimeUtility;
 use Laminas\Db\TableGateway\AbstractTableGateway;
 use Laminas\Db\Sql\Predicate\Expression as WhereExpression;
 
@@ -548,7 +549,7 @@ class SampleTable extends AbstractTableGateway
             $fQuery = $sql->select()
                 ->from(['f' => 'facility_details'])
                 ->columns(['facility_id'])
-                ->where(new Expression('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")'));
+                ->where(new WhereExpression('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")'));
 
             $facilityResult = $dbAdapter->query($sql->buildSqlString($fQuery), $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
@@ -7319,165 +7320,49 @@ class SampleTable extends AbstractTableGateway
     /////////*** Turnaround Time Page ***///////
     ///////////////////////////////////////////
 
-    public function getTATbyProvince($labs, $startDate, $endDate, $params = "")
+    /**
+     * Runs a TAT report query. Selected labs win. Otherwise a non-admin user
+     * is limited to their mapped facilities, if they have any.
+     */
+    private function getTurnaroundTime(string $groupBy, $labs, $startDate, $endDate): array
     {
         $loginContainer = new Container('credo');
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-        $skipDays = $this->config['defaults']['tat-skipdays'] ?? 365;
-
-        $squery = $sql->select()
-            ->from(['vl' => $this->table])
-            ->columns([
-                "Collection_Receive"   => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, sample_received_at_lab_datetime), 0)), 2)"),
-                "Receive_Register"     => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_received_at_lab_datetime, sample_registered_at_lab), 0)), 2)"),
-                "Register_Analysis"    => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_registered_at_lab, sample_tested_datetime), 0)), 2)"),
-                "Analysis_Authorise"   => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_tested_datetime, result_approved_datetime), 0)), 2)"),
-                "total"                => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, result_approved_datetime), 0)), 2)")
-            ])
-            ->join('facility_details', 'facility_details.facility_id = vl.facility_id', [])
-            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id', [], Select::JOIN_LEFT)
-            ->where([
-                new Expression("sample_tested_datetime BETWEEN '$startDate' AND '$endDate'"),
-                new Expression("vl.sample_collection_date IS NOT NULL AND vl.sample_collection_date != '' AND vl.sample_collection_date NOT IN ('1970-01-01', '0000-00-00')")
-            ]);
-
-        if ($skipDays > 0) {
-            $squery->where([
-                new Expression("DATEDIFF(sample_received_at_lab_datetime, sample_collection_date) BETWEEN 0 AND $skipDays"),
-                new Expression("DATEDIFF(sample_registered_at_lab, sample_received_at_lab_datetime) BETWEEN 0 AND $skipDays"),
-                new Expression("DATEDIFF(sample_tested_datetime, sample_registered_at_lab) BETWEEN 0 AND $skipDays"),
-                new Expression("DATEDIFF(result_approved_datetime, sample_tested_datetime) BETWEEN 0 AND $skipDays")
-            ]);
-        }
-
+        $labIds = null;
         if (!empty($labs)) {
-            $labList = implode(',', array_map('intval', $labs));
-            $squery->where(new Expression("vl.lab_id IN ($labList)"));
-        } elseif ($loginContainer->role != 1) {
-            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-            if (!empty($mappedFacilities)) {
-                $quoted = implode('", "', array_map('addslashes', $mappedFacilities));
-                $squery->where(new Expression('vl.lab_id IN ("' . $quoted . '")'));
-            }
+            $labIds = CommonService::parseIdList($labs);
+        } elseif ($loginContainer->role != 1 && !empty($loginContainer->mappedFacilities)) {
+            $labIds = CommonService::parseIdList($loginContainer->mappedFacilities);
         }
 
-        $squery->group('geo_id');
+        $sql = new Sql($this->adapter);
+        $select = TurnaroundTimeUtility::select(
+            $sql,
+            $this->table,
+            $groupBy,
+            (string) $startDate,
+            (string) $endDate,
+            $labIds,
+            (int) ($this->config['defaults']['tat-skipdays'] ?? 365)
+        );
 
-        $sQueryStr = $sql->buildSqlString($squery);
-        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-
-        return $sResult;
+        return $this->adapter->query($sql->buildSqlString($select), Adapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
+    public function getTATbyProvince($labs, $startDate, $endDate, $params = "")
+    {
+        return $this->getTurnaroundTime(TurnaroundTimeUtility::BY_PROVINCE, $labs, $startDate, $endDate);
+    }
 
     public function getTATbyDistrict($labs, $startDate, $endDate)
     {
-        $loginContainer = new Container('credo');
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-        $skipDays = $this->config['defaults']['tat-skipdays'] ?? 365;
-
-        $squery = $sql->select()
-            ->from(['vl' => $this->table])
-            ->columns([
-                "Collection_Receive"  => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, sample_received_at_lab_datetime), 0)), 2)"),
-                "Receive_Register"    => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_received_at_lab_datetime, sample_registered_at_lab), 0)), 2)"),
-                "Register_Analysis"   => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_registered_at_lab, sample_tested_datetime), 0)), 2)"),
-                "Analysis_Authorise"  => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_tested_datetime, result_approved_datetime), 0)), 2)"),
-                "total"               => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, result_approved_datetime), 0)), 2)")
-            ])
-            ->join('facility_details', 'facility_details.facility_id = vl.facility_id', [])
-            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id', [], Select::JOIN_LEFT)
-            ->where([
-                new Expression("sample_tested_datetime BETWEEN '$startDate' AND '$endDate'"),
-                new Expression("vl.sample_collection_date IS NOT NULL AND vl.sample_collection_date != '' AND vl.sample_collection_date NOT IN ('1970-01-01', '0000-00-00')")
-            ]);
-
-        if ($skipDays > 0) {
-            $squery->where([
-                new Expression("DATEDIFF(sample_received_at_lab_datetime, sample_collection_date) BETWEEN 0 AND $skipDays"),
-                new Expression("DATEDIFF(sample_registered_at_lab, sample_received_at_lab_datetime) BETWEEN 0 AND $skipDays"),
-                new Expression("DATEDIFF(sample_tested_datetime, sample_registered_at_lab) BETWEEN 0 AND $skipDays"),
-                new Expression("DATEDIFF(result_approved_datetime, sample_tested_datetime) BETWEEN 0 AND $skipDays")
-            ]);
-        }
-
-        if (!empty($labs)) {
-            $labList = implode(',', array_map('intval', $labs));
-            $squery->where(new Expression("vl.lab_id IN ($labList)"));
-        } elseif ($loginContainer->role != 1) {
-            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-            if (!empty($mappedFacilities)) {
-                $quoted = implode('", "', array_map('addslashes', $mappedFacilities));
-                $squery->where(new Expression('vl.lab_id IN ("' . $quoted . '")'));
-            }
-        }
-
-        $squery->group('facility_details.facility_district');
-
-        $sQueryStr = $sql->buildSqlString($squery);
-        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $this->getTurnaroundTime(TurnaroundTimeUtility::BY_DISTRICT, $labs, $startDate, $endDate);
     }
-
 
     public function getTATbyClinic($labs, $startDate, $endDate)
     {
-        $loginContainer = new Container('credo');
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-        $skipDays = $this->config['defaults']['tat-skipdays'] ?? 365;
-
-        $squery = $sql->select()
-            ->from(['vl' => $this->table])
-            ->columns([
-                "Collection_Receive"  => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, sample_received_at_lab_datetime), 0)), 2)"),
-                "Receive_Register"    => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_received_at_lab_datetime, sample_registered_at_lab), 0)), 2)"),
-                "Register_Analysis"   => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_registered_at_lab, sample_tested_datetime), 0)), 2)"),
-                "Analysis_Authorise"  => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_tested_datetime, result_approved_datetime), 0)), 2)"),
-                "total"               => new Expression("ROUND(AVG(GREATEST(TIMESTAMPDIFF(DAY, sample_collection_date, result_approved_datetime), 0)), 2)")
-            ])
-            ->join('facility_details', 'facility_details.facility_id = vl.facility_id', [])
-            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id', [], Select::JOIN_LEFT)
-            ->where([
-                new Expression("sample_tested_datetime BETWEEN '$startDate' AND '$endDate'"),
-                new Expression("vl.sample_collection_date IS NOT NULL AND vl.sample_collection_date != '' AND vl.sample_collection_date NOT IN ('1970-01-01', '0000-00-00')")
-            ]);
-
-        if ($skipDays > 0) {
-            $squery->where([
-                new Expression("DATEDIFF(sample_received_at_lab_datetime, sample_collection_date) BETWEEN 0 AND $skipDays"),
-                new Expression("DATEDIFF(sample_registered_at_lab, sample_received_at_lab_datetime) BETWEEN 0 AND $skipDays"),
-                new Expression("DATEDIFF(sample_tested_datetime, sample_registered_at_lab) BETWEEN 0 AND $skipDays"),
-                new Expression("DATEDIFF(result_approved_datetime, sample_tested_datetime) BETWEEN 0 AND $skipDays")
-            ]);
-        }
-
-        if (!empty($labs)) {
-            $labList = implode(',', array_map('intval', $labs));
-            $squery->where(new Expression("vl.lab_id IN ($labList)"));
-        } elseif ($loginContainer->role != 1) {
-            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-            if (!empty($mappedFacilities)) {
-                $quoted = implode('", "', array_map('addslashes', $mappedFacilities));
-                $squery->where(new Expression('vl.lab_id IN ("' . $quoted . '")'));
-            }
-        }
-
-        $squery->group('vl.facility_id');
-
-        $sQueryStr = $sql->buildSqlString($squery);
-        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $this->getTurnaroundTime(TurnaroundTimeUtility::BY_CLINIC, $labs, $startDate, $endDate);
     }
 
-
-    /////////////////////////////////////////////
-    /////////*** Turnaround Time Page ***////////
-    ////////////////////////////////////////////
-
-
-
-    //api for fetch samples refer SourceData Controller
     public function fetchSourceData($params)
     {
         $result = [];
@@ -7544,7 +7429,6 @@ class SampleTable extends AbstractTableGateway
             vl.patient_age_in_years,
             vl.sample_collection_date,
             vl.sample_received_at_lab_datetime,
-            vl.sample_registered_at_lab,
             vl.result_approved_datetime,
             vl.is_adherance_poor,
             vl.arv_adherance_percentage,
@@ -7614,7 +7498,7 @@ class SampleTable extends AbstractTableGateway
             //var_dump($rResult);die;
 
             $output = [];
-            $headings = array("Sample Code", "Patient ID (ART No.)", "Sex", "Age In Years", "Clinic Name", "Clinic Code", "Clinic Phone Number", "Clinic Address", "Clinic HUB Name", "Clinic Contact Person", "Clinic Report Mail", "Clinic Country", "Clinic Longitude", "Clinic Latitude", "Sample Type", "Sample Collection Date", "LAB Name", "Lab Code", "Lab Phone Number", "Lab Address", "Lab HUB Name", "Lab Contact Person", "Lab Report Mail", "Lab Country", "Lab Longitude", "Lab Latitude", "Lab Type", "Lab Tested Date", "Log Value", "Absolute Value", "Text Value", "Absolute Decimal Value", "Result", "Testing Reason", "Sample Status", "Sample Received Datetime", "Line Of Treatment", "Sample Rejected", "Rejection Reason Name", "Rejection Reason Status", "Pregnant", "Breast Feeding", "Regimen Initiated Date", "ARV Adherance Percentage", "Is Adherance poor", "Approved Datetime", "Current Regimen", "Sample Registered Datetime");
+            $headings = array("Sample Code", "Patient ID (ART No.)", "Sex", "Age In Years", "Clinic Name", "Clinic Code", "Clinic Phone Number", "Clinic Address", "Clinic HUB Name", "Clinic Contact Person", "Clinic Report Mail", "Clinic Country", "Clinic Longitude", "Clinic Latitude", "Sample Type", "Sample Collection Date", "LAB Name", "Lab Code", "Lab Phone Number", "Lab Address", "Lab HUB Name", "Lab Contact Person", "Lab Report Mail", "Lab Country", "Lab Longitude", "Lab Latitude", "Lab Type", "Lab Tested Date", "Log Value", "Absolute Value", "Text Value", "Absolute Decimal Value", "Result", "Testing Reason", "Sample Status", "Sample Received Datetime", "Line Of Treatment", "Sample Rejected", "Rejection Reason Name", "Rejection Reason Status", "Pregnant", "Breast Feeding", "Regimen Initiated Date", "ARV Adherance Percentage", "Is Adherance poor", "Approved Datetime", "Current Regimen");
             foreach ($rResult as $aRow) {
                 $row = [];
                 $row[] = $aRow['sample_code'];
@@ -7665,7 +7549,6 @@ class SampleTable extends AbstractTableGateway
                 $row[] = $aRow['is_adherance_poor'];
                 $row[] = $aRow['result_approved_datetime'];
                 $row[] = $aRow['current_regimen'];
-                $row[] = $aRow['sample_registered_at_lab'];
                 $output[] = $row;
             }
 
