@@ -122,16 +122,6 @@ return [
                     ],
                 ],
             ],
-            'login-otp' => [
-                'type' => 'Literal',
-                'options' => [
-                    'route'    => '/login/otp',
-                    'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action'     => 'otp',
-                    ],
-                ],
-            ],
             'users' => [
                 'type'    => 'segment',
                 'options' => [

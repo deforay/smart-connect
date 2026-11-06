@@ -8,8 +8,8 @@ namespace Application\Session;
  * Namespaced session container, replacing Laminas\Session\Container.
  *
  * laminas-session was used here as a namespaced wrapper over $_SESSION and
- * nothing more: five namespaces — credo, query, language, alert and
- * dataInterfaceLogin — reached entirely through property access, with no
+ * nothing more: namespaces such as credo, query, language and alert, reached
+ * entirely through property access, with no
  * session configuration, no validators, no expiration hops and no custom save
  * handler. This is that wrapper, over the PHP session directly.
  *
