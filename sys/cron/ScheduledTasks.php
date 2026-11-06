@@ -12,7 +12,7 @@ $timezone = date_default_timezone_get();
 
 $schedule = new Schedule();
 
-// Housekeeping — prune API payload dirs (vlsm-vl / vlsm-eid / vlsm-covid19 /
+// Housekeeping — prune API payload dirs (vlsm-vl / vlsm-eid /
 // vlsm-reference), track-api JSON, temp files, cache and stale DB rows
 $schedule->run("{$php} {$root}/bin/console housekeeping")
     ->dailyAt('02:00')
@@ -29,9 +29,9 @@ $schedule->run("{$php} {$root}/bin/console send-mail")
 
 // Rebuild the dash_form_*_current snapshot tables (last 12 months). Gated by
 // dash_global_config.daily_snapshot_rebuild (OFF by default) — the command
-// exits quietly unless that flag is set to "yes". All three test types are
-// rebuilt because the app's "current tables" toggle switches vl, eid and
-// covid19 together; restrict with e.g. --tests=vl if that ever changes.
+// exits quietly unless that flag is set to "yes". Both test types are
+// rebuilt because the app's "current tables" toggle switches vl and eid
+// together; restrict with e.g. --tests=vl if that ever changes.
 $schedule->run("{$php} {$root}/bin/console rebuild-snapshots")
     ->dailyAt('01:00')
     ->timezone($timezone)

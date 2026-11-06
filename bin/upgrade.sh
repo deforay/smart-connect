@@ -680,7 +680,7 @@ upgrade_instance() {
     local dir
     for dir in data/cache data/cache/app data/logs backup backup/db temporary \
         public/temporary public/temporary/vlsm-vl public/temporary/vlsm-eid \
-        public/temporary/vlsm-covid19 public/temporary/vlsm-reference \
+        public/temporary/vlsm-reference \
         public/uploads public/uploads/not-import-vl \
         public/uploads/track-api/requests public/uploads/track-api/responses; do
         mkdir -p "$app_path/$dir"

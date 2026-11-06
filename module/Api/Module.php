@@ -149,14 +149,6 @@ class Module
                         return new \Api\Controller\VlsmEidController($sampleService);
                     }
                 },
-                'Api\Controller\VlsmCovid19' => new class
-                {
-                    public function __invoke($diContainer)
-                    {
-                        $sampleService = $diContainer->get('Covid19FormService');
-                        return new \Api\Controller\VlsmCovid19Controller($sampleService);
-                    }
-                },
                 'Api\Controller\WeblimsVL' => new class
                 {
                     public function __invoke($diContainer)

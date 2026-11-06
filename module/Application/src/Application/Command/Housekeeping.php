@@ -60,13 +60,12 @@ class Housekeeping extends Command
         // duration = days to keep (null = no age limit); max_size_mb = cap after
         // which oldest files are removed until the folder is back to 80% of cap.
         // The vlsm-* dirs hold raw payloads spooled by the /api/vlsm,
-        // /api/vlsm-eid, /api/vlsm-covid19 and /api/vlsm-metadata endpoints —
+        // /api/vlsm-eid and /api/vlsm-metadata endpoints —
         // already parsed during the request, so they only need a short window
         // for debugging before being pruned aggressively.
         $cleanup = [
             $tempUploadPath . DIRECTORY_SEPARATOR . 'vlsm-vl' => ['duration' => 3, 'max_size_mb' => 1000],
             $tempUploadPath . DIRECTORY_SEPARATOR . 'vlsm-eid' => ['duration' => 3, 'max_size_mb' => 1000],
-            $tempUploadPath . DIRECTORY_SEPARATOR . 'vlsm-covid19' => ['duration' => 3, 'max_size_mb' => 1000],
             $tempUploadPath . DIRECTORY_SEPARATOR . 'vlsm-reference' => ['duration' => 3, 'max_size_mb' => 1000],
             $tempUploadPath => ['duration' => 7, 'max_size_mb' => 2000],
             $appPath . DIRECTORY_SEPARATOR . 'temporary' => ['duration' => 3, 'max_size_mb' => 500],

@@ -1,6 +1,6 @@
 # Smart Connect documentation
 
-Smart Connect is the national dashboard that collects viral load, EID, and Covid-19 testing data from InteLIS installations across a country. Each laboratory runs its own InteLIS instance. Those instances push their records to Smart Connect over the API.
+Smart Connect is the national dashboard that collects viral load and EID testing data from InteLIS installations across a country. Each laboratory runs its own InteLIS instance. Those instances push their records to Smart Connect over the API.
 
 Use the sidebar to navigate.
 

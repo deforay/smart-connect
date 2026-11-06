@@ -7,7 +7,6 @@ return [
         'use-current-sample-table' => false,
         'vlModule'      => true,
         'eidModule'     => true,
-        'covid19Module' => true,
         'pocDashboard'     => true,
         'time-zone' => 'UTC',
         'cache-expiry' => 1440, // in minutes

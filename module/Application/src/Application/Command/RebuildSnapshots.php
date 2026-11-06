@@ -20,7 +20,6 @@ class RebuildSnapshots extends Command
     private const SNAPSHOT_TABLES = [
         'vl' => 'dash_form_vl',
         'eid' => 'dash_form_eid',
-        'covid19' => 'dash_form_covid19',
     ];
 
     private Adapter $adapter;

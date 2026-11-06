@@ -18,7 +18,6 @@ class GetActiveModules extends AbstractHelper
         return [
             'vl' => $this->config['defaults']['vlModule'],
             'eid' => $this->config['defaults']['eidModule'],
-            'covid19' => $this->config['defaults']['covid19Module'],
             'poc' => $this->config['defaults']['pocDashboard']
         ];
     }
