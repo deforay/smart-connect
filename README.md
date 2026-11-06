@@ -23,7 +23,7 @@ The documentation is at <https://deforay.github.io/smart-connect/>. It covers:
 
 - [connecting a laboratory's LIS](docs/guides/connecting-a-lis.md);
 - [diagnosing a laboratory that isn't syncing](docs/guides/troubleshooting.md);
-- [upgrading an installation](docs/guides/upgrading.md);
+- [installing on a new server](docs/guides/installing.md) and [upgrading an installation](docs/guides/upgrading.md);
 - [setting up backups](docs/guides/backups.md) and [restoring one](docs/guides/restoring-a-backup.md);
 - [the API](docs/api/index.md), for LIS developers.
 

@@ -133,9 +133,15 @@ function fetch_column(Adapter $adapter, string $sql, array $params = []): array
 /** Extract the underlying MySQL error code from a wrapped DB exception. */
 function db_error_code(Throwable $e): string
 {
-    $prev = $e->getPrevious();
-    if ($prev instanceof PDOException && isset($prev->errorInfo[1])) {
-        return (string) $prev->errorInfo[1];
+    // A PDOException's getCode() is the SQLSTATE, such as 42S02, which several
+    // MySQL errors share. The classifier needs the MySQL number, such as 1146.
+    foreach ([$e, $e->getPrevious()] as $candidate) {
+        if ($candidate instanceof PDOException && isset($candidate->errorInfo[1])) {
+            return (string) $candidate->errorInfo[1];
+        }
+    }
+    if (preg_match('/SQLSTATE\[[0-9A-Z]+\]: [^:]*: (\d{4})\b/', $e->getMessage(), $m)) {
+        return $m[1];
     }
     return (string) $e->getCode();
 }
@@ -251,6 +257,33 @@ function unique_index_over_columns(Adapter $adapter, string $table, array $colum
                 GROUP_CONCAT(LOWER(COLUMN_NAME) ORDER BY SEQ_IN_INDEX) AS cols
            FROM information_schema.STATISTICS
           WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND NON_UNIQUE = 0
+          GROUP BY INDEX_NAME
+         HAVING cols = ?",
+        [current_db($adapter), $table, implode(',', $columns)]
+    );
+
+    return $matches !== [];
+}
+
+/**
+ * Whether any index, unique or not, covers exactly these columns in this order.
+ *
+ * Live databases carry indexes added by hand under whatever name was typed. A
+ * migration asking for the same access path under its own name would otherwise
+ * add a second copy, which MySQL maintains on every insert and never reads.
+ */
+function index_over_columns(Adapter $adapter, string $table, array $columns): bool
+{
+    if ($columns === [] || !table_exists($adapter, $table)) {
+        return false;
+    }
+
+    $matches = fetch_column(
+        $adapter,
+        "SELECT INDEX_NAME,
+                GROUP_CONCAT(LOWER(COLUMN_NAME) ORDER BY SEQ_IN_INDEX) AS cols
+           FROM information_schema.STATISTICS
+          WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
           GROUP BY INDEX_NAME
          HAVING cols = ?",
         [current_db($adapter), $table, implode(',', $columns)]
@@ -437,6 +470,11 @@ function add_index_if_missing(Adapter $adapter, string $table, string $index, st
                 );
             }
         }
+    }
+
+    if (preg_match('/^\s*CREATE\s+INDEX\b.*?\bON\b[^(]*\((.+)\)\s*;?\s*$/is', $ddl, $m)
+        && index_over_columns($adapter, $table, parse_cols_list($m[1]))) {
+        return MIG_SKIPPED;
     }
 
     run_sql($adapter, $ddl);
