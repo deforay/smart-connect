@@ -1,6 +1,6 @@
 # Smart Connect
 
-Open source national dashboard for priority diseases (Viral Load, EID, COVID-19).
+Open source national dashboard for priority diseases (Viral Load, EID).
 
 ![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue)
 

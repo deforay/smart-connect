@@ -179,15 +179,11 @@ curl -X POST https://dashboard.example.org/api/v2/eid \
 
 ### POST /api/v2/covid19
 
-Stores Covid-19 records. Requires a `client` token.
+Retired. Returns `410 Gone` with `{"status": "error"}` and stores nothing. Requires no token.
 
-Identical to `POST /api/v2/vl`, with the upload field named `covid19File`.
+The dashboard no longer carries the Covid-19 module. The route stays so that LIS instances with the module switched on get a clear refusal. Their sync watermark stays where it is, so if the module returns, they resend every record from that point.
 
-```bash
-curl -X POST https://dashboard.example.org/api/v2/covid19 \
-  -H "Authorization: Bearer $TOKEN" \
-  -F 'source=LIS' -F 'labId=7' -F 'covid19File=@covid19-payload.json'
-```
+Covid-19 reference tables sent to `POST /api/v2/metadata` are accepted and discarded. They do not make the sync partial.
 
 ### POST /api/v2/metadata
 

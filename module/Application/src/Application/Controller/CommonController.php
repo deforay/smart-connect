@@ -70,7 +70,6 @@ class CommonController extends AbstractActionController
         //$loginContainer->sampleTable = "";
         unset($loginContainer->sampleTable);
         unset($loginContainer->eidSampleTable);
-        unset($loginContainer->covid19SampleTable);
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -79,12 +78,10 @@ class CommonController extends AbstractActionController
                 $loginContainer->useCurrentTables = true;
                 $loginContainer->sampleTable = 'dash_form_vl_current';
                 $loginContainer->eidSampleTable = 'dash_form_eid_current';
-                $loginContainer->covid19SampleTable = 'dash_form_covid19_current';
             } else {
                 $loginContainer->useCurrentTables = false;
                 $loginContainer->sampleTable = 'dash_form_vl';
                 $loginContainer->eidSampleTable = 'dash_form_eid';
-                $loginContainer->covid19SampleTable = 'dash_form_covid19';
             }
         }
         $viewModel = new ViewModel();

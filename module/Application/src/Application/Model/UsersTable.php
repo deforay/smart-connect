@@ -127,11 +127,9 @@ class UsersTable extends BaseTableGateway
                 $loginContainer->useCurrentTables = $this->useCurrentSampleTable;
                 $loginContainer->sampleTable = 'dash_form_vl_current';
                 $loginContainer->eidSampleTable = 'dash_form_eid_current';
-                $loginContainer->covid19SampleTable = 'dash_form_covid19_current';
             } else {
                 $loginContainer->sampleTable = 'dash_form_vl';
                 $loginContainer->eidSampleTable = 'dash_form_eid';
-                $loginContainer->covid19SampleTable = 'dash_form_covid19';
             }
 
 

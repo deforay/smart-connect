@@ -21,9 +21,9 @@ use App\HttpHandlers\V2\FacilitiesHandler;
 use App\HttpHandlers\V2\HealthHandler;
 use App\HttpHandlers\V2\ImportVlHandler;
 use App\HttpHandlers\V2\MetadataHandler;
-use App\HttpHandlers\V2\ReceiveCovid19Handler;
 use App\HttpHandlers\V2\ReceiveEidHandler;
 use App\HttpHandlers\V2\ReceiveVlHandler;
+use App\HttpHandlers\V2\RetiredModuleHandler;
 use App\HttpHandlers\V2\SourceDataHandler;
 use App\HttpHandlers\V2\WeblimsVlHandler;
 use App\Middlewares\ApiErrorMiddleware;
@@ -90,12 +90,12 @@ return static function (string $basePath = ''): void {
         AuthLoginHandler::class => autowire(),
         ReceiveVlHandler::class => autowire(),
         ReceiveEidHandler::class => autowire(),
-        ReceiveCovid19Handler::class => autowire(),
         WeblimsVlHandler::class => autowire(),
         ImportVlHandler::class => autowire(),
         SourceDataHandler::class => autowire(),
         MetadataHandler::class => autowire(),
         FacilitiesHandler::class => autowire(),
+        RetiredModuleHandler::class => autowire(),
 
         ResponseFactory::class => get(ResponseFactoryInterface::class),
     ]);
@@ -122,7 +122,8 @@ return static function (string $basePath = ''): void {
         // LIS ingestion — an enrolled lab client pushing data up.
         $group->post('/vl', ReceiveVlHandler::class)->add('auth.client');
         $group->post('/eid', ReceiveEidHandler::class)->add('auth.client');
-        $group->post('/covid19', ReceiveCovid19Handler::class)->add('auth.client');
+        // Covid-19 is retired. LIS instances with the module on still post here.
+        $group->post('/covid19', RetiredModuleHandler::class);
         $group->post('/vl/weblims', WeblimsVlHandler::class)->add('auth.client');
         $group->post('/vl/import', ImportVlHandler::class)->add('auth.client');
         $group->post('/metadata', MetadataHandler::class)->add('auth.client');

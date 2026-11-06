@@ -11,6 +11,5 @@ return [
     'Application',
     'Api',
     'Eid',
-    'Covid19',
     'DataManagement'
 ];

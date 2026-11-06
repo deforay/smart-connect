@@ -1,13 +1,12 @@
 {
     "name": "deforay/smart-connect",
-    "description": "National Dashboard for Priory Diseases (Viral Load, EID, Covid-19)",
+    "description": "National Dashboard for Priority Diseases (Viral Load, EID)",
     "version": "3.5.0",
     "type": "project",
     "license": "AGPL-3.0-or-later",
     "keywords": [
         "viral load",
         "eid",
-        "covid-19",
         "dashboard",
         "hiv vl",
         "intelis"

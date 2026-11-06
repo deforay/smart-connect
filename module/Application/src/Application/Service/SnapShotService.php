@@ -52,7 +52,7 @@ class SnapShotService
         $loginContainer = new Container('credo');
         $mappedFacilities = $loginContainer->mappedFacilities ?? null;
 
-        $types = (!isset($params['testType']) || empty($params['testType'])) ? ["vl", "eid", "covid19"] : (array) $params['testType'];
+        $types = (!isset($params['testType']) || empty($params['testType'])) ? ["vl", "eid"] : (array) $params['testType'];
         $testTypeQuery = [];
         $whereConditions = [];
 
@@ -175,12 +175,11 @@ class SnapShotService
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         $age['vl'] = "patient_age_in_years";
         $age['eid'] = "child_age";
-        $age['covid19'] = "patient_age";
         $age['hepatitis'] = "patient_age";
         $age['tb'] = "patient_age";
         $query = [];
         //get received data
-        $types = array("vl", "eid", "tb", "covid19", "hepatitis");
+        $types = array("vl", "eid", "tb", "hepatitis");
         if (isset($params['testType']) && !empty($params['testType'])) {
             $types = $params['testType'];
         }
@@ -309,7 +308,7 @@ class SnapShotService
         $dimension = $params['dimension'] ?? 'testing_lab';
         // When dimension=health_facility we group by facility_id (the requesting site); otherwise by lab_id.
         $facilityColumn = ($dimension === 'health_facility') ? 'facility_id' : 'lab_id';
-        $types = (!isset($params['testType']) || empty($params['testType'])) ? ["vl", "eid", "covid19"] : (array) $params['testType'];
+        $types = (!isset($params['testType']) || empty($params['testType'])) ? ["vl", "eid"] : (array) $params['testType'];
         $mode = $params['mode'] ?? 'backlog';
         $topN = isset($params['topN']) ? (int) $params['topN'] : 10;
 

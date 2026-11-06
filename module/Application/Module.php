@@ -44,21 +44,17 @@ use Application\Model\OrganizationsTable;
 use Application\Model\GenerateBackupTable;
 use Application\Model\RemovedSamplesTable;
 use Application\View\Helper\GetLocaleData;
-use Application\Model\Covid19SymptomsTable;
 use Application\Model\LocationDetailsTable;
 use Application\Model\UserFacilityMapTable;
 use Application\Model\HepatitisResultsTable;
 use Application\Service\OrganizationService;
 
-use Application\Model\Covid19SampleTypeTable;
 use Application\Model\OrganizationTypesTable;
-use Application\Model\Covid19TestReasonsTable;
 use Application\Service\ApiSyncHistoryService;
 use Application\Model\HepatitisRiskFactorTable;
 use Application\Model\HepatitisSampleTypeTable;
 use Application\Model\ImportConfigMachineTable;
 
-use Application\Model\Covid19ComorbiditiesTable;
 use Application\Model\DashApiReceiverStatsTable;
 
 use Application\Model\DashTrackApiRequestsTable;
@@ -67,7 +63,6 @@ use Application\Model\HepatitisTestReasonsTable;
 use Application\Model\UserOrganizationsMapTable;
 use Application\Model\SampleRejectionReasonTable;
 use Application\Model\EidSampleRejectionReasonTable;
-use Application\Model\Covid19SampleRejectionReasonsTable;
 use Application\Model\HepatitisSampleRejectionReasonTable;
 
 class Module
@@ -740,46 +735,11 @@ class Module
 				return new EidSampleRejectionReasonTable($dbAdapter);
 			}
 				},
-				'Covid19SampleRejectionReasonsTable' => new class {
-			public function __invoke($diContainer)
-			{
-				$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
-				return new Covid19SampleRejectionReasonsTable($dbAdapter);
-			}
-				},
 				'EidSampleTypeTable' => new class {
 			public function __invoke($diContainer)
 			{
 				$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 				return new EidSampleTypeTable($dbAdapter);
-			}
-				},
-				'Covid19SampleTypeTable' => new class {
-			public function __invoke($diContainer)
-			{
-				$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
-				return new Covid19SampleTypeTable($dbAdapter);
-			}
-				},
-				'Covid19ComorbiditiesTable' => new class {
-			public function __invoke($diContainer)
-			{
-				$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
-				return new Covid19ComorbiditiesTable($dbAdapter);
-			}
-				},
-				'Covid19SymptomsTable' => new class {
-			public function __invoke($diContainer)
-			{
-				$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
-				return new Covid19SymptomsTable($dbAdapter);
-			}
-				},
-				'Covid19TestReasonsTable' => new class {
-			public function __invoke($diContainer)
-			{
-				$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
-				return new Covid19TestReasonsTable($dbAdapter);
 			}
 				},
 				'ProvinceTable' => new class {

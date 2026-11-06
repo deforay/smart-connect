@@ -523,15 +523,10 @@ class CommonService
      {
           $gateways = [
                'TestReasonTable' => $this->sm->get('TestReasonTable'),
-               'Covid19TestReasonsTable' => $this->sm->get('Covid19TestReasonsTable'),
                'ArtCodeTable' => $this->sm->get('ArtCodeTable'),
                'SampleRejectionReasonTable' => $this->sm->get('SampleRejectionReasonTable'),
                'EidSampleRejectionReasonTable' => $this->sm->get('EidSampleRejectionReasonTable'),
-               'Covid19SampleRejectionReasonsTable' => $this->sm->get('Covid19SampleRejectionReasonsTable'),
                'EidSampleTypeTable' => $this->sm->get('EidSampleTypeTable'),
-               'Covid19SampleTypeTable' => $this->sm->get('Covid19SampleTypeTable'),
-               'Covid19ComorbiditiesTable' => $this->sm->get('Covid19ComorbiditiesTable'),
-               'Covid19SymptomsTable' => $this->sm->get('Covid19SymptomsTable'),
                'FacilityTableWithoutCache' => $this->sm->get('FacilityTableWithoutCache'),
                'LocationDetailsTable' => $this->sm->get('LocationDetailsTable'),
                'ImportConfigMachineTable' => $this->sm->get('ImportConfigMachineTable'),
@@ -584,18 +579,13 @@ class CommonService
                'geographical_divisions' => [],
                'facility_details' => [],
                'r_vl_test_reasons' => ['service' => 'TestReasonTable'],
-               'r_covid19_test_reasons' => ['service' => 'Covid19TestReasonsTable', 'name' => 'test_reason_name', 'id' => 'test_reason_id'],
                'r_vl_art_regimen' => ['service' => 'ArtCodeTable', 'exclude' => ['data_sync']],
                'r_vl_sample_rejection_reasons' => ['service' => 'SampleRejectionReasonTable', 'exclude' => ['data_sync']],
                'r_eid_sample_rejection_reasons' => ['service' => 'EidSampleRejectionReasonTable', 'name' => 'rejection_reason_name', 'id' => 'rejection_reason_id'],
-               'r_covid19_sample_rejection_reasons' => ['service' => 'Covid19SampleRejectionReasonsTable', 'name' => 'rejection_reason_name', 'id' => 'rejection_reason_id'],
                'instrument_machines' => ['service' => 'ImportConfigMachineTable', 'name' => 'config_machine_name', 'id' => 'config_machine_id'],
                'instruments' => ['sqlUpsert' => true, 'encodeJson' => true],
                'r_vl_sample_type' => ['sqlUpsert' => true],
                'r_eid_sample_type' => ['service' => 'EidSampleTypeTable', 'name' => 'sample_name', 'id' => 'sample_id'],
-               'r_covid19_sample_type' => ['service' => 'Covid19SampleTypeTable', 'name' => 'sample_name', 'id' => 'sample_id'],
-               'r_covid19_comorbidities' => ['service' => 'Covid19ComorbiditiesTable', 'name' => 'comorbidity_name', 'id' => 'comorbidity_id'],
-               'r_covid19_symptoms' => ['service' => 'Covid19SymptomsTable', 'name' => 'symptom_name', 'id' => 'symptom_id'],
                'r_hepatitis_sample_rejection_reasons' => ['service' => 'HepatitisSampleRejectionReasonTable', 'name' => 'rejection_reason_name', 'id' => 'rejection_reason_id'],
                'r_hepatitis_rick_factors' => ['service' => 'HepatitisRiskFactorTable', 'name' => 'riskfactor_name', 'id' => 'riskfactor_id'],
                'r_hepatitis_test_reasons' => ['service' => 'HepatitisTestReasonsTable', 'name' => 'test_reason_name', 'id' => 'test_reason_id'],
@@ -646,10 +636,25 @@ class CommonService
           return empty($localTimestamp) || strtotime($remoteTimestamp) > strtotime($localTimestamp);
      }
 
+     /** Reference tables of retired modules: accepted from the LIS and discarded. */
+     private const RETIRED_METADATA_TABLES = [
+          'r_covid19_comorbidities',
+          'r_covid19_sample_rejection_reasons',
+          'r_covid19_sample_type',
+          'r_covid19_symptoms',
+          'r_covid19_test_reasons',
+     ];
+
      private function unknownMetadataTables(object|array $apiData, array $definitions): array
      {
           $errors = [];
           foreach ((array) $apiData as $table => $payload) {
+               // LIS instances with the Covid-19 module on still send these tables. The
+               // dashboard no longer stores them, but reporting them as unknown would
+               // turn every such metadata sync into a partial failure.
+               if (in_array($table, self::RETIRED_METADATA_TABLES, true)) {
+                    continue;
+               }
                if ($table === 'forceSync' || isset($definitions[$table]) || empty($payload->tableData)) {
                     continue;
                }

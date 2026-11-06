@@ -191,7 +191,8 @@ namespace {
             }
             if ($scenario === 'insert') {
                 $templateTables = array_column(array_filter($trace->events, fn ($event) => $event[0] === 'template'), 1);
-                verifyMetadata(count($templateTables) === 19, 'Reference tables were skipped');
+                verifyMetadata(count($templateTables) === 14, 'Reference tables were skipped');
+                verifyMetadata(!str_contains(json_encode($trace->events), 'r_covid19_'), 'Retired Covid-19 tables reached storage');
                 verifyMetadata($trace->events[0] === ['timestamp', 'geographical_divisions', 'updated_datetime'], 'Geography must sync first');
                 verifyMetadata(!str_contains(json_encode($trace->events), 'sender_only_column'), 'Unexpected sender fields reached storage');
                 $sqlEvents = array_column(array_filter($trace->events, fn ($event) => $event[0] === 'sql'), 1);
@@ -199,7 +200,7 @@ namespace {
             }
             if ($scenario === 'update') {
                 $updates = array_filter($trace->events, fn ($event) => ($event[1] ?? null) === 'update');
-                verifyMetadata(count($updates) === 13, 'Legacy lookup updates changed');
+                verifyMetadata(count($updates) === 8, 'Legacy lookup updates changed');
             }
             if ($scenario === 'force') {
                 verifyMetadata(!array_filter($trace->events, fn ($event) => $event[0] === 'timestamp'), 'Force sync must bypass timestamps');

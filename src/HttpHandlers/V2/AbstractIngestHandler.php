@@ -14,7 +14,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Shared shape of the three file-ingestion endpoints (VL, EID, Covid-19).
+ * Shared shape of the two file-ingestion endpoints (VL, EID).
  *
  * Each is a thin wrapper over the service method its v1 controller already
  * called. What v2 adds is everything that happens before that call: the upload

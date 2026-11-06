@@ -45,7 +45,6 @@ Anything that must be true for every request has to be applied in all four place
 | `Application` | The dashboard, users, roles, facilities, configuration, the ACL, shared services |
 | `Api` | The v1 API |
 | `Eid` | Early infant diagnosis pages |
-| `Covid19` | Covid-19 pages |
 | `DataManagement` | Duplicate data tools |
 
 Load order has caught people out. Three modules set `display_exceptions` in their own
@@ -72,17 +71,17 @@ way have no rows at all.
 
 Two APIs, both live.
 
-**v1**, in `module/Api/`, at `/api/vlsm`, `/api/vlsm-eid`, `/api/vlsm-covid19`,
+**v1**, in `module/Api/`, at `/api/vlsm`, `/api/vlsm-eid`,
 `/api/vlsm-metadata`, `/api/weblims-vl`, `/api/import-viral-load`, `/api/facility`,
 `/api/user` and `/api/source-data`. The ingestion endpoints have no authentication. This is
 the reason v2 exists.
 
-**v2**, in `src/`, at `/api/v2/{vl,eid,covid19,metadata,facilities,enroll,health,auth/login}`
+**v2**, in `src/`, at `/api/v2/{vl,eid,metadata,facilities,enroll,health,auth/login}`
 and the `vl/` variants. Callers authenticate with a bearer token. An instance obtains one by
 posting to `/api/v2/enroll` with the shared enrollment key from
 `config/autoload/custom.global.php`, and the issued client is stored in `dash_api_clients`.
 
-Records land in `dash_form_vl`, `dash_form_eid` and `dash_form_covid19` through
+Records land in `dash_form_vl` and `dash_form_eid` through
 `CommonService::upsert`, which is `INSERT ... ON DUPLICATE KEY UPDATE`. The unique indexes on
 those tables are therefore load-bearing. Dropping one changes an update into a duplicate row.
 
