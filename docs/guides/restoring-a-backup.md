@@ -49,7 +49,7 @@ To run it without the prompt, from a script, add `--yes`.
 
 A rebuilt server has no backup identity, so the setup script offers the folders already at the destination.
 
-1. Install the server and check out the code, as in [Setting up](https://github.com/deforay/smart-connect#setting-up). Stop before creating the database.
+1. Install the server and check out the code, as in [Install from source](../developers/maintaining.md#install-from-source). Stop before creating the database.
 
 2. Run `composer install` in the installation folder.
 

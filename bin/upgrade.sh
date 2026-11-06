@@ -489,6 +489,19 @@ acquire_source() {
 
 # -------------------------------------------------------------- instance ----
 
+# The new release names its minimum PHP in composer.json (config.platform.php).
+# composer install enforces it, but only after rsync has already put the new
+# code in place, which would leave a half-upgraded tree. Check it first.
+check_php_version() {
+    local required current
+    required="$(php -r '$c = json_decode((string) file_get_contents($argv[1]), true); echo $c["config"]["platform"]["php"] ?? "";' "$src_dir/composer.json" 2>>"$log_file")"
+    [ -n "$required" ] || return 0
+    current="$(php -r 'echo PHP_VERSION;')"
+    php -r 'exit(version_compare($argv[1], $argv[2], ">=") ? 0 : 1);' "$current" "$required" && return 0
+    fail "This release needs PHP ${required} or later. The server runs PHP ${current}. Upgrade PHP, then run this script again. Nothing was deployed."
+    return 1
+}
+
 upgrade_instance() {
     app_path="$1"
     local position="$2" total="$3"
@@ -547,6 +560,7 @@ upgrade_instance() {
 
     acquire_source ||
         { fail "Could not obtain the source (mirror, clone and tarball all failed)."; return 1; }
+    check_php_version || return 1
 
     # Excluding a path is enough to protect it, because the deploy runs without
     # --delete. rsync never writes an excluded file, so the deployment's own copy

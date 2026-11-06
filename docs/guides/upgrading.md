@@ -9,7 +9,8 @@ The script does no system-level work. PHP, MySQL, and Apache belong to the setup
 ## Prerequisites
 
 - Root access to the server
-- `php`, `composer`, and `rsync` installed
+- PHP 8.4.27 or later. The script checks this before it deploys anything, and stops if the server runs an older version
+- `composer` and `rsync` installed
 - Working off-machine backups, ideally. See [Set up off-machine backups](backups.md)
 
 ## Upgrade the server
