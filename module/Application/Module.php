@@ -41,7 +41,6 @@ use Application\Service\FacilityService;
 use Application\Service\SnapShotService;
 use Application\Model\EidSampleTypeTable;
 use Application\Model\OrganizationsTable;
-use Application\Model\GenerateBackupTable;
 use Application\Model\RemovedSamplesTable;
 use Application\View\Helper\GetLocaleData;
 use Application\Model\LocationDetailsTable;
@@ -714,13 +713,6 @@ class Module
 				return new RemovedSamplesTable($dbAdapter);
 			}
 				},
-				'GenerateBackupTable' => new class {
-			public function __invoke($diContainer)
-			{
-				$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
-				return new GenerateBackupTable($dbAdapter);
-			}
-				},
 				'SampleRejectionReasonTable' => new class {
 			public function __invoke($diContainer)
 			{
@@ -937,13 +929,6 @@ class Module
 			{
 				$userLoginHistoryService = $diContainer->get('UserLoginHistoryService');
 				return new \Application\Controller\UserLoginHistoryController($userLoginHistoryService);			
-			}
-				},
-				'Application\Controller\CronController' => new class {
-			public function __invoke($diContainer)
-			{
-				$sampleService = $diContainer->get('SampleService');
-				return new \Application\Controller\CronController($sampleService);
 			}
 				},
 				'Application\Controller\StatusController' => new class {

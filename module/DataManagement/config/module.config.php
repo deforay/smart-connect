@@ -20,22 +20,11 @@ return array(
                     ),
                 ),
             ),
-            'data-management-export' => array(
-                'type' => 'segment',
-                'options' => array(
-                    'route' => '/data-management/export[/:action][/][:id]',
-                    'defaults' => array(
-                        'controller' => 'DataManagement\Controller\Export',
-                        'action' => 'index'
-                    ),
-                ),
-            ),
         ),
     ),
     'controllers' => array(
         'invokables' => array(
             'DataManagement\Controller\DuplicateData' => 'DataManagement\Controller\DuplicateDataController',
-            'DataManagement\Controller\Export' => 'DataManagement\Controller\ExportController'
         ),
     ),
     'view_manager' => array(

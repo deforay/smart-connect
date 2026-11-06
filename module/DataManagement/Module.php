@@ -21,14 +21,6 @@ class Module
                         return new \DataManagement\Controller\DuplicateDataController($sampleService);
                     }
                 },
-                'DataManagement\Controller\ExportController' => new class
-                {
-                    public function __invoke($diContainer)
-                    {
-                        $commonService = $diContainer->get('CommonService');
-                        return new \DataManagement\Controller\ExportController($commonService);
-                    }
-                },
             ),
         );
     }

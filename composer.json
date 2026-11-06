@@ -1,7 +1,7 @@
 {
     "name": "deforay/smart-connect",
     "description": "National Dashboard for Priority Diseases (Viral Load, EID)",
-    "version": "3.5.1",
+    "version": "3.5.2",
     "type": "project",
     "license": "AGPL-3.0-or-later",
     "keywords": [
