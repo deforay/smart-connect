@@ -4,7 +4,7 @@
 
 A server usually hosts one dashboard. Where it hosts more, the script upgrades all of them in one run and keeps going when one fails.
 
-The script does no system-level work. PHP, MySQL, and Apache belong to the setup script and are left alone.
+The script does no system-level work. PHP, MySQL, and Apache belong to [setup](installing.md) and are left alone.
 
 ## Prerequisites
 

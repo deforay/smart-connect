@@ -47,28 +47,22 @@ To run it without the prompt, from a script, add `--yes`.
 
 ## Restore onto a rebuilt server
 
-A rebuilt server has no backup identity, so the setup script offers the folders already at the destination.
+A rebuilt server has no backup identity, so the backup setup offers the folders already at the destination.
 
-1. Install the server and check out the code, as in [Install from source](../developers/maintaining.md#install-from-source). Stop before creating the database.
+1. Install Smart Connect with [setup](installing.md). Pass no `--database` option.
 
-2. Run `composer install` in the installation folder.
+2. When setup offers to set up off-machine backups, answer yes.
 
-3. Run the setup script:
-
-    ```bash
-    sudo bin/remote-backup.sh
-    ```
-
-4. Point it at the same destination as before. It lists the folders it finds:
+3. Point it at the same destination as before. It lists the folders it finds:
 
     ```text
       1) kenya-national-0c4cb82d
          kenya-national on dashboard-01, newest backup 20260817-023012
     ```
 
-5. Enter the number of the folder that belongs to this installation. The script takes over that folder, so the history stays in one place.
+4. Enter the number of the folder that belongs to this installation. The script takes over that folder, so the history stays in one place.
 
-6. Answer `y` when it offers to restore the newest backup.
+5. Answer `y` when it offers to restore the newest backup.
 
 If the restore stops because the database user cannot log in, create it with the credentials the backup carries. Read them from the restored `config/autoload/local.php`, then:
 

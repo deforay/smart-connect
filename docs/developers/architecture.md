@@ -117,7 +117,11 @@ Migrations replay. `bin/migrate` routes common DDL through helpers that check
 `information_schema` first, and it re-runs the file matching the current version on every run,
 so idempotency is required rather than encouraged.
 
-Two things about the schema are not obvious and cost time when discovered late.
+`sys/schema/init.sql` is the full schema at a release, with the seed rows a new install needs.
+`bin/setup.sh` imports it, and `bin/dev/export-schema` regenerates it. See the
+[maintainer reference](maintaining.md#the-bundled-schema).
+
+Two other schema files are not what their names suggest.
 
 `sys/migrations/3.0.0-baseline.sql` is not a full schema. Its own header says it is a snapshot
 of `data/alter.sql` at the point the migrator arrived. It creates twelve tables.
@@ -126,11 +130,13 @@ of `data/alter.sql` at the point the migrator arrived. It creates twelve tables.
 co-located `vlsm` database on the same server, and it begins by dropping the `dash_form_*`
 tables. It is destructive on a populated database.
 
-Together these mean a database cannot be built from this repository alone. Around a hundred
-tables that the running application uses, including `facility_details` and the `r_*` reference
-tables, have no definition here.
-
 ## Deployment
+
+`bin/setup.sh` installs a new server. It installs Apache, MySQL and PHP with
+deforay/utility-scripts' `lamp-setup.sh` and InteLIS's `shared-functions.sh`, clones the code,
+creates the database and a dedicated MySQL user, imports `sys/schema/init.sql`, and then runs
+`bin/upgrade.sh` for everything after that, including the `cron.sh` entry in the web user's
+crontab.
 
 `bin/upgrade.sh` refreshes a shallow source mirror from master and rsyncs it over the tree,
 excluding `.git`. It never consults an instance's own git state, and it never overwrites

@@ -44,7 +44,8 @@ nav:
   - Backups:
       - Set up off-machine backups: guides/backups.md
       - Restore from a backup: guides/restoring-a-backup.md
-  - Upgrading:
+  - Installing and upgrading:
+      - Install on a new server: guides/installing.md
       - Upgrade an installation: guides/upgrading.md
   - Troubleshooting:
       - Diagnose a laboratory that is not syncing: guides/troubleshooting.md

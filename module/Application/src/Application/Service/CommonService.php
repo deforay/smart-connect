@@ -587,7 +587,7 @@ class CommonService
                'r_vl_sample_type' => ['sqlUpsert' => true],
                'r_eid_sample_type' => ['service' => 'EidSampleTypeTable', 'name' => 'sample_name', 'id' => 'sample_id'],
                'r_hepatitis_sample_rejection_reasons' => ['service' => 'HepatitisSampleRejectionReasonTable', 'name' => 'rejection_reason_name', 'id' => 'rejection_reason_id'],
-               'r_hepatitis_rick_factors' => ['service' => 'HepatitisRiskFactorTable', 'name' => 'riskfactor_name', 'id' => 'riskfactor_id'],
+               'r_hepatitis_risk_factors' => ['service' => 'HepatitisRiskFactorTable', 'name' => 'riskfactor_name', 'id' => 'riskfactor_id'],
                'r_hepatitis_test_reasons' => ['service' => 'HepatitisTestReasonsTable', 'name' => 'test_reason_name', 'id' => 'test_reason_id'],
                'r_hepatitis_results' => ['service' => 'HepatitisResultsTable', 'name' => 'result', 'id' => 'result_id', 'quotedId' => true],
                'r_hepatitis_sample_type' => ['service' => 'HepatitisSampleTypeTable', 'name' => 'sample_name', 'id' => 'sample_id', 'quotedId' => true],
@@ -597,10 +597,11 @@ class CommonService
      private function syncMetadataPayload(object|array $apiData, array $gateways, Adapter $dbAdapter): array
      {
           $forceSync = !empty($apiData->forceSync);
-          // The sender uses "risk", while the local schema retains the historical "rick" name.
-          if (isset($apiData->r_hepatitis_risk_factors) && !isset($apiData->r_hepatitis_rick_factors)) {
-               $apiData->r_hepatitis_rick_factors = $apiData->r_hepatitis_risk_factors;
-               unset($apiData->r_hepatitis_risk_factors);
+          // Older senders use the historical misspelling "rick". The table, like
+          // vlsm's, is r_hepatitis_risk_factors.
+          if (isset($apiData->r_hepatitis_rick_factors) && !isset($apiData->r_hepatitis_risk_factors)) {
+               $apiData->r_hepatitis_risk_factors = $apiData->r_hepatitis_rick_factors;
+               unset($apiData->r_hepatitis_rick_factors);
           }
 
           $definitions = $this->metadataTableDefinitions();

@@ -118,7 +118,7 @@ namespace {
         'r_covid19_comorbidities' => ['comorbidity_id', 'comorbidity_name'],
         'r_covid19_symptoms' => ['symptom_id', 'symptom_name'],
         'r_hepatitis_sample_rejection_reasons' => ['rejection_reason_id', 'rejection_reason_name'],
-        'r_hepatitis_rick_factors' => ['riskfactor_id', 'riskfactor_name'],
+        'r_hepatitis_risk_factors' => ['riskfactor_id', 'riskfactor_name'],
         'r_hepatitis_test_reasons' => ['test_reason_id', 'test_reason_name'],
         'r_hepatitis_results' => ['result_id', 'result'],
         'r_hepatitis_sample_type' => ['sample_id', 'sample_name'],
@@ -161,8 +161,8 @@ namespace {
                 $data['facility_details']['tableData'][] = $second;
             }
             if (in_array($scenario, ['alias', 'both-aliases'], true)) {
-                $data['r_hepatitis_risk_factors'] = $data['r_hepatitis_rick_factors'];
-                if ($scenario === 'alias') { unset($data['r_hepatitis_rick_factors']); }
+                $data['r_hepatitis_rick_factors'] = $data['r_hepatitis_risk_factors'];
+                if ($scenario === 'alias') { unset($data['r_hepatitis_risk_factors']); }
             }
             if ($scenario === 'unknown') { $data['unhandled_table'] = ['tableData' => [['id' => 1]]]; }
             if ($scenario === 'empty') { $data = []; }

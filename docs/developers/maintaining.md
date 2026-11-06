@@ -7,23 +7,23 @@ Commands, scheduled tasks and schema versioning for whoever maintains Smart Conn
 | Component | Version |
 |---|---|
 | PHP | 8.4.27 or later, with `pdo_mysql`, `intl`, `mbstring`, `gd` and `zip` |
-| Database | MySQL or MariaDB |
+| Database | MySQL 8. `bin/setup.sh` installs it. MariaDB also works for a manual install. |
 | Web server | Apache with `mod_rewrite`, or equivalent |
 | Composer | Any current release |
 
 ## Install from source
 
-!!! warning
-    `data/setup.sql` is not an installer. It copies table structures from a co-located `vlsm` database and drops the `dash_form_*` tables first. Never run it on a populated database. A database cannot be built from this repository alone. See [Schema and versioning](architecture.md#schema-and-versioning).
+To install on a server, use `bin/setup.sh`. See [Install Smart Connect on a new server](../guides/installing.md). On a development machine, do the same steps by hand:
 
 1. Clone the source code into the web server's root folder.
 2. Run `composer install`.
 3. Create the database.
-4. Set the DSN in `config/autoload/global.php`.
-5. Set the credentials in `config/autoload/local.php`.
-6. Run `php bin/migrate`.
-7. Run `php bin/console seed-admin` to create the first admin user.
-8. Point a virtual host at the `public` folder:
+4. Import `sys/schema/init.sql` into it.
+5. Set the DSN in `config/autoload/global.php`.
+6. Set the credentials in `config/autoload/local.php`.
+7. Run `php bin/migrate`.
+8. Run `php bin/console seed-admin` to create the first admin user.
+9. Point a virtual host at the `public` folder:
 
 ```apache
 <VirtualHost *:80>
@@ -31,7 +31,7 @@ Commands, scheduled tasks and schema versioning for whoever maintains Smart Conn
    ServerName smart-connect
 
    <Directory "/var/www/smart-connect/public">
-       Options Indexes MultiViews FollowSymLinks
+       Options FollowSymLinks
        AllowOverride All
        Require all granted
    </Directory>
@@ -39,6 +39,20 @@ Commands, scheduled tasks and schema versioning for whoever maintains Smart Conn
 ```
 
 If dashboards look stale after a data import, use the "clear cache" link at the bottom of the page.
+
+!!! warning
+    `data/setup.sql` is not an installer. It copies table structures from a co-located `vlsm` database and drops the `dash_form_*` tables first. Never run it on a populated database.
+
+## The bundled schema
+
+`sys/schema/init.sql` is the empty database that setup imports. `php bin/dev/export-schema` regenerates it from a development database at the current schema version:
+
+- It reads the structure of every table except the retired Covid-19 ones.
+- It takes the structure of tables the code uses but the development database lacks from the `vlsm` database on the same server. smart-connect mirrors those from vlsm.
+- It seeds the roles, privileges, resources, locales and global configuration. Country-specific values, such as the logos, start empty.
+- It writes `CREATE TABLE IF NOT EXISTS`, keeps each index once, and uses `utf8mb4_general_ci` throughout, so the file also imports on MariaDB.
+
+Regenerate it after a release whose migrations change the schema, so a new install starts at that version. Pass `--vlsm-db=<name>` if the vlsm database has another name.
 
 ## Console commands
 
