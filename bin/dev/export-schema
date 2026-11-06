@@ -68,7 +68,7 @@ const SPLIT_ROLES = [
     9 => ['Testing Lab Manager', 'tlm', [
         'Application\\Controller\\SummaryController', 'Eid\\Controller\\SummaryController',
         'Application\\Controller\\LaboratoryController', 'Eid\\Controller\\LabsController',
-        'Application\\Controller\\SnapshotController',
+        'Application\\Controller\\SnapshotController', 'Application\\Controller\\TimeController',
     ]],
 ];
 

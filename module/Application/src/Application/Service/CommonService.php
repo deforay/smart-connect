@@ -411,12 +411,6 @@ class CommonService
           error_log(ob_get_clean());
      }
 
-     public function addBackupGeneration($params)
-     {
-          $facilityDb = $this->sm->get('GenerateBackupTable');
-          return $facilityDb->addBackupGeneration($params);
-     }
-
      public function translate($text)
      {
           $translateObj = $this->sm->get('translator');

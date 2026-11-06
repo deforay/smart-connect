@@ -1263,16 +1263,6 @@ class SampleService
         return $this->sampleTable->fetchSourceData($params);
     }
 
-    public function generateBackup()
-    {
-        $sampleDb = $this->sm->get('SampleTableWithoutCache');
-        $response = $sampleDb->generateBackup();
-        if (isset($response['fileName']) && file_exists($response['fileName'])) {
-            $generateBackupDb = $this->sm->get('GenerateBackupTable');
-            $generateBackupDb->completeBackup($response['backupId']);
-        }
-    }
-
 
     public function saveFileFromVlsmAPIV2(?array $credential = null)
     {

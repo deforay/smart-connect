@@ -141,8 +141,6 @@ class UsersTable extends BaseTableGateway
                 $dataInterfaceLogin->email = $rResult["email"];
                 $dataInterfaceLogin->password = $rResult["password"];
                 return 'login-otp';
-            } elseif ($otp != null && $loginContainer->role == 7) {
-                return 'data-management-export';
             } elseif ($loginContainer->role == 3) {
                 return 'clinics';
             } elseif ($loginContainer->role == 2) {
