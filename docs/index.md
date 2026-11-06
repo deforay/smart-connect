@@ -18,6 +18,7 @@ Use the sidebar to navigate.
 
 - [Install on a new server](guides/installing.md) — the web server, PHP, the database and the application, in one script
 - [Upgrade an installation](guides/upgrading.md) — bring a server up to the latest release, one instance or all of them
+- [Release notes](release-notes.md) — what changed in each release, and what to do before upgrading
 
 ## Troubleshooting
 
