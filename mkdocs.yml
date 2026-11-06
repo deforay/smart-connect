@@ -47,6 +47,7 @@ nav:
   - Installing and upgrading:
       - Install on a new server: guides/installing.md
       - Upgrade an installation: guides/upgrading.md
+      - Release notes: release-notes.md
   - Troubleshooting:
       - Diagnose a laboratory that is not syncing: guides/troubleshooting.md
       - Read the application log: guides/reading-the-logs.md
