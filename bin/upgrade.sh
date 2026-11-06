@@ -719,14 +719,23 @@ upgrade_instance() {
     # --- cron ---------------------------------------------------------------
     # crunz reads crunz.yml from the working directory. cron.sh cd's there
     # itself, so the crontab line needs no cd of its own.
+    # Minimal Ubuntu images ship without cron. Without it the scheduled jobs
+    # never run, so install it rather than leave the install half-working.
+    if ! command -v crontab >/dev/null 2>&1; then
+        say info "Installing cron..."
+        if ! { apt-get install -y cron >>"$log_file" 2>&1 && systemctl enable --now cron >>"$log_file" 2>&1; }; then
+            fail "Could not install cron. Scheduled jobs will not run. Install the cron package, then run this script again."
+            return
+        fi
+    fi
+
     local cron_line current_crontab
     cron_line="* * * * * ${app_path}/cron.sh >> ${app_path}/data/logs/crunz.log 2>&1"
     current_crontab="$(crontab -u "$web_user" -l 2>/dev/null || true)"
 
     if printf '%s\n' "$current_crontab" | grep -Fq "${app_path}/cron.sh"; then
         say info "crunz cron entry already present for ${app_path}."
-    else
-        {
+    elif ! {
             if [ -z "$current_crontab" ]; then
                 printf 'MAILTO=""\n'
                 printf 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n\n'
@@ -734,7 +743,10 @@ upgrade_instance() {
                 printf '%s\n' "$current_crontab"
             fi
             printf '%s\n' "$cron_line"
-        } | crontab -u "$web_user" -
+        } | crontab -u "$web_user" -; then
+        fail "Could not write the ${web_user} crontab. Scheduled jobs will not run."
+        return
+    else
         say success "crunz cron entry added to the ${web_user} crontab."
     fi
 
