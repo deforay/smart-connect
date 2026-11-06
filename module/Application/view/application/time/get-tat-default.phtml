@@ -1,4 +1,6 @@
 <?php
+// The EID TAT views render this template with drillUrl set to their own page.
+$drillUrl = $drillUrl ?? '/times/dashboard';
 
 //echo "<pre>";
 //var_dump($results);die;
@@ -24,7 +26,7 @@ $total = $this->translate('Total');
     generateChart('provinceTable', 'provinceChart', 'Provinces Chart', <?php getSeries($results, $collectReceive, $receiveAnalysis, $analysisAuthorise) ?>, 'PROVINCES');
     $('.clickable').click(function() {
       if ($(this).attr('data-category') != 2) {
-        window.location.href = '/times/dashboard?province=' + $(this).attr('id') + '&lab=' + $(this).attr('data-labs') + '&range=' + $(this).attr('data-date-range') + '&category=' + $(this).attr('data-category') + '&place=' + $(this).attr('data-place');
+        window.location.href = '<?php echo $drillUrl; ?>?province=' + $(this).attr('id') + '&lab=' + $(this).attr('data-labs') + '&range=' + $(this).attr('data-date-range') + '&category=' + $(this).attr('data-category') + '&place=' + $(this).attr('data-place');
       }
     });
   });
@@ -99,7 +101,7 @@ $total = $this->translate('Total');
               if ($categoryNext == 0 || $categoryNext == 1) {
               ?>
                 click: function() {
-                  window.location.href = '/times/dashboard?province=' + this.id + '&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category=<?php echo $categoryNext; ?>&place=' + this.category;
+                  window.location.href = '<?php echo $drillUrl; ?>?province=' + this.id + '&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category=<?php echo $categoryNext; ?>&place=' + this.category;
                 }
               <?php
               }
