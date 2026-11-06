@@ -18,7 +18,7 @@
 # The reviewing CLI is named by $REVIEW_AGENT rather than hard-coded, so the repository
 # carries no vendor name and the reviewer can be swapped without editing anything here.
 #
-# The brief is EXTRACTED from docs/internal/engineering-standards.md section 1 rather than
+# The brief is EXTRACTED from docs/developers/engineering-standards.md section 1 rather than
 # duplicated here. Two copies of a review checklist means the one nobody edits is the one
 # that gets used.
 set -euo pipefail
@@ -122,10 +122,10 @@ if [ -z "${REVIEW_AGENT:-}" ]; then
 fi
 
 BRIEF="$(awk '/^\*\*The review brief/{found=1; next} found && /^> /{sub(/^> /,""); gsub(/^"|"$/,""); print; exit}' \
-    docs/internal/engineering-standards.md)"
+    docs/developers/engineering-standards.md)"
 
 if [ -z "$BRIEF" ]; then
-    echo "Could not extract the review brief from docs/internal/engineering-standards.md section 1." >&2
+    echo "Could not extract the review brief from docs/developers/engineering-standards.md section 1." >&2
     echo "Has the '**The review brief**' heading changed?" >&2
     exit 1
 fi
@@ -136,9 +136,9 @@ fi
 # DATE() wrapper on an indexed column is a bug rather than a style choice. Several of these
 # invariants live in code rather than prose, so the pointers name the code.
 CONTEXT="Before reviewing, read these for the rules this codebase is held to:
-- docs/internal/architecture.md — entry points, how a request is authorised, how records
+- docs/developers/architecture.md — entry points, how a request is authorised, how records
   arrive, and what the schema does and does not define
-- docs/internal/engineering-standards.md — the bar, and what counts as a finding
+- docs/developers/engineering-standards.md — the bar, and what counts as a finding
 - sys/migrations/ — every schema change belongs here and must replay on a fresh install.
   data/setup.sql is a seed and is never edited to make a schema change. bin/migrate routes
   common DDL through idempotent helpers, so a migration must be safe to replay
