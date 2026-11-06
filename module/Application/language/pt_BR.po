@@ -2424,6 +2424,9 @@ msgstr "Recepção ao Registo"
 msgid "Register-Analysis"
 msgstr "Registo à Análise"
 
+msgid "Receive-Analysis"
+msgstr "Recepção à Análise"
+
 #: ../view/application/time/get-tat-default.phtml:15
 #: ../view/application/time/get-tat-from-search-field.phtml:11
 #: ../view/application/time/get-tat-from-url.phtml:11

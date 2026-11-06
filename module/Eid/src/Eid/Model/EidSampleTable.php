@@ -7,6 +7,7 @@ use Laminas\Db\Sql\Expression;
 use Application\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use \Application\Service\CommonService;
+use Application\Service\TurnaroundTimeUtility;
 use Laminas\Db\TableGateway\AbstractTableGateway;
 use Laminas\Db\Sql\Predicate\Expression as WhereExpression;
 
@@ -2791,170 +2792,53 @@ class EidSampleTable extends AbstractTableGateway
     /////////*** Turnaround Time Page ***///////
     ///////////////////////////////////////////
 
-    public function getTATbyProvince($labs, $startDate, $endDate, $params = [])
+    /**
+     * Runs a TAT report query. Selected labs win. Otherwise a non-admin user
+     * sees only their mapped facilities, and nothing if they have none.
+     */
+    private function getTurnaroundTime(string $groupBy, $labs, $startDate, $endDate, $params = []): array
     {
         $loginContainer = new Container('credo');
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
-        $squery = $sql->select()->from(array('vl' => $this->table))
-            ->columns(
-                array(
-                    "Collection_Receive" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                    "Receive_Register" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
-                    "Register_Analysis" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "Analysis_Authorise" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "total" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
-                )
-            )
-            ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
-            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')
-            ->where(
-                array(
-                    "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
-                    "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')",
-                    // "facility_details.facility_state = '$provinceID'"
-                )
-            );
-        if ($skipDays > 0) {
-            $squery = $squery->where("DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) <= $skipDays AND
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) >= 0 AND
-
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) <= $skipDays AND
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) >= 0 AND
-
-                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime) <= $skipDays AND
-                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
-
-                DATEDIFF(result_approved_datetime,sample_tested_datetime) <= $skipDays AND
-                DATEDIFF(result_approved_datetime,sample_tested_datetime) >= 0");
-        }
-
-        if (isset($labs) && !empty($labs)) {
-            $squery = $squery->where(['vl.lab_id' => CommonService::parseIdList($labs)]);
+        $labIds = null;
+        if (!empty($labs)) {
+            $labIds = CommonService::parseIdList($labs);
         } elseif ($loginContainer->role != 1) {
-            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-            $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            $labIds = CommonService::parseIdList($loginContainer->mappedFacilities ?? []);
         }
-        if (isset($params['flag']) && $params['flag'] == 'poc') {
-            $squery = $squery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
+
+        $sql = new Sql($this->adapter);
+        $select = TurnaroundTimeUtility::select(
+            $sql,
+            $this->table,
+            $groupBy,
+            (string) $startDate,
+            (string) $endDate,
+            $labIds,
+            (int) ($this->config['defaults']['tat-skipdays'] ?? 365)
+        );
+
+        if (($params['flag'] ?? null) === 'poc') {
+            $select->join(['icm' => 'instrument_machines'], 'icm.config_machine_id = vl.import_machine_name', [])
+                ->where(['icm.poc_device' => 'yes']);
         }
-        $squery = $squery->group(array('geo_id'));
-        $sQueryStr = $sql->buildSqlString($squery);
-        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+        return $this->adapter->query($sql->buildSqlString($select), Adapter::QUERY_MODE_EXECUTE)->toArray();
+    }
+
+    public function getTATbyProvince($labs, $startDate, $endDate, $params = [])
+    {
+        return $this->getTurnaroundTime(TurnaroundTimeUtility::BY_PROVINCE, $labs, $startDate, $endDate, $params);
     }
 
     public function getTATbyDistrict($labs, $startDate, $endDate, $params = [])
     {
-        $loginContainer = new Container('credo');
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
-        $squery = $sql->select()->from(array('vl' => $this->table))
-            ->columns(
-                [
-                    "Collection_Receive" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                    "Receive_Register" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
-                    "Register_Analysis" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "Analysis_Authorise" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "total" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
-                ]
-            )
-            ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
-            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')
-            ->where(
-                [
-                    "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
-                    "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')",
-                    // "facility_details.facility_district = '$districtID'"
-                ]
-            );
-        if ($skipDays > 0) {
-            $squery = $squery->where("
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < $skipDays AND
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)>=0 AND
-
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) < $skipDays AND
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)>=0 AND
-
-                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime) < $skipDays AND
-                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
-
-                DATEDIFF(result_approved_datetime,sample_tested_datetime) < $skipDays AND
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0");
-        }
-
-        if (isset($labs) && !empty($labs)) {
-            $squery = $squery->where(['vl.lab_id' => CommonService::parseIdList($labs)]);
-        } elseif ($loginContainer->role != 1) {
-            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-            $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
-        }
-        if (!empty($params['flag']) && $params['flag'] == 'poc') {
-            $squery = $squery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
-        }
-        $squery = $squery->group(array('geo_id'));
-        $sQueryStr = $sql->buildSqlString($squery);
-        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $this->getTurnaroundTime(TurnaroundTimeUtility::BY_DISTRICT, $labs, $startDate, $endDate, $params);
     }
 
     public function getTATbyClinic($labs, $startDate, $endDate, $params = [])
     {
-        $loginContainer = new Container('credo');
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
-        $squery = $sql->select()->from(array('vl' => $this->table))
-            ->columns(
-                [
-                    "Collection_Receive" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                    "Receive_Register" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
-                    "Register_Analysis" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "Analysis_Authorise" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
-                    "total" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
-                ]
-            )
-            ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
-            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')
-            ->where(
-                array(
-                    "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
-                    "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')",
-                    // "vl.facility_id = '$clinicID'"
-                )
-            );
-        if ($skipDays > 0) {
-            $squery = $squery->where("
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < $skipDays AND
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)>=0 AND
-
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) < $skipDays AND
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)>=0 AND
-
-                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime) < $skipDays AND
-                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
-
-                DATEDIFF(result_approved_datetime,sample_tested_datetime) < $skipDays AND
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0");
-        }
-
-        if (isset($labs) && !empty($labs)) {
-            $squery = $squery->where(['vl.lab_id' => CommonService::parseIdList($labs)]);
-        } elseif ($loginContainer->role != 1) {
-            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-            $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
-        }
-        if (isset($params['flag']) && $params['flag'] == 'poc') {
-            $squery = $squery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
-        }
-        $squery = $squery->group(array('geo_id'));
-        $sQueryStr = $sql->buildSqlString($squery);
-        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $this->getTurnaroundTime(TurnaroundTimeUtility::BY_CLINIC, $labs, $startDate, $endDate, $params);
     }
-
-    /////////////////////////////////////////////
-    /////////*** Turnaround Time Page ***////////
-    ////////////////////////////////////////////
 
     public function fetchProvinceWiseResultAwaitedDrillDown($params)
     {

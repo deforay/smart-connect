@@ -228,7 +228,6 @@ class EidSampleService
                     $instanceCode = trim($row['vlsm_instance_id']);
 
                     $sampleCollectionDate = (trim($row['sample_collection_date']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_collection_date']))) : null);
-                    $sampleReceivedAtLab = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
                     // $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
                     $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
                     $sampleTestedDateTime = (trim($row['sample_tested_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_tested_datetime']))) : null);
@@ -245,7 +244,8 @@ class EidSampleService
                     $data['sample_code']                = $sampleCode;
                     $data['remote_sample_code']         = $remoteSampleCode;
                     $data['sample_collection_date']     = $sampleCollectionDate;
-                    $data['sample_registered_at_lab']   = $sampleReceivedAtLab;
+                    // vlsm 5.3.2 dropped this column and the dashboard table has no such column.
+                    unset($data['sample_registered_at_lab']);
                     $data['result_approved_datetime']   = $resultApprovedDateTime;
                     $data['sample_tested_datetime']     = $sampleTestedDateTime;
 
@@ -574,8 +574,7 @@ class EidSampleService
                 "facility_id"        => $key['geo_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
-                "receive_register"   => $key['Receive_Register'],
-                "register_analysis"  => $key['Register_Analysis'],
+                "receive_analysis"   => $key['Receive_Analysis'],
                 "analysis_authorise" => $key['Analysis_Authorise'],
                 "total" => $key['total']
             );
@@ -594,8 +593,7 @@ class EidSampleService
                 "facility_id"        => $key['geo_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
-                "receive_register"   => $key['Receive_Register'],
-                "register_analysis"  => $key['Register_Analysis'],
+                "receive_analysis"   => $key['Receive_Analysis'],
                 "analysis_authorise" => $key['Analysis_Authorise'],
                 "total" => $key['total']
             );
@@ -611,12 +609,11 @@ class EidSampleService
         $resultSet = $this->eidSampleTable->getTATbyClinic($labs, $startDate, $endDate, $params);
         foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $key['geo_name'],
-                "facility_id"        => $key['geo_id'],
+                "facility"           => $key['facility_name'],
+                "facility_id"        => $key['facility_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
-                "receive_register"   => $key['Receive_Register'],
-                "register_analysis"  => $key['Register_Analysis'],
+                "receive_analysis"   => $key['Receive_Analysis'],
                 "analysis_authorise" => $key['Analysis_Authorise'],
                 "total" => $key['total']
             );
