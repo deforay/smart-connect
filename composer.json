@@ -12,7 +12,7 @@
         "intelis"
     ],
     "require": {
-        "php": "^8.4.1",
+        "php": "^8.4.27",
         "amitdugar/db-tools": "^3.3",
         "crunzphp/crunz": "^3.9",
         "halaxa/json-machine": "^1.2",
@@ -95,7 +95,7 @@
         "sort-packages": true,
         "secure-http": true,
         "platform": {
-            "php": "8.4.1"
+            "php": "8.4.27"
         }
     },
     "require-dev": {
