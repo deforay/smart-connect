@@ -11,7 +11,7 @@ Commands, scheduled tasks and schema versioning for whoever maintains Smart Conn
 | Web server | Apache with `mod_rewrite`, or equivalent |
 | Composer | Any current release |
 
-## Development setup
+## Install from source
 
 !!! warning
     `data/setup.sql` is not an installer. It copies table structures from a co-located `vlsm` database and drops the `dash_form_*` tables first. Never run it on a populated database. A database cannot be built from this repository alone. See [Schema and versioning](architecture.md#schema-and-versioning).
