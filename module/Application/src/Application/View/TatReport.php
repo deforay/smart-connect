@@ -31,27 +31,27 @@ final class TatReport
     ): string {
         $header = '';
         foreach ($headings as $heading) {
-            $header .= '<th>' . $heading . '</th>';
+            $header .= '<th>' . self::html($heading) . '</th>';
         }
 
         $body = '';
         foreach (array_values($rows) as $i => $row) {
-            $place = htmlspecialchars((string) $row['facility'], ENT_QUOTES, 'UTF-8');
-            $body .= '<tr class="' . ($clickable ? 'clickable' : '') . '" id="' . $row['facility_id']
-                . '" data-labs="' . $labs . '" data-date-range="' . $daterange
+            $place = self::html($row['facility']);
+            $body .= '<tr class="' . ($clickable ? 'clickable' : '') . '" id="' . self::html($row['facility_id'])
+                . '" data-labs="' . self::html($labs) . '" data-date-range="' . self::html($daterange)
                 . '" data-category="' . $facilityCategory . '" data-place="' . $place . '">'
                 . '<td id="td-' . $i . '-0">' . $place . '</td>'
-                . '<td id="td-' . $i . '-1">' . $row['collect_receive'] . '</td>'
-                . '<td id="td-' . $i . '-2">' . $row['receive_analysis'] . '</td>'
-                . '<td id="td-' . $i . '-3">' . $row['analysis_authorise'] . '</td>'
-                . '<td id="td-' . $i . '-4">' . $row['total'] . '</td>'
+                . '<td id="td-' . $i . '-1">' . self::html($row['collect_receive']) . '</td>'
+                . '<td id="td-' . $i . '-2">' . self::html($row['receive_analysis']) . '</td>'
+                . '<td id="td-' . $i . '-3">' . self::html($row['analysis_authorise']) . '</td>'
+                . '<td id="td-' . $i . '-4">' . self::html($row['total']) . '</td>'
                 . '</tr>';
         }
 
         $html = '<div class="scrolltable">'
-            . '<table class="' . $idTable . ' header"><thead>' . $header . '</thead></table>'
+            . '<table class="' . self::html($idTable) . ' header"><thead>' . $header . '</thead></table>'
             . '<div class="body scrollbar style-3">'
-            . '<table id="' . $idTable . '"><tbody>' . $body . '</tbody></table>'
+            . '<table id="' . self::html($idTable) . '"><tbody>' . $body . '</tbody></table>'
             . '</div>'
             . '</div>';
 
@@ -79,6 +79,12 @@ final class TatReport
         }
 
         return json_encode($series, self::JSON_FLAGS);
+    }
+
+    /** A value escaped for HTML text and attribute values. */
+    private static function html(mixed $value): string
+    {
+        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
     }
 
     /** Any value as a JavaScript literal that is safe inside a script element. */
