@@ -30,7 +30,7 @@ class UsersTable extends BaseTableGateway
         $this->useCurrentSampleTable = $this->config['defaults']['use-current-sample-table'];
     }
 
-    public function login($params, $otp = null)
+    public function login($params)
     {
         $username = $params['email'];
         $dbAdapter = $this->adapter;
@@ -40,10 +40,6 @@ class UsersTable extends BaseTableGateway
         $sQuery = $sql->select()->from(['u' => 'dash_users'])
             ->join(['r' => 'dash_user_roles'], 'u.role=r.role_id')
             ->where(['email' => $username]);
-
-        if (isset($otp) && $otp != null && $otp != '') {
-            $sQuery = $sQuery->where(['otp' => $otp]);
-        }
 
         $sQueryStr = $sql->buildSqlString($sQuery);
 
@@ -133,15 +129,7 @@ class UsersTable extends BaseTableGateway
             }
 
 
-            if ($otp == null && $loginContainer->role == 7) {
-                // Let us ensure this person cannot login till they enter OTP.
-                // so we will clear the login session
-                $loginContainer->getManager()->getStorage()->clear('credo');
-                $dataInterfaceLogin = new Container('dataInterfaceLogin');
-                $dataInterfaceLogin->email = $rResult["email"];
-                $dataInterfaceLogin->password = $rResult["password"];
-                return 'login-otp';
-            } elseif ($loginContainer->role == 3) {
+            if ($loginContainer->role == 3) {
                 return 'clinics';
             } elseif ($loginContainer->role == 2) {
                 return 'laboratory';

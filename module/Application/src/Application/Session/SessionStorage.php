@@ -15,9 +15,7 @@ class SessionStorage
      * session, not just the container that reached it.
      *
      * With a name it drops that one namespace and leaves the session running,
-     * again as Laminas did. UsersTable depends on the difference — it clears
-     * 'credo' to block a role 7 login until the OTP is entered, then writes
-     * the pending credentials into another namespace on the same session.
+     * again as Laminas did.
      */
     public function clear(?string $name = null): void
     {

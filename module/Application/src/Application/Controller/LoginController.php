@@ -52,23 +52,6 @@ class LoginController extends AbstractActionController
         }
     }
 
-    public function otpAction()
-    {
-        /** @var \Laminas\Http\Request $request */
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            $url = $this->userService->otp($params);
-            return $this->redirect()->toRoute($url);
-        }
-
-        $config = $this->configService->getAllGlobalConfig();
-        $vm = new ViewModel();
-        $vm->setVariables(array('config' => $config))
-            ->setTerminal(true);
-        return $vm;
-    }
-
     public function logoutAction()
     {
         $sessionLogin = new Container('credo');
