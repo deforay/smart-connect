@@ -116,13 +116,13 @@ class EidSampleService
             mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
         }
         if (
-            !file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid")
-            && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid")
+            !file_exists(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid")
+            && !is_dir(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid")
         ) {
-            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid", 0777, true);
+            mkdir(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid", 0777, true);
         }
 
-        $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid" . DIRECTORY_SEPARATOR . $fileName;
+        $fileName = VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid" . DIRECTORY_SEPARATOR . $fileName;
         if (!file_exists($fileName) && move_uploaded_file($_FILES['eidFile']['tmp_name'], $fileName)) {
             [$apiData, $timestamp] = CommonService::processJsonFile($fileName);
         }
@@ -202,13 +202,13 @@ class EidSampleService
 
         $extension = strtolower(pathinfo($_FILES['eidFile']['name'], PATHINFO_EXTENSION));
         $newFileName = CommonService::generateRandomString(12) . "." . $extension;
-        $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $newFileName;
+        $fileName = VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid" . DIRECTORY_SEPARATOR . $newFileName;
 
         if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
             mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
         }
-        if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid")) {
-            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid", 0777, true);
+        if (!file_exists(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid") && !is_dir(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid")) {
+            mkdir(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid", 0777, true);
         }
 
         $apiData = [];

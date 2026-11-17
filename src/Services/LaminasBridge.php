@@ -79,7 +79,7 @@ final class LaminasBridge
     }
 
     /**
-     * TEMP_UPLOAD_PATH and UPLOAD_PATH are defined as a side effect of the
+     * TEMP_UPLOAD_PATH, UPLOAD_PATH and VAR_PATH are defined as a side effect of the
      * config merge (config/autoload/constants.global.php), so they are reached
      * through the bridge rather than referenced directly — that way a handler
      * cannot read them before the container has been built.
@@ -96,6 +96,13 @@ final class LaminasBridge
         $this->serviceManager();
 
         return implode(DIRECTORY_SEPARATOR, [UPLOAD_PATH, ...$segments]);
+    }
+
+    public function varPath(string ...$segments): string
+    {
+        $this->serviceManager();
+
+        return implode(DIRECTORY_SEPARATOR, [VAR_PATH, ...$segments]);
     }
 
     /**

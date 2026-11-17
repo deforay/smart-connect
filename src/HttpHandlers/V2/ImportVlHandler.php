@@ -14,7 +14,7 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * POST /api/v2/vl/import — replaces POST /api/import-viral-load.
  *
- * Parks a file in uploads/not-import-vl for offline processing; there is no
+ * Parks a file in var/not-import-vl for offline processing; there is no
  * service behind it. v1 took whatever name the client sent, so the accepted
  * extensions are pinned here and the stored name is generated rather than
  * echoed back from the request.
@@ -46,7 +46,7 @@ final class ImportVlHandler
             return ApiResponse::error($response, $problem, 422);
         }
 
-        $directory = $this->bridge->uploadPath('not-import-vl');
+        $directory = $this->bridge->varPath('not-import-vl');
         UploadGuard::ensureDirectory($directory);
 
         $extension = strtolower(pathinfo((string) $_FILES[self::FIELD]['name'], PATHINFO_EXTENSION));

@@ -48,3 +48,6 @@ composer.phar
 
 data/logs/*
 !data/logs/.gitkeep
+
+var/*
+!var/.gitkeep

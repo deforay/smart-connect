@@ -100,7 +100,7 @@ namespace {
     $root = sys_get_temp_dir() . '/metadata-sync-' . bin2hex(random_bytes(8));
     mkdir($root, 0700);
     mkdir($root . '/vlsm-reference', 0700);
-    define('TEMP_UPLOAD_PATH', $root);
+    define('VAR_PATH', $root);
     $columns = [
         'geographical_divisions' => ['geo_id', 'geo_parent', 'geo_name', 'geo_code', 'geo_status', 'updated_datetime'],
         'facility_details' => ['facility_id', 'facility_state', 'facility_district', 'facility_state_id', 'facility_district_id', 'data_sync'],

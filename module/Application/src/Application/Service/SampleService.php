@@ -1286,14 +1286,14 @@ class SampleService
             /** @var SampleTable $sampleDb */
             $sampleDb = $this->sm->get('SampleTableWithoutCache');
 
-            if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
-                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777, true);
+            if (!file_exists(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
+                mkdir(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777, true);
             }
 
             $extension = strtolower(pathinfo($_FILES['vlFile']['name'], PATHINFO_EXTENSION));
             $fileName = CommonService::generateRandomString(12) . time() . "." . $extension;
 
-            $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
+            $fileName = VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
 
 
             if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName) && is_readable($fileName)) {
@@ -1376,14 +1376,14 @@ class SampleService
         $locationDb = $this->sm->get('LocationDetailsTable');
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
 
-        if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
-            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777, true);
+        if (!file_exists(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
+            mkdir(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777, true);
         }
 
         $extension = strtolower(pathinfo($_FILES['vlFile']['name'], PATHINFO_EXTENSION));
         $newFileName = CommonService::generateRandomString(12) . "." . $extension;
 
-        $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $newFileName;
+        $fileName = VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $newFileName;
 
         if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName)) {
             if (is_readable($fileName)) {
