@@ -181,13 +181,6 @@ class Module
                         return new \Api\Controller\SourceDataController($sampleService);
                     }
                 },
-                'Api\Controller\ImportViral' => new class
-                {
-                    public function __invoke($diContainer)
-                    {
-                        return new \Api\Controller\ImportViralLoadController();
-                    }
-                },
             ),
         );
     }
