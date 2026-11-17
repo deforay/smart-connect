@@ -141,7 +141,7 @@ if (isset($requestType) && !empty($requestType)) {
             placeholder: "<?php echo $this->translate('Select Testing Lab'); ?>",
             allowClear: true
         });
-        $('.daterangefield').daterangepicker({
+        var dateRangeOptions = {
             "ranges": {
                 'Today': [moment(), moment()],
                 'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -192,8 +192,21 @@ if (isset($requestType) && !empty($requestType)) {
             //"startDate": "11/08/2015",
             //"endDate": "11/14/2015",
             opens: "left",
-        }, function(start, end, label) {
+        };
+        var dateRangeChanged = function(start, end, label) {
             $('.daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        };
+        $('#testedDate').daterangepicker(dateRangeOptions, dateRangeChanged);
+
+        // The Collection Date picker's Cancel button clears the field, so the
+        // search can run with no collection date limit.
+        $('#collectionDate').daterangepicker($.extend(true, {}, dateRangeOptions, {
+            "locale": {
+                "cancelLabel": "<?php echo $this->translate('Clear'); ?>"
+            }
+        }), dateRangeChanged);
+        $('#collectionDate').on('cancel.daterangepicker', function() {
+            $(this).val('');
         });
 
         $('#collectionDate').val(moment().subtract(1, 'month').format('DD-MMM-YYYY') + ' to ' + moment().format('DD-MMM-YYYY'));
