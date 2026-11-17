@@ -37,7 +37,7 @@ abstract class AbstractIngestHandler
     /** The multipart field name the LIS posts the file under. */
     abstract protected function fileField(): string;
 
-    /** Sub-directory of TEMP_UPLOAD_PATH the service unpacks into. */
+    /** Sub-directory of VAR_PATH the service unpacks into. */
     abstract protected function tempFolder(): string;
 
     /**
@@ -71,7 +71,7 @@ abstract class AbstractIngestHandler
 
         // Created here so the service's own `mkdir(..., 0777, true)` branch is
         // never reached.
-        UploadGuard::ensureDirectory($this->bridge->tempUploadPath($this->tempFolder()));
+        UploadGuard::ensureDirectory($this->bridge->varPath($this->tempFolder()));
 
         // Read from the authenticated principal, never from the payload. The
         // point of the exercise is that the uploaded JSON does not get to say

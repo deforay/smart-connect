@@ -4,7 +4,7 @@ use Application\Service\CommonService;
 $common = new CommonService();
 
 $request = $response = "{}";
-$folder = realpath(UPLOAD_PATH . DIRECTORY_SEPARATOR . 'track-api');
+$folder = realpath(VAR_PATH . DIRECTORY_SEPARATOR . 'api-payloads');
 
 $request = $common->getJsonFromZip($folder . DIRECTORY_SEPARATOR . 'requests' . DIRECTORY_SEPARATOR . $result['transaction_id'] . '.json.zip', $result['transaction_id'] . '.json');
 $response = $common->getJsonFromZip($folder . DIRECTORY_SEPARATOR . 'responses' . DIRECTORY_SEPARATOR . $result['transaction_id'] . '.json.zip', $result['transaction_id'] . '.json');

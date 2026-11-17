@@ -17,5 +17,10 @@ defined('TEMP_UPLOAD_PATH')
 defined('LOG_PATH')
     || define('LOG_PATH', APPLICATION_PATH . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'logs');
 
+// Private files (API payload copies, parked imports, incoming sync files).
+// Beside public/, never under it, so none of them can be fetched by URL.
+defined('VAR_PATH')
+    || define('VAR_PATH', APPLICATION_PATH . DIRECTORY_SEPARATOR . 'var');
+
 // returning this empty array to avoid error in config merging
 return [];

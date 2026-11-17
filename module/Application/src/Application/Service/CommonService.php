@@ -542,7 +542,7 @@ class CommonService
      /** @return array{0: object|array, 1: string} */
      private function readMetadataUpload(): array
      {
-          $directory = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . 'vlsm-reference';
+          $directory = VAR_PATH . DIRECTORY_SEPARATOR . 'vlsm-reference';
           if (!file_exists($directory) && !is_dir($directory)) {
                mkdir($directory, 0777, true);
           }

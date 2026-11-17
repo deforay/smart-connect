@@ -502,6 +502,50 @@ check_php_version() {
     return 1
 }
 
+# Private files used to live under public/, where anyone could fetch them by
+# URL. Safe to run on every upgrade: once the old folders are gone it does
+# nothing. Expects var/api-payloads/{requests,responses} to exist already.
+move_private_files() {
+    local app_path="$1" kind old_dir new_dir file stranded
+
+    # API payload copies are kept, so Sync History still shows old payloads.
+    for kind in requests responses; do
+        old_dir="$app_path/public/uploads/track-api/$kind"
+        new_dir="$app_path/var/api-payloads/$kind"
+        [ -d "$old_dir" ] || continue
+
+        # -n never overwrites a file already in var/. Its exit status differs
+        # between coreutils versions, so what is left behind is checked instead.
+        find "$old_dir" -mindepth 1 -maxdepth 1 -type f \
+            -exec mv -n -t "$new_dir" {} + 2>>"$log_file" || true
+
+        # Anything still here either has a copy in var/ already (safe to drop)
+        # or failed to move (keep the folder, so nothing is lost).
+        stranded=0
+        while IFS= read -r -d '' file; do
+            [ -e "$new_dir/$(basename "$file")" ] || stranded=$((stranded + 1))
+        done < <(find "$old_dir" -mindepth 1 -maxdepth 1 -print0)
+        if [ "$stranded" -gt 0 ]; then
+            say warning "${stranded} file(s) in ${old_dir} could not be moved to ${new_dir}. Left in place."
+            continue
+        fi
+        rm -rf "$old_dir"
+        say info "Moved API payloads from public/uploads/track-api/${kind} to var/api-payloads/${kind}."
+    done
+    if [ -d "$app_path/public/uploads/track-api" ]; then
+        rmdir "$app_path/public/uploads/track-api" 2>/dev/null || true
+    fi
+
+    # Incoming sync files are processed during the request, so the old copies
+    # are not needed.
+    for kind in vlsm-vl vlsm-eid vlsm-reference; do
+        if [ -d "$app_path/public/temporary/$kind" ]; then
+            rm -rf "$app_path/public/temporary/$kind"
+            say info "Removed public/temporary/${kind}."
+        fi
+    done
+}
+
 upgrade_instance() {
     app_path="$1"
     local position="$2" total="$3"
@@ -571,7 +615,7 @@ upgrade_instance() {
         rsync_excludes+=(--exclude="$pattern")
     done
     for exclude in '.git' '.env' 'vendor/' 'data/cache/' 'data/logs/' \
-        'public/uploads/' 'public/temporary/' 'temporary/' 'backup/'; do
+        'public/uploads/' 'public/temporary/' 'temporary/' 'backup/' 'var/'; do
         rsync_excludes+=(--exclude="$exclude")
     done
 
@@ -693,16 +737,16 @@ upgrade_instance() {
     # contents, and the rsync deploy excludes them, so they can be missing.
     local dir
     for dir in data/cache data/cache/app data/logs backup backup/db temporary \
-        public/temporary public/temporary/vlsm-vl public/temporary/vlsm-eid \
-        public/temporary/vlsm-reference \
-        public/uploads public/uploads/not-import-vl \
-        public/uploads/track-api/requests public/uploads/track-api/responses; do
+        public/temporary public/uploads \
+        var var/api-payloads/requests var/api-payloads/responses \
+        var/not-import-vl var/vlsm-vl var/vlsm-eid var/vlsm-reference; do
         mkdir -p "$app_path/$dir"
     done
+    move_private_files "$app_path"
 
     chown -R "$web_user":"$web_user" "$app_path"
     chmod -R u+rwX,g+rwX "$app_path/data" "$app_path/backup" "$app_path/temporary" \
-        "$app_path/public/temporary" "$app_path/public/uploads"
+        "$app_path/public/temporary" "$app_path/public/uploads" "$app_path/var"
     # Query cache contents are private to the shared web/cron owner.
     chmod 700 "$app_path/data/cache/app"
     chmod +x "$app_path/cron.sh" "$app_path/bin/migrate" "$app_path/bin/console" \

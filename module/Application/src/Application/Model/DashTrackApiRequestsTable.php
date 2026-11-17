@@ -227,7 +227,7 @@ class DashTrackApiRequestsTable extends BaseTableGateway
             $requestData = $common->toJSON($requestData);
             $responseData = $common->toJSON($responseData);
 
-            $folderPath = UPLOAD_PATH . DIRECTORY_SEPARATOR . 'track-api';
+            $folderPath = VAR_PATH . DIRECTORY_SEPARATOR . 'api-payloads';
             if ($requestData !== null && $requestData !== '' && $requestData != '[]') {
                 $common->makeDirectory($folderPath . DIRECTORY_SEPARATOR . 'requests');
                 $common->zipJson($requestData, "$folderPath/requests/$transactionId.json");
@@ -250,10 +250,10 @@ class DashTrackApiRequestsTable extends BaseTableGateway
             ];
             if ($requestData !== null && $requestData !== '' && $requestData != '[]') {
                 // $data['api_params'] = '/uploads/requests/' . $transactionId . '.json';
-                $data['request_data'] = '/uploads/track-api/requests/' . $transactionId . '.json';
+                $data['request_data'] = 'var/api-payloads/requests/' . $transactionId . '.json';
             }
             if ($responseData !== null && $responseData !== '' && $responseData != '[]') {
-                $data['response_data'] = '/uploads/track-api/responses/' . $transactionId . '.json';
+                $data['response_data'] = 'var/api-payloads/responses/' . $transactionId . '.json';
             }
 
             // Whitelisted rather than merged wholesale, so a caller passing a

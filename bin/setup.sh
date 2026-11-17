@@ -197,6 +197,13 @@ git clone --depth 1 --single-branch --branch master "$REPO_GIT_URL" "$app_path" 
     { print error "git clone failed. See ${log_file}."; exit 1; }
 rm -rf "$app_path/.git"
 
+# Private runtime files live in var/, beside public/ so none can be fetched by
+# URL. bin/upgrade.sh, run below, creates these too and sets their ownership.
+for dir in var/api-payloads/requests var/api-payloads/responses var/not-import-vl \
+    var/vlsm-vl var/vlsm-eid var/vlsm-reference; do
+    mkdir -p "$app_path/$dir"
+done
+
 # ------------------------------------------------------------ database ----
 
 print header "Creating the database"
