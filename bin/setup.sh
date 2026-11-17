@@ -196,6 +196,8 @@ fi
 git clone --depth 1 --single-branch --branch master "$REPO_GIT_URL" "$app_path" >>"$log_file" 2>&1 ||
     { print error "git clone failed. See ${log_file}."; exit 1; }
 rm -rf "$app_path/.git"
+# Exports and result PDFs. Kept out of public/ and served through /download.
+mkdir -p "$app_path/var/exports"
 
 # ------------------------------------------------------------ database ----
 
