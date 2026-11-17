@@ -51,6 +51,8 @@ class Housekeeping extends Command
         $webRoot = defined('WEB_ROOT') ? WEB_ROOT : $appPath . DIRECTORY_SEPARATOR . 'public';
         $uploadPath = defined('UPLOAD_PATH') ? UPLOAD_PATH : $webRoot . DIRECTORY_SEPARATOR . 'uploads';
         $tempUploadPath = defined('TEMP_UPLOAD_PATH') ? TEMP_UPLOAD_PATH : $webRoot . DIRECTORY_SEPARATOR . 'temporary';
+        $varPath = defined('VAR_PATH') ? VAR_PATH : $appPath . DIRECTORY_SEPARATOR . 'var';
+        $exportPath = defined('EXPORT_PATH') ? EXPORT_PATH : $varPath . DIRECTORY_SEPARATOR . 'exports';
 
         $output->writeln('');
         $output->writeln('<info>HOUSEKEEPING STARTED: ' . date('Y-m-d H:i:s') . ($dryRun ? ' (DRY RUN)' : '') . '</info>');
@@ -68,6 +70,7 @@ class Housekeeping extends Command
             $tempUploadPath . DIRECTORY_SEPARATOR . 'vlsm-eid' => ['duration' => 3, 'max_size_mb' => 1000],
             $tempUploadPath . DIRECTORY_SEPARATOR . 'vlsm-reference' => ['duration' => 3, 'max_size_mb' => 1000],
             $tempUploadPath => ['duration' => 7, 'max_size_mb' => 2000],
+            $exportPath => ['duration' => 7, 'max_size_mb' => 2000],
             $appPath . DIRECTORY_SEPARATOR . 'temporary' => ['duration' => 3, 'max_size_mb' => 500],
             $uploadPath . DIRECTORY_SEPARATOR . 'track-api' . DIRECTORY_SEPARATOR . 'requests' => ['duration' => 120, 'max_size_mb' => 1000],
             $uploadPath . DIRECTORY_SEPARATOR . 'track-api' . DIRECTORY_SEPARATOR . 'responses' => ['duration' => 120, 'max_size_mb' => 1000],

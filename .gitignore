@@ -16,6 +16,8 @@ public/uploads/*
 !public/uploads/index.php
 public/temporary/*
 !public/temporary/index.php
+# Files the app writes at runtime: exports, result PDFs.
+var/
 vendor/
 .venv-docs/
 site/

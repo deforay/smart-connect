@@ -570,7 +570,7 @@ upgrade_instance() {
     for pattern in "${DEPLOYMENT_CONFIG[@]}"; do
         rsync_excludes+=(--exclude="$pattern")
     done
-    for exclude in '.git' '.env' 'vendor/' 'data/cache/' 'data/logs/' \
+    for exclude in '.git' '.env' 'vendor/' 'data/cache/' 'data/logs/' 'var/' \
         'public/uploads/' 'public/temporary/' 'temporary/' 'backup/'; do
         rsync_excludes+=(--exclude="$exclude")
     done
@@ -693,6 +693,7 @@ upgrade_instance() {
     # contents, and the rsync deploy excludes them, so they can be missing.
     local dir
     for dir in data/cache data/cache/app data/logs backup backup/db temporary \
+        var var/exports \
         public/temporary public/temporary/vlsm-vl public/temporary/vlsm-eid \
         public/temporary/vlsm-reference \
         public/uploads public/uploads/not-import-vl \
@@ -702,7 +703,13 @@ upgrade_instance() {
 
     chown -R "$web_user":"$web_user" "$app_path"
     chmod -R u+rwX,g+rwX "$app_path/data" "$app_path/backup" "$app_path/temporary" \
-        "$app_path/public/temporary" "$app_path/public/uploads"
+        "$app_path/var" "$app_path/public/temporary" "$app_path/public/uploads"
+
+    # Exports and result PDFs are now written to var/exports and served only
+    # through /download/:file, which needs a login. Any still at the top of
+    # public/temporary are old ones, readable by anyone with the file name, so
+    # they go. The vlsm-* sync folders below it are left alone.
+    find "$app_path/public/temporary" -maxdepth 1 -type f ! -name 'index.php' -delete 2>>"$log_file" || true
     # Query cache contents are private to the shared web/cron owner.
     chmod 700 "$app_path/data/cache/app"
     chmod +x "$app_path/cron.sh" "$app_path/bin/migrate" "$app_path/bin/console" \

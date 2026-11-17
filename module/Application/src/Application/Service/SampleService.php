@@ -520,7 +520,7 @@ class SampleService
                     }
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
                     $filename = 'TEST-RESULT-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
-                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
                     return "";
@@ -693,7 +693,7 @@ class SampleService
                     }
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
                     $filename = 'HIGH-VL-SAMPLE-RESULT-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
-                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
                     return "";
@@ -798,7 +798,7 @@ class SampleService
                         }
                         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
                         $filename = 'SAMPLE-TEST-RESULT-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
-                        $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                        $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                         return $filename;
                     } else {
                         return "";
@@ -903,7 +903,7 @@ class SampleService
                     }
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
                     $filename = 'SAMPLE-TESTED-LAB-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
-                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
                     return "";
@@ -1004,7 +1004,7 @@ class SampleService
                     }
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
                     $filename = 'LAB-TAT-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
-                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
                     return "";
@@ -1132,7 +1132,7 @@ class SampleService
                     }
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
                     $filename = 'RESULTS-AWAITED--' . date('d-M-Y-H-i-s') . '.xlsx';
-                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
                     return "";
