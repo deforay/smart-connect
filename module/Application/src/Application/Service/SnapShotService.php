@@ -45,15 +45,40 @@ class SnapShotService
         return new WhereExpression("$column IN ($placeholders)", $values);
     }
 
-    public function getSnapshotData($params)
+    /**
+     * The controllers pass the POST body as Laminas\Stdlib\Parameters.
+     */
+    private static function paramsArray($params): array
     {
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-        $loginContainer = new Container('credo');
-        $mappedFacilities = $loginContainer->mappedFacilities ?? null;
+        return $params instanceof \Laminas\Stdlib\Parameters ? $params->toArray() : (array) $params;
+    }
 
-        $types = (!isset($params['testType']) || empty($params['testType'])) ? ["vl", "eid"] : (array) $params['testType'];
-        $testTypeQuery = [];
+    /**
+     * Rows whose lab has $column (a facility_details column) in $values.
+     */
+    private static function inLabsWhere(string $alias, string $column, array $values): WhereExpression
+    {
+        $values = array_values($values);
+        $placeholders = implode(',', array_fill(0, count($values), '?'));
+
+        return new WhereExpression(
+            "$alias.lab_id IN (SELECT fd.facility_id FROM facility_details fd WHERE fd.$column IN ($placeholders))",
+            $values
+        );
+    }
+
+    /**
+     * The where conditions shared by the Snapshot grid and its quick stats, so
+     * both count the same rows. The POC condition reads icm.poc_device, so a
+     * caller that passes flag=poc must join instrument_machines as icm.
+     *
+     * $alias is the dash_form_* table's alias. The grid joins facility_details,
+     * which also has a facility_id, so the clinic filter must be qualified.
+     * Province and district live only on facility_details, so they go through
+     * a subquery on the lab and work whether or not the caller joins it.
+     */
+    private function buildFilters(array $params, ?array $mappedFacilities, string $alias): array
+    {
         $whereConditions = [];
 
         // Collection Date
@@ -70,22 +95,22 @@ class SnapShotService
 
         // Province Name
         if (isset($params['provinceName']) && !empty($params['provinceName'])) {
-            $whereConditions[] = self::inList("facility_state_id", $params['provinceName']);
+            $whereConditions[] = self::inLabsWhere($alias, "facility_state_id", $params['provinceName']);
         }
 
         // District Name
         if (isset($params['districtName']) && !empty($params['districtName'])) {
-            $whereConditions[] = self::inList("facility_district_id", $params['districtName']);
+            $whereConditions[] = self::inLabsWhere($alias, "facility_district_id", $params['districtName']);
         }
 
         // Clinic ID
         if (isset($params['clinicId']) && !empty($params['clinicId'])) {
-            $whereConditions[] = self::inList("facility_id", $params['clinicId']);
+            $whereConditions[] = self::inList("$alias.facility_id", $params['clinicId']);
         }
 
         // Lab ID
         if (isset($params['labId']) && !empty($params['labId'])) {
-            $whereConditions[] = self::inList("lab_id", $params['labId']);
+            $whereConditions[] = self::inList("$alias.lab_id", $params['labId']);
         }
 
         // POC Flag
@@ -95,17 +120,31 @@ class SnapShotService
 
         // Mapped Facilities
         if (!empty($mappedFacilities)) {
-            $whereConditions[] = self::inList("lab_id", $mappedFacilities);
+            $whereConditions[] = self::inList("$alias.lab_id", $mappedFacilities);
         }
 
+        return $whereConditions;
+    }
+
+    public function getSnapshotData($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $loginContainer = new Container('credo');
+        $mappedFacilities = $loginContainer->mappedFacilities ?? null;
+
+        $types = (!isset($params['testType']) || empty($params['testType'])) ? ["vl", "eid"] : (array) $params['testType'];
+        $testTypeQuery = [];
+
         foreach ($types as $type) {
+            $whereConditions = $this->buildFilters(self::paramsArray($params), $mappedFacilities, $type);
             $select = $sql->select()
                 ->from(["$type" => "dash_form_$type"])
                 ->columns([
                     'reg' => new Expression("COUNT(*)"),
                     'totalReceived' => new Expression("SUM(CASE WHEN sample_collection_date IS NOT NULL AND DATE(sample_collection_date) NOT IN ('1970-01-01', '0000-00-00') THEN 1 ELSE 0 END)"),
                     'totalTested' => new Expression("SUM(CASE WHEN sample_tested_datetime IS NOT NULL AND DATE(sample_tested_datetime) NOT IN ('1970-01-01', '0000-00-00') THEN 1 ELSE 0 END)"),
-                    'totalRejected' => new Expression("SUM(CASE WHEN (reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection != '' AND reason_for_sample_rejection != 0) OR (is_sample_rejected LIKE 'yes') AND (sample_collection_date IS NOT NULL AND DATE(sample_collection_date) NOT IN ('1970-01-01', '0000-00-00')) THEN 1 ELSE 0 END)"),
+                    'totalRejected' => new Expression("SUM(CASE WHEN ((reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection != '' AND reason_for_sample_rejection != 0) OR is_sample_rejected LIKE 'yes') AND (sample_collection_date IS NOT NULL AND DATE(sample_collection_date) NOT IN ('1970-01-01', '0000-00-00')) THEN 1 ELSE 0 END)"),
                     'totalPending' => new Expression("SUM(CASE WHEN (sample_collection_date IS NOT NULL AND DATE(sample_collection_date) NOT IN ('1970-01-01', '0000-00-00')) AND (is_sample_rejected LIKE 'yes' OR result IS NULL OR result = '' OR result_status IN (2,4,5,10)) THEN 1 ELSE 0 END)")
                 ])
                 // LEFT, not INNER. Most historical rows carry no lab_id, because
@@ -175,15 +214,19 @@ class SnapShotService
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         $age['vl'] = "patient_age_in_years";
         $age['eid'] = "child_age";
-        $age['hepatitis'] = "patient_age";
-        $age['tb'] = "patient_age";
         $query = [];
-        //get received data
-        $types = array("vl", "eid", "tb", "hepatitis");
-        if (isset($params['testType']) && !empty($params['testType'])) {
-            $types = $params['testType'];
+        // Only dash_form_vl and dash_form_eid exist. An unknown test type would
+        // name a missing table and fail the whole panel, so it is dropped, and
+        // a selection with nothing left falls back to both.
+        $supportedTypes = ["vl", "eid"];
+        $types = array_values(array_intersect((array) ($params['testType'] ?? []), $supportedTypes));
+        if (empty($types)) {
+            $types = $supportedTypes;
         }
-        if (isset($types) && !empty($types)) {
+        // Every quick stats query aliases its table as vl.
+        $whereConditions = $this->buildFilters(self::paramsArray($params), $mappedFacilities, 'vl');
+        $isPoc = !empty($params['flag']) && $params['flag'] == 'poc';
+        if (!empty($types)) {
             foreach ($types as $type) {
                 $gender = ($type == 'eid') ? 'child_gender' : 'patient_gender';
                 $quickStatsquery = $sql->select()->from(array("vl" => "dash_form_" . $type))
@@ -236,31 +279,14 @@ class SnapShotService
                     // ->where("(is_sample_rejected like 'yes' OR result IS NULL OR result LIKE '' OR result_status IN(2,4,5,10)) AND (sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')")
                     ->group(array("rejectedDate"));
 
-                if (isset($params['collectionDate']) && !empty($params['collectionDate'])) {
-                    $date = explode(" to ", $params['collectionDate']);
-                    $quickStatsquery = $quickStatsquery->where(array("sample_collection_date >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_collection_date <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
-                    $receivedQuery = $receivedQuery->where(array("sample_collection_date >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_collection_date <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
-                    $testedQuery = $testedQuery->where(array("sample_collection_date >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_collection_date <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
-                    $rejectedQuery = $rejectedQuery->where(array("sample_collection_date >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_collection_date <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
-                }
-                if (isset($params['testedDate']) && !empty($params['testedDate'])) {
-                    $date = explode(" to ", $params['testedDate']);
-                    $quickStatsquery = $quickStatsquery->where(array("sample_tested_datetime >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_tested_datetime <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
-                    $receivedQuery = $receivedQuery->where(array("sample_tested_datetime >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_tested_datetime <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
-                    $testedQuery = $testedQuery->where(array("sample_tested_datetime >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_tested_datetime <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
-                    $rejectedQuery = $rejectedQuery->where(array("sample_tested_datetime >= '" . $this->commonService->isoDateFormat($date[0]) . " 00:00:00'", "sample_tested_datetime <= '" . $this->commonService->isoDateFormat($date[1]) . " 23:59:59'"));
-                }
-                if (!empty($params['flag']) && $params['flag'] == 'poc') {
-                    $quickStatsquery = $quickStatsquery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
-                    $receivedQuery = $receivedQuery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
-                    $testedQuery = $testedQuery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
-                    $rejectedQuery = $rejectedQuery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
-                }
-                if (isset($mappedFacilities) && !empty($mappedFacilities)) {
-                    $quickStatsquery = $quickStatsquery->where(array("lab_id IN ('" . implode('", "', $mappedFacilities) . "')"));
-                    $receivedQuery = $receivedQuery->where(array("lab_id IN ('" . implode('", "', $mappedFacilities) . "')"));
-                    $testedQuery = $testedQuery->where(array("lab_id IN ('" . implode('", "', $mappedFacilities) . "')"));
-                    $rejectedQuery = $rejectedQuery->where(array("lab_id IN ('" . implode('", "', $mappedFacilities) . "')"));
+                foreach ([$quickStatsquery, $receivedQuery, $testedQuery, $rejectedQuery] as $select) {
+                    if ($isPoc) {
+                        // buildFilters() adds the icm.poc_device condition.
+                        $select->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array());
+                    }
+                    foreach ($whereConditions as $condition) {
+                        $select->where($condition);
+                    }
                 }
                 $query['quickStats'][] = $sql->buildSqlString($quickStatsquery);
                 $query['received'][] = $sql->buildSqlString($receivedQuery);
