@@ -1150,13 +1150,15 @@ class SampleService
     public function getAllSamples($parameters)
     {
         $acl = $this->sm->get('AppAcl');
-        return $this->sampleTable->fetchAllSamples($parameters, $acl);
+        // Uncached: the grid must reflect rows removed a moment ago
+        return $this->sm->get('SampleTableWithoutCache')->fetchAllSamples($parameters, $acl);
     }
 
     public function removeDuplicateSampleRows($params)
     {
-
-        return $this->sampleTable->removeDuplicateSampleRows($params);
+        // A write must never go through the method cache, or a repeat call
+        // with the same ids returns the cached result and deletes nothing
+        return $this->sm->get('SampleTableWithoutCache')->removeDuplicateSampleRows($params);
     }
 
     public function getVLTestReasonBasedOnAgeGroup($params)

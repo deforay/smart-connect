@@ -18,7 +18,7 @@ class Module
                     public function __invoke($diContainer)
                     {
                         $sampleService = $diContainer->get('SampleService');
-                        return new \DataManagement\Controller\DuplicateDataController($sampleService);
+                        return new \DataManagement\Controller\DuplicateDataController($sampleService, $diContainer->get('AppAcl'));
                     }
                 },
             ),

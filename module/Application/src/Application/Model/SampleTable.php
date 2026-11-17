@@ -4747,18 +4747,19 @@ class SampleTable extends AbstractTableGateway
                 $sampleCollectionDate = CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
             }
             $row = [];
-            $row[] = '<input type="checkbox" name="duplicate-select[]" class="' . $aRow['sample_code'] . '" id="' . $aRow['vl_sample_id'] . '" value="' . $aRow['vl_sample_id'] . '" onchange="duplicateCheck(this);"/>';
-            $row[] = $aRow['sample_code'];
-            $row[] = $sampleCollectionDate;
-            $row[] = (isset($aRow['batch_code'])) ? $aRow['batch_code'] : '';
-            $row[] = $aRow['patient_art_no'];
-            $row[] = ($aRow['patient_first_name'] . ' ' . $aRow['patient_last_name']);
-            $row[] = (isset($aRow['facility_name'])) ? ($aRow['facility_name']) : '';
-            $row[] = (isset($aRow['province'])) ? ($aRow['province']) : '';
-            $row[] = (isset($aRow['district'])) ? ($aRow['district']) : '';
-            $row[] = (isset($aRow['sample_name'])) ? ($aRow['sample_name']) : '';
-            $row[] = $aRow['result'];
-            $row[] = ($aRow['status_name']);
+            $esc = static fn($v): string => htmlspecialchars((string) $v, ENT_QUOTES);
+            $row[] = '<input type="checkbox" name="duplicate-select[]" class="' . $esc($aRow['sample_code']) . '" id="' . $esc($aRow['vl_sample_id']) . '" value="' . $esc($aRow['vl_sample_id']) . '" onchange="duplicateCheck(this);"/>';
+            $row[] = $esc($aRow['sample_code']);
+            $row[] = $esc($sampleCollectionDate);
+            $row[] = (isset($aRow['batch_code'])) ? $esc($aRow['batch_code']) : '';
+            $row[] = $esc($aRow['patient_art_no']);
+            $row[] = $esc($aRow['patient_first_name'] . ' ' . $aRow['patient_last_name']);
+            $row[] = (isset($aRow['facility_name'])) ? $esc($aRow['facility_name']) : '';
+            $row[] = (isset($aRow['province'])) ? $esc($aRow['province']) : '';
+            $row[] = (isset($aRow['district'])) ? $esc($aRow['district']) : '';
+            $row[] = (isset($aRow['sample_name'])) ? $esc($aRow['sample_name']) : '';
+            $row[] = $esc($aRow['result']);
+            $row[] = $esc($aRow['status_name']);
             if ($update) {
                 $row[] = '<a href="/data-management/duplicate-data/edit/' . base64_encode($aRow['vl_sample_id']) . '" class="btn green" title="Edit">' . $buttText . '</a>';
             }
@@ -4782,6 +4783,8 @@ class SampleTable extends AbstractTableGateway
                 $rQueryStr = $sql->buildSqlString($rQuery);
                 $rResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 if ($rResult) {
+                    // current() returns an ArrayObject; TableGateway::insert() wants an array
+                    $rResult = (array) $rResult;
                     $hasInserted = $removedSamplesDb->insert($rResult);
                     if ($hasInserted !== 0) {
                         $response = $this->delete(array('vl_sample_id' => $rResult['vl_sample_id']));
