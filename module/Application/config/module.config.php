@@ -102,16 +102,6 @@ return [
                     ],
                 ],
             ],
-            'hubs' => [
-                'type' => 'segment',
-                'options' => [
-                    'route' => '/hubs[/][:action][/:id]',
-                    'defaults' => [
-                        'controller' => Controller\HubsController::class,
-                        'action' => 'index',
-                    ],
-                ],
-            ],
             'login' => [
                 'type'    => 'segment',
                 'options' => [
