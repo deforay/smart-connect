@@ -72,7 +72,7 @@ way have no rows at all.
 Two APIs, both live.
 
 **v1**, in `module/Api/`, at `/api/vlsm`, `/api/vlsm-eid`,
-`/api/vlsm-metadata`, `/api/weblims-vl`, `/api/import-viral-load`, `/api/facility`,
+`/api/vlsm-metadata`, `/api/weblims-vl`, `/api/facility`,
 `/api/user` and `/api/source-data`. The ingestion endpoints have no authentication. This is
 the reason v2 exists.
 

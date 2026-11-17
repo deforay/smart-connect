@@ -12,18 +12,6 @@ return array(
                     ),
                 ),
             ),
-            'api-import-viral-load' => array(
-                'type'    => 'segment',
-                'options' => array(
-                    'route'    => '/api/import-viral-load[/:id]',
-                    'constraints' => array(
-                        'id'     => '[0-9]+',
-                    ),
-                    'defaults' => array(
-                        'controller' => 'Api\Controller\ImportViralLoad',
-                    ),
-                ),
-            ),
             'api-source-data' => array(
                 'type'    => 'segment',
                 'options' => array(
