@@ -377,7 +377,7 @@ class Module
 				return $response;
 			}
 
-			if (($shortControllerName == 'Clinic' || $shortControllerName == 'Hubs') && $session->role == '2') {
+			if ($shortControllerName == 'Clinic' && $session->role == '2') {
 				/** @var \Laminas\Http\PhpEnvironment\Response $response */
 				$response = $e->getResponse();
 				$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
@@ -392,7 +392,7 @@ class Module
 				//Attach the "break" as a listener with a high priority
 				$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
 				return $response;
-			} elseif (($shortControllerName == 'Laboratory' || $shortControllerName == 'Hubs') && $session->role == '3') {
+			} elseif ($shortControllerName == 'Laboratory' && $session->role == '3') {
 				/** @var \Laminas\Http\PhpEnvironment\Response $response */
 				$response = $e->getResponse();
 				$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
@@ -407,72 +407,6 @@ class Module
 				//Attach the "break" as a listener with a high priority
 				$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
 				return $response;
-			} elseif (($shortControllerName == 'Laboratory' || $shortControllerName == 'Clinic') && $session->role == '4') {
-				/** @var \Laminas\Http\PhpEnvironment\Response $response */
-				$response = $e->getResponse();
-				$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
-				$response->setStatusCode(302);
-				$response->sendHeaders();
-				// To avoid additional processing
-				// we can attach a listener for Event Route with a high priority
-				$stopCallBack = function ($event) use ($response) {
-					$event->stopPropagation();
-					return $response;
-				};
-				//Attach the "break" as a listener with a high priority
-				$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
-				return $response;
-			}
-
-			//clinic/lab dashboard re-direction, in-case of passing invalid url params
-			if ($session->role != 1) {
-				/*$mappedFacilities = (isset($session->mappedFacilities) && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
-				$mappedFacilitiesName = (isset($session->mappedFacilitiesName) && !empty($session->mappedFacilitiesName)) ? $session->mappedFacilitiesName : array();
-				$mappedFacilitiesCode = (isset($session->mappedFacilitiesCode) && !empty($session->mappedFacilitiesCode)) ? $session->mappedFacilitiesCode : array();
-				$lab = [];
-				if (isset($_GET['lab']) && trim($_GET['lab']) != '') {
-					$lab = array_values(array_filter(explode(',', $_GET['lab'])));
-				}
-				$redirect = false;
-				if ($lab !== []) {
-					$counter = count($lab);
-					for ($l = 0; $l < $counter; $l++) {
-						if (!in_array($lab[$l], $mappedFacilities) && !in_array($lab[$l], $mappedFacilitiesName) && !in_array($lab[$l], $mappedFacilitiesCode)) {
-							$redirect = true;
-							break;
-						}
-					}
-				}*/
-
-				if ($shortControllerName == 'Users' || $shortControllerName == 'Config' || $shortControllerName == 'Facility' || $shortControllerName == 'Import') {
-					$redirect = true;
-				}
-				if ($redirect) {
-					//set redirect path
-					/** @var \Laminas\Http\PhpEnvironment\Response $response */
-					$response = $e->getResponse();
-					if ($session->role == 2) {
-						$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
-					} elseif ($session->role == 3) {
-						$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
-					} elseif ($session->role == 4) {
-						$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
-					} elseif ($session->role == 5) {
-						$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
-					}
-					$response->setStatusCode(302);
-					$response->sendHeaders();
-
-					// To avoid additional processing
-					// we can attach a listener for Event Route with a high priority
-					$stopCallBack = function ($event) use ($response) {
-						$event->stopPropagation();
-						return $response;
-					};
-					//Attach the "break" as a listener with a high priority
-					$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
-					return $response;
-				}
 			}
 		}
 	}

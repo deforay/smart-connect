@@ -54,18 +54,6 @@ class UsersTable extends BaseTableGateway
         // successful one with the configured zone, leaving the two kinds of row
         // in one table an hour apart on any deployment where they differ.
         if (!empty($rResult) && $this->passwordVerify($rResult["user_id"], $params['password'], $rResult['password'])) {
-            // Let us flush the file cache
-            $cacheExpiryInMins = isset($this->config['defaults']['cache-expiry']) ? $this->config['defaults']['cache-expiry'] : 120;
-            clearstatcache();
-
-            $cacheDirLastModified = filemtime(realpath(APPLICATION_PATH . "/../data/cache"));
-            $cacheExpiryInMins = strtotime("-$cacheExpiryInMins mins");
-
-            if ($cacheDirLastModified > strtotime("-$cacheExpiryInMins mins")) {
-                $this->commonService->clearAllCache();
-            }
-
-
             $facilities_id = [];
             $facilities_name = [];
             $facilities_code = [];

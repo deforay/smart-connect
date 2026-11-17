@@ -9,7 +9,6 @@ return [
         'eidModule'     => true,
         'pocDashboard'     => true,
         'time-zone' => 'UTC',
-        'cache-expiry' => 1440, // in minutes
     ],
     'email' => [
         'host' => '',
