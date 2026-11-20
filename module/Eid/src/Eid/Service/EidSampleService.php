@@ -127,9 +127,6 @@ class EidSampleService
         $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         $fileName = CommonService::generateRandomString(6) . "." . $extension;
 
-        if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
-        }
         if (
             !file_exists(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid")
             && !is_dir(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid")
@@ -225,9 +222,6 @@ class EidSampleService
         $newFileName = CommonService::generateRandomString(12) . "." . $extension;
         $fileName = VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid" . DIRECTORY_SEPARATOR . $newFileName;
 
-        if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
-        }
         if (!file_exists(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid") && !is_dir(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid")) {
             mkdir(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid", 0777, true);
         }
@@ -768,7 +762,7 @@ class EidSampleService
                     }
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
                     $filename = 'RESULTS-AWAITED--' . date('d-M-Y-H-i-s') . '.xlsx';
-                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
                     return "";
@@ -932,7 +926,7 @@ class EidSampleService
                     }
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
                     $filename = 'TEST-RESULT-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
-                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
                     return "";
@@ -1046,7 +1040,7 @@ class EidSampleService
                     }
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
                     $filename = 'SAMPLE-TESTED-LAB-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
-                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
                     return "";
@@ -1208,7 +1202,7 @@ class EidSampleService
                     }
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
                     $filename = 'HIGH-VL-SAMPLE-RESULT-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
-                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
                     return "";
@@ -1304,7 +1298,7 @@ class EidSampleService
                         }
                         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
                         $filename = 'SAMPLE-TEST-RESULT-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
-                        $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                        $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                         return $filename;
                     } else {
                         return "";

@@ -202,6 +202,16 @@ return [
                     ],
                 ],
             ],
+            'download' => [
+                'type'    => 'segment',
+                'options' => [
+                    'route'    => '/download/:file',
+                    'defaults' => [
+                        'controller' => Controller\DownloadController::class,
+                        'action' => 'index',
+                    ],
+                ],
+            ],
             'logs' => [
                 'type'    => 'segment',
                 'options' => [

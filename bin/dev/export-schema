@@ -63,12 +63,13 @@ const SPLIT_ROLES = [
     8 => ['Clinician', 'cli', [
         'Application\\Controller\\SummaryController', 'Eid\\Controller\\SummaryController',
         'Application\\Controller\\ClinicController', 'Eid\\Controller\\ClinicsController',
-        'Application\\Controller\\SnapshotController',
+        'Application\\Controller\\SnapshotController', 'Application\\Controller\\DownloadController',
     ]],
     9 => ['Testing Lab Manager', 'tlm', [
         'Application\\Controller\\SummaryController', 'Eid\\Controller\\SummaryController',
         'Application\\Controller\\LaboratoryController', 'Eid\\Controller\\LabsController',
         'Application\\Controller\\SnapshotController', 'Application\\Controller\\TimeController',
+        'Application\\Controller\\DownloadController',
     ]],
 ];
 

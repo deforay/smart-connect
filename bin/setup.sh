@@ -200,7 +200,7 @@ rm -rf "$app_path/.git"
 # Private runtime files live in var/, beside public/ so none can be fetched by
 # URL. bin/upgrade.sh, run below, creates these too and sets their ownership.
 for dir in var/api-payloads/requests var/api-payloads/responses var/not-import-vl \
-    var/vlsm-vl var/vlsm-eid var/vlsm-reference; do
+    var/vlsm-vl var/vlsm-eid var/vlsm-reference var/exports; do
     mkdir -p "$app_path/$dir"
 done
 

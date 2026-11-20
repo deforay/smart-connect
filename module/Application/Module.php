@@ -899,6 +899,12 @@ class Module
 				return new \Application\Controller\ClientErrorController();
 			}
 				},
+				'Application\Controller\DownloadController' => new class {
+			public function __invoke($diContainer)
+			{
+				return new \Application\Controller\DownloadController();
+			}
+				},
 				'Application\Controller\LogsController' => new class {
 			public function __invoke($diContainer)
 			{

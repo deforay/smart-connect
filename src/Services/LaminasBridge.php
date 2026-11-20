@@ -46,7 +46,7 @@ final class LaminasBridge
         $serviceManager->get('ModuleManager')->loadModules();
 
         // Forces the config merge, which is also what defines APPLICATION_PATH,
-        // UPLOAD_PATH and TEMP_UPLOAD_PATH (config/autoload/constants.global.php).
+        // UPLOAD_PATH and VAR_PATH (config/autoload/constants.global.php).
         $config = $serviceManager->get('config');
 
         // The v2 API forks in public/index.php before the MVC application
@@ -79,18 +79,11 @@ final class LaminasBridge
     }
 
     /**
-     * TEMP_UPLOAD_PATH, UPLOAD_PATH and VAR_PATH are defined as a side effect of the
+     * UPLOAD_PATH and VAR_PATH are defined as a side effect of the
      * config merge (config/autoload/constants.global.php), so they are reached
      * through the bridge rather than referenced directly — that way a handler
      * cannot read them before the container has been built.
      */
-    public function tempUploadPath(string ...$segments): string
-    {
-        $this->serviceManager();
-
-        return implode(DIRECTORY_SEPARATOR, [TEMP_UPLOAD_PATH, ...$segments]);
-    }
-
     public function uploadPath(string ...$segments): string
     {
         $this->serviceManager();
