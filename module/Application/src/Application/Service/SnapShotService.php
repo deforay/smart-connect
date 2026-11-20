@@ -244,9 +244,9 @@ class SnapShotService
 
                             $this->translator->translate("age") => new Expression("SUM(CASE WHEN ((" . $age[$type] . " IS NULL OR " . $age[$type] . " ='' OR " . $age[$type] . " ='Unreported'  OR " . $age[$type] . " ='unreported')) THEN 1 ELSE 0 END)"),
 
-                            $this->translator->translate("less6") => new Expression("SUM(CASE WHEN ((sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END)"),
+                            $this->translator->translate("less6") => new Expression("SUM(CASE WHEN ((result IS NULL OR result = '') AND (sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END)"),
 
-                            $this->translator->translate("greater6") => new Expression("SUM(CASE WHEN ((sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END)")
+                            $this->translator->translate("greater6") => new Expression("SUM(CASE WHEN ((result IS NULL OR result = '') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END)")
                         )
                     );
                 // recevied data
@@ -271,7 +271,7 @@ class SnapShotService
                 $rejectedQuery = $sql->select()->from(array("vl" => "dash_form_" . $type))
                     ->columns(array('total' => new Expression("SUM(
                     CASE WHEN (
-                        (is_sample_rejected like 'yes' OR result_status IN(4))
+                        ((reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection != '' AND reason_for_sample_rejection != 0) OR is_sample_rejected LIKE 'yes')
                         AND
                         (sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')
                     ) THEN 1 ELSE 0 END
@@ -338,41 +338,12 @@ class SnapShotService
         $mode = $params['mode'] ?? 'backlog';
         $topN = isset($params['topN']) ? (int) $params['topN'] : 10;
 
-        $whereConditions = [];
-
-        if (isset($params['collectionDate']) && !empty($params['collectionDate'])) {
-            [$from, $to] = CommonService::convertDateRange($params['collectionDate']);
-            $whereConditions[] = new WhereExpression("sample_collection_date BETWEEN ? AND ?", [$from . ' 00:00:00', $to . ' 23:59:59']);
-        }
-
-        if (isset($params['testedDate']) && !empty($params['testedDate'])) {
-            [$from, $to] = CommonService::convertDateRange($params['testedDate']);
-            $whereConditions[] = new WhereExpression("sample_tested_datetime BETWEEN ? AND ?", [$from . ' 00:00:00', $to . ' 23:59:59']);
-        }
-
-        if (isset($params['provinceName']) && !empty($params['provinceName'])) {
-            $whereConditions[] = self::inList("facility_state_id", $params['provinceName']);
-        }
-
-        if (isset($params['districtName']) && !empty($params['districtName'])) {
-            $whereConditions[] = self::inList("facility_district_id", $params['districtName']);
-        }
-
-        if (isset($params['clinicId']) && !empty($params['clinicId'])) {
-            $whereConditions[] = self::inList("facility_id", $params['clinicId']);
-        }
-
-        if (isset($params['labId']) && !empty($params['labId'])) {
-            $whereConditions[] = self::inList("lab_id", $params['labId']);
-        }
-
-        if (!empty($params['flag']) && $params['flag'] == 'poc') {
-            $whereConditions[] = new WhereExpression("icm.poc_device = ?", ['yes']);
-        }
-
-        if (!empty($mappedFacilities)) {
-            $whereConditions[] = self::inList("lab_id", $mappedFacilities);
-        }
+        // The same filters as the grid. This method kept its own copy, whose
+        // clinic condition named facility_id without the table alias. The
+        // query joins facility_details, which has a facility_id too, so MySQL
+        // rejected it as ambiguous and the panel failed whenever a health
+        // facility was selected.
+        $whereConditions = $this->buildFilters(self::paramsArray($params), $mappedFacilities, 't');
 
         $unionQueries = [];
         foreach ($types as $type) {
