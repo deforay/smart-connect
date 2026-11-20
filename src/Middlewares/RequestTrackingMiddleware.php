@@ -89,6 +89,7 @@ final class RequestTrackingMiddleware implements MiddlewareInterface
         $envelope = $this->envelope($response);
 
         $trackerTable = $this->bridge->get('DashTrackApiRequestsTable');
+        $counts = $this->context->recordCounts();
 
         // Deliberately not the uploaded payload: these are multi-megabyte
         // sample dumps and addApiTracking() would zip a copy of every one to
@@ -105,7 +106,7 @@ final class RequestTrackingMiddleware implements MiddlewareInterface
         $trackerTable->addApiTracking(
             Uuid::uuid4()->toString(),
             $principal['label'] ?? 'api-v2-client',
-            0,
+            $counts['received'] ?? 0,
             'api-v2' . str_replace('/', '-', substr($path, strlen('/api/v2'))),
             $this->testTypeFor($path),
             $path,
@@ -118,6 +119,7 @@ final class RequestTrackingMiddleware implements MiddlewareInterface
                 'outcome' => $status >= 400 || ($envelope['status'] ?? null) === 'error' ? 'failed' : 'success',
                 'error_message' => $status >= 400 ? ($envelope['message'] ?? null) : null,
                 'error_id' => $envelope['error_id'] ?? null,
+                'failed_records' => $counts === null ? null : max(0, $counts['received'] - $counts['processed']),
                 'duration_ms' => $durationMs,
             ]
         );

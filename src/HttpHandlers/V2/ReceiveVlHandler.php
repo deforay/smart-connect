@@ -21,4 +21,9 @@ final class ReceiveVlHandler extends AbstractIngestHandler
     {
         return $this->bridge->get('SampleService')->saveFileFromVlsmAPIV2($credential);
     }
+
+    protected function recordCounts(): ?array
+    {
+        return $this->bridge->get('SampleService')->lastRecordCounts();
+    }
 }

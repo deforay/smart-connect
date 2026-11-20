@@ -28,6 +28,9 @@ class SampleService
     public FacilityTable|CachedMethodProxy $facilityTable;
     public Adapter $dbAdapter;
 
+    /** @var array{received: int, processed: int}|null */
+    private ?array $lastRecordCounts = null;
+
     public function __construct($sm, $sampleTable, $commonService, $apiTrackerTable, $facilityTable, $dbAdapter)
     {
         $this->sm = $sm;
@@ -1266,9 +1269,21 @@ class SampleService
     }
 
 
+    /**
+     * Received and imported counts from the last saveFileFromVlsmAPIV2() call,
+     * or null if it failed before counting. The v2 tracker records these.
+     *
+     * @return array{received: int, processed: int}|null
+     */
+    public function lastRecordCounts(): ?array
+    {
+        return $this->lastRecordCounts;
+    }
+
     public function saveFileFromVlsmAPIV2(?array $credential = null)
     {
         //ini_set("memory_limit", -1);
+        $this->lastRecordCounts = null;
         try {
             $apiData = [];
             //$this->commonService->errorLog($_POST);
@@ -1321,6 +1336,8 @@ class SampleService
                     error_log($e->getFile() . ":" . $e->getLine() . " -" . $e->getMessage());
                 }
             }
+
+            $this->lastRecordCounts = ['received' => $counter, 'processed' => $numRows];
 
             if ($counter === $numRows) {
                 $status = "success";
