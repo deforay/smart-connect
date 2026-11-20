@@ -21,6 +21,9 @@ final class CallContext
     /** @var array<string, mixed> */
     private array $principal = [];
 
+    /** @var array{received: int, processed: int}|null */
+    private ?array $recordCounts = null;
+
     /** @param array<string, mixed> $principal */
     public function setPrincipal(array $principal): void
     {
@@ -31,5 +34,22 @@ final class CallContext
     public function principal(): array
     {
         return $this->principal;
+    }
+
+    /**
+     * Left by an ingest handler: how many records the upload held and how many
+     * were imported. Null for calls that carry no records.
+     *
+     * @param array{received: int, processed: int}|null $counts
+     */
+    public function setRecordCounts(?array $counts): void
+    {
+        $this->recordCounts = $counts;
+    }
+
+    /** @return array{received: int, processed: int}|null */
+    public function recordCounts(): ?array
+    {
+        return $this->recordCounts;
     }
 }

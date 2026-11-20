@@ -17,6 +17,9 @@ class EidSampleService
     /** @var \Eid\Model\EidSampleTable $eidSampleTable */
     public $eidSampleTable;
 
+    /** @var array{received: int, processed: int}|null */
+    private ?array $lastRecordCounts = null;
+
     public function __construct($sm, $eidSampleTable)
     {
         $this->sm = $sm;
@@ -91,9 +94,21 @@ class EidSampleService
 
     // END OF LABS DASHBOARD
 
+    /**
+     * Received and imported counts from the last saveFileFromVlsmAPIV2() call.
+     * The v2 tracker records these.
+     *
+     * @return array{received: int, processed: int}|null
+     */
+    public function lastRecordCounts(): ?array
+    {
+        return $this->lastRecordCounts;
+    }
+
     public function saveFileFromVlsmAPIV2(?array $credential = null)
     {
         $apiData = [];
+        $this->lastRecordCounts = null;
 
         /** @var \Application\Model\DashApiReceiverStatsTable $apiTrackDb */
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
@@ -181,11 +196,17 @@ class EidSampleService
             'message'   => $numRows . ' uploaded successfully',
         );
         $apiTrackDb->insert($apiTrackData);
-        $trackApiDb->addApiTracking(CommonService::generateUUID(), 1, $numRows, 'weblims-eid', 'eid', $_SERVER['REQUEST_URI'], $apiData, $response, 'json', $labId ?? $data['lab_id'], [
-            'http_status' => 200,
-            'outcome' => $status,
-            'failed_records' => max(0, $counter - $numRows),
-        ]);
+        $this->lastRecordCounts = ['received' => $counter, 'processed' => $numRows];
+        // A v2 call (it always carries a credential) is recorded by
+        // RequestTrackingMiddleware, which reads lastRecordCounts(). Tracking it
+        // here as well gave every v2 EID sync a second history row.
+        if ($credential === null) {
+            $trackApiDb->addApiTracking(CommonService::generateUUID(), 1, $numRows, 'weblims-eid', 'eid', $_SERVER['REQUEST_URI'], $apiData, $response, 'json', $labId ?? $data['lab_id'], [
+                'http_status' => 200,
+                'outcome' => $status,
+                'failed_records' => max(0, $counter - $numRows),
+            ]);
+        }
         return $response;
     }
 

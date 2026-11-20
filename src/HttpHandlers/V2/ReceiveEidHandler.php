@@ -21,4 +21,9 @@ final class ReceiveEidHandler extends AbstractIngestHandler
     {
         return $this->bridge->get('EidSampleService')->saveFileFromVlsmAPIV2($credential);
     }
+
+    protected function recordCounts(): ?array
+    {
+        return $this->bridge->get('EidSampleService')->lastRecordCounts();
+    }
 }

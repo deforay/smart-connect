@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpHandlers\V2;
 
+use App\Api\CallContext;
 use App\Http\ApiResponse;
 use App\Middlewares\BearerAuthMiddleware;
 use App\Http\LegacyResult;
@@ -30,7 +31,8 @@ abstract class AbstractIngestHandler
 {
     public function __construct(
         protected readonly ResponseFactoryInterface $responseFactory,
-        protected readonly LaminasBridge $bridge
+        protected readonly LaminasBridge $bridge,
+        private readonly CallContext $context
     ) {
     }
 
@@ -48,6 +50,17 @@ abstract class AbstractIngestHandler
      * uploaded JSON claims. Null where the route carries no credential.
      */
     abstract protected function ingest(?array $credential): mixed;
+
+    /**
+     * Received and imported record counts from the ingest() that just ran, for
+     * API Sync History. Null where the endpoint carries no patient records.
+     *
+     * @return array{received: int, processed: int}|null
+     */
+    protected function recordCounts(): ?array
+    {
+        return null;
+    }
 
     public function __invoke(ServerRequestInterface $request): ResponseInterface
     {
@@ -78,10 +91,9 @@ abstract class AbstractIngestHandler
         // which laboratory it belongs to.
         $principal = $request->getAttribute(BearerAuthMiddleware::ATTRIBUTE);
 
-        return LegacyResult::toResponse(
-            $response,
-            $this->ingest(is_array($principal) ? $principal : null),
-            'Records received'
-        );
+        $result = $this->ingest(is_array($principal) ? $principal : null);
+        $this->context->setRecordCounts($this->recordCounts());
+
+        return LegacyResult::toResponse($response, $result, 'Records received');
     }
 }
