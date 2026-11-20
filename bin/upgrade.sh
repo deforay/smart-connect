@@ -536,14 +536,14 @@ move_private_files() {
         rmdir "$app_path/public/uploads/track-api" 2>/dev/null || true
     fi
 
-    # Incoming sync files are processed during the request, so the old copies
-    # are not needed.
-    for kind in vlsm-vl vlsm-eid vlsm-reference; do
-        if [ -d "$app_path/public/temporary/$kind" ]; then
-            rm -rf "$app_path/public/temporary/$kind"
-            say info "Removed public/temporary/${kind}."
-        fi
-    done
+    # public/temporary held old Excel exports and result PDFs, which anyone
+    # with a file name could fetch, and copies of incoming sync files that were
+    # processed during the request. Exports now go to var/exports and are served
+    # through /download, so nothing in the folder is needed.
+    if [ -e "$app_path/public/temporary" ] || [ -L "$app_path/public/temporary" ]; then
+        rm -rf "$app_path/public/temporary"
+        say info "Removed public/temporary."
+    fi
 }
 
 upgrade_instance() {
@@ -615,7 +615,7 @@ upgrade_instance() {
         rsync_excludes+=(--exclude="$pattern")
     done
     for exclude in '.git' '.env' 'vendor/' 'data/cache/' 'data/logs/' \
-        'public/uploads/' 'public/temporary/' 'temporary/' 'backup/' 'var/'; do
+        'public/uploads/' 'temporary/' 'backup/' 'var/'; do
         rsync_excludes+=(--exclude="$exclude")
     done
 
@@ -737,16 +737,16 @@ upgrade_instance() {
     # contents, and the rsync deploy excludes them, so they can be missing.
     local dir
     for dir in data/cache data/cache/app data/logs backup backup/db temporary \
-        public/temporary public/uploads \
+        public/uploads \
         var var/api-payloads/requests var/api-payloads/responses \
-        var/not-import-vl var/vlsm-vl var/vlsm-eid var/vlsm-reference; do
+        var/not-import-vl var/vlsm-vl var/vlsm-eid var/vlsm-reference var/exports; do
         mkdir -p "$app_path/$dir"
     done
     move_private_files "$app_path"
 
     chown -R "$web_user":"$web_user" "$app_path"
     chmod -R u+rwX,g+rwX "$app_path/data" "$app_path/backup" "$app_path/temporary" \
-        "$app_path/public/temporary" "$app_path/public/uploads" "$app_path/var"
+        "$app_path/public/uploads" "$app_path/var"
     # Query cache contents are private to the shared web/cron owner.
     chmod 700 "$app_path/data/cache/app"
     chmod +x "$app_path/cron.sh" "$app_path/bin/migrate" "$app_path/bin/console" \

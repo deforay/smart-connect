@@ -303,7 +303,7 @@ if (sizeof($sampleResult) > 0) {
           $html .= '</table>';
           $pdf->writeHTML($html);
           $pdf->lastPage();
-          $filename = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . 'p' . $page . '.pdf';
+          $filename = EXPORT_PATH . DIRECTORY_SEPARATOR . 'p' . $page . '.pdf';
           $pdf->Output($filename, "F");
           $pages[] = $filename;
           $page++;
@@ -316,6 +316,6 @@ if (!empty($pages)) {
      $resultPdf->setPrintFooter(false);
      $resultPdf->concat();
      $resultFilename = 'Viral-Load-Result-' . $result['sample_code'] . '.pdf';
-     $resultPdf->Output(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $resultFilename, "F");
+     $resultPdf->Output(EXPORT_PATH . DIRECTORY_SEPARATOR . $resultFilename, "F");
 }
 echo $resultFilename;

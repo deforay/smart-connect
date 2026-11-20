@@ -1,7 +1,7 @@
 RewriteEngine On
-# The app writes files into uploads/ and temporary/. Never run a script from
-# either folder, whatever put it there.
-RewriteRule ^(uploads|temporary)/.*\.(php[0-9]*|phtml|phar|pht)$ - [F,NC,L]
+# The app writes files into uploads/. Never run a script from it, whatever
+# put it there.
+RewriteRule ^uploads/.*\.(php[0-9]*|phtml|phar|pht)$ - [F,NC,L]
 # The following rule tells Apache that if the requested filename
 # exists, simply serve it.
 RewriteCond %{REQUEST_FILENAME} -s [OR]
