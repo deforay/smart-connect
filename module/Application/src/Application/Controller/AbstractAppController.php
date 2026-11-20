@@ -50,7 +50,7 @@ abstract class AbstractAppController extends AbstractActionController
      * @return void
      * @param array<string, mixed> $config
      * */
-    public function __construct(array $config = null)
+    public function __construct(?array $config = null)
     {
         $this->config   = $config;
         $this->view     = new ViewModel();
