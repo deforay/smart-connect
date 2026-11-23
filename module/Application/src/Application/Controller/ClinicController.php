@@ -23,7 +23,9 @@ class ClinicController extends AbstractActionController
     public function indexAction()
     {
         $this->layout()->setVariable('activeTab', 'clinics-dashboard');
-        return $this->redirect()->toRoute('clinics');
+        // The 'clinics' route defaults to this action, so redirecting to it
+        // without one looped until the browser gave up.
+        return $this->redirect()->toRoute('clinics', ['action' => 'dashboard']);
     }
 
     public function dashboardAction()

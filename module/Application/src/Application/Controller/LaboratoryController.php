@@ -702,7 +702,7 @@ class LaboratoryController extends AbstractAppController
         if (trim($fromDate) != '' && trim($toDate) != '') {
             return $this->view->setVariables(array('fromMonth' => date('M-Y', strtotime($fromDate)), 'toMonth' => date('M-Y', strtotime($toDate)), 'labFilter' => $labFilter, 'labName' => $labName));
         } else {
-            return $this->redirect()->toRoute("laboratory");
+            return $this->redirect()->toRoute("laboratory", ["action" => "dashboard"]);
         }
     }
 

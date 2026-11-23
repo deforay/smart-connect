@@ -118,7 +118,7 @@ class SampleTable extends AbstractTableGateway
         $receivedResult = [];
         $tResult = [];
         $rejectedResult = [];
-        if (trim($params['daterange']) != '') {
+        if (trim((string) ($params['daterange'] ?? '')) != '') {
             $splitDate = CommonService::convertDateRange($params['daterange']);
         } else {
             $timestamp = time();
@@ -138,7 +138,7 @@ class SampleTable extends AbstractTableGateway
         if ($loginContainer->role != 1) {
             $receivedQuery = $receivedQuery->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
-        if (trim($params['daterange']) != '') {
+        if (trim((string) ($params['daterange'] ?? '')) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
                 $receivedQuery = $receivedQuery->where(array("vl.sample_collection_date <= '$splitDate[1] 23:59:59'", "vl.sample_collection_date >= '$splitDate[0] 00:00:00'"));
             }
@@ -166,7 +166,7 @@ class SampleTable extends AbstractTableGateway
         if ($loginContainer->role != 1) {
             $testedQuery = $testedQuery->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
-        if (trim($params['daterange']) != '') {
+        if (trim((string) ($params['daterange'] ?? '')) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
                 $testedQuery = $testedQuery->where(array("vl.sample_tested_datetime <= '$splitDate[1] 23:59:59'", "vl.sample_tested_datetime >= '$splitDate[0] 00:00:00'"));
             }
@@ -194,7 +194,7 @@ class SampleTable extends AbstractTableGateway
         if ($loginContainer->role != 1) {
             $rejectedQuery = $rejectedQuery->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
-        if (trim($params['daterange']) != '') {
+        if (trim((string) ($params['daterange'] ?? '')) != '') {
             if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
                 $rejectedQuery = $rejectedQuery->where(array("vl.sample_collection_date <= '$splitDate[1] 23:59:59'", "vl.sample_collection_date >= '$splitDate[0] 00:00:00'"));
             }
@@ -1084,10 +1084,10 @@ class SampleTable extends AbstractTableGateway
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $inCompleteQuery = $inCompleteQuery->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
         }
-        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+        if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
             $inCompleteQuery = $inCompleteQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
-        if (isset($params['districts']) && trim($params['districts']) != '') {
+        if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
             $inCompleteQuery = $inCompleteQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['lab']) && trim($params['lab']) != '') {
@@ -1172,10 +1172,10 @@ class SampleTable extends AbstractTableGateway
             if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
                 $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
             }
-            if (isset($params['provinces']) && trim($params['provinces']) != '') {
+            if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
                 $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             }
-            if (isset($params['districts']) && trim($params['districts']) != '') {
+            if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
                 $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             }
             if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -1232,10 +1232,10 @@ class SampleTable extends AbstractTableGateway
                     )
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array());
-            if (isset($params['provinces']) && trim($params['provinces']) != '') {
+            if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
                 $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             }
-            if (isset($params['districts']) && trim($params['districts']) != '') {
+            if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
                 $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             }
             if (isset($params['lab']) && trim($params['lab']) != '') {
@@ -2563,10 +2563,10 @@ class SampleTable extends AbstractTableGateway
                 if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
                     $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
                 }
-                if (isset($params['provinces']) && trim($params['provinces']) != '') {
+                if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
                     $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
                 }
-                if (isset($params['districts']) && trim($params['districts']) != '') {
+                if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
                     $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
                 }
                 if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
@@ -2704,10 +2704,10 @@ class SampleTable extends AbstractTableGateway
                 if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
                     $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
                 }
-                if (isset($params['provinces']) && trim($params['provinces']) != '') {
+                if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
                     $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
                 }
-                if (isset($params['districts']) && trim($params['districts']) != '') {
+                if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
                     $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
                 }
                 if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
@@ -2834,10 +2834,10 @@ class SampleTable extends AbstractTableGateway
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
-            if (isset($params['provinces']) && trim($params['provinces']) != '') {
+            if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
                 $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             }
-            if (isset($params['districts']) && trim($params['districts']) != '') {
+            if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
                 $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             }
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
@@ -2958,10 +2958,10 @@ class SampleTable extends AbstractTableGateway
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
-            if (isset($params['provinces']) && trim($params['provinces']) != '') {
+            if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
                 $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             }
-            if (isset($params['districts']) && trim($params['districts']) != '') {
+            if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
                 $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             }
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
@@ -3056,10 +3056,10 @@ class SampleTable extends AbstractTableGateway
             //             $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             //         }
             //     }
-            //     if(isset($params['provinces']) && trim($params['provinces'])!= ''){
+            //     if(isset($params['provinces']) && trim((string) ($params['provinces'] ?? ''))!= ''){
             //         $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
             //     }
-            //     if(isset($params['districts']) && trim($params['districts'])!= ''){
+            //     if(isset($params['districts']) && trim((string) ($params['districts'] ?? ''))!= ''){
             //         $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
             //     }
             //     if(isset($params['clinicId']) && trim($params['clinicId'])!= ''){
@@ -3831,7 +3831,7 @@ class SampleTable extends AbstractTableGateway
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
-        if (isset($params['daterange']) && trim($params['daterange']) != '') {
+        if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '') {
             $splitDate = CommonService::convertDateRange($params['daterange']);
         }
 
@@ -3853,16 +3853,16 @@ class SampleTable extends AbstractTableGateway
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $countQuery = $countQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
-        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+        if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
             $countQuery = $countQuery->where(['p.geo_id' => CommonService::parseIdList($params['provinces'])]);
         }
-        if (isset($params['districts']) && trim($params['districts']) != '') {
+        if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
             $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
             $countQuery = $countQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
         }
-        if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
+        if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "vl.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
         } elseif (isset($params['frmSource']) && trim($params['frmSource']) == '<') {
             $countQuery = $countQuery->where("(vl.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
@@ -3943,7 +3943,7 @@ class SampleTable extends AbstractTableGateway
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
-        if (isset($params['daterange']) && trim($params['daterange']) != '') {
+        if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '') {
             $splitDate = CommonService::convertDateRange($params['daterange']);
         }
 
@@ -3966,16 +3966,16 @@ class SampleTable extends AbstractTableGateway
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $countQuery = $countQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
-        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+        if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
             $countQuery = $countQuery->where(['p.geo_id' => CommonService::parseIdList($params['provinces'])]);
         }
-        if (isset($params['districts']) && trim($params['districts']) != '') {
+        if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
             $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
             $countQuery = $countQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
         }
-        if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
+        if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "vl.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
         } elseif (isset($params['frmSource']) && trim($params['frmSource']) == '<') {
             $countQuery = $countQuery->where("(vl.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
@@ -4057,7 +4057,7 @@ class SampleTable extends AbstractTableGateway
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
-        if (isset($params['daterange']) && trim($params['daterange']) != '') {
+        if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '') {
             $splitDate = CommonService::convertDateRange($params['daterange']);
         }
 
@@ -4079,16 +4079,16 @@ class SampleTable extends AbstractTableGateway
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
-        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+        if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
             $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
-        if (isset($params['districts']) && trim($params['districts']) != '') {
+        if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
             $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
             $countQuery = $countQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
         }
-        if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
+        if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "vl.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
         } elseif (isset($params['frmSource']) && trim($params['frmSource']) == '<') {
             $countQuery = $countQuery->where("(vl.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
@@ -4171,7 +4171,7 @@ class SampleTable extends AbstractTableGateway
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
-        if (isset($params['daterange']) && trim($params['daterange']) != '') {
+        if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '') {
             $splitDate = CommonService::convertDateRange($params['daterange']);
         }
 
@@ -4193,16 +4193,16 @@ class SampleTable extends AbstractTableGateway
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
-        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+        if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
             $countQuery = $countQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
-        if (isset($params['districts']) && trim($params['districts']) != '') {
+        if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
             $countQuery = $countQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
             $countQuery = $countQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinicId'])]);
         }
-        if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
+        if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "vl.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
         } elseif (isset($params['frmSource']) && trim($params['frmSource']) == '<') {
             $countQuery = $countQuery->where("(vl.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
@@ -4849,16 +4849,16 @@ class SampleTable extends AbstractTableGateway
             //->where("sample_collection_date >= DATE_ADD(Now(),interval - 12 month)")
             ->group(array(new Expression('YEAR(vl.sample_collection_date)'), new Expression('MONTH(vl.sample_collection_date)')));
 
-        if (trim($params['provinces']) != '' || trim($params['districts']) != '' || trim($params['clinics']) != '') {
+        if (trim((string) ($params['provinces'] ?? '')) != '' || trim((string) ($params['districts'] ?? '')) != '' || trim((string) ($params['clinics'] ?? '')) != '') {
             $sQuery = $sQuery->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'));
         }
-        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+        if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
             $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
-        if (isset($params['districts']) && trim($params['districts']) != '') {
+        if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
             $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
-        if (isset($params['clinics']) && trim($params['clinics']) != '') {
+        if (isset($params['clinics']) && trim((string) ($params['clinics'] ?? '')) != '') {
             $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
@@ -5435,18 +5435,18 @@ class SampleTable extends AbstractTableGateway
             //->where("sample_collection_date >= DATE_ADD(Now(),interval - 12 month)")
             ->group(array(new Expression('YEAR(sample_collection_date)'), new Expression('MONTH(sample_collection_date)')));
 
-        if (trim($params['provinces']) != '' || trim($params['districts']) != '' || trim($params['clinics']) != '') {
+        if (trim((string) ($params['provinces'] ?? '')) != '' || trim((string) ($params['districts'] ?? '')) != '' || trim((string) ($params['clinics'] ?? '')) != '') {
             $sQuery = $sQuery->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'));
         }
 
-        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+        if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
             $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
-        if (isset($params['districts']) && trim($params['districts']) != '') {
+        if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
             $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
 
-        if (isset($params['clinics']) && trim($params['clinics']) != '') {
+        if (isset($params['clinics']) && trim((string) ($params['clinics'] ?? '')) != '') {
             $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
@@ -5992,16 +5992,16 @@ class SampleTable extends AbstractTableGateway
             ->order('rejections DESC')
             ->limit(4);
 
-        if (trim($params['provinces']) != '' || trim($params['districts']) != '' || trim($params['clinics']) != '') {
+        if (trim((string) ($params['provinces'] ?? '')) != '' || trim((string) ($params['districts'] ?? '')) != '' || trim((string) ($params['clinics'] ?? '')) != '') {
             $mostRejectionQuery = $mostRejectionQuery->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'));
         }
-        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+        if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
             $mostRejectionQuery = $mostRejectionQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
-        if (isset($params['districts']) && trim($params['districts']) != '') {
+        if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
             $mostRejectionQuery = $mostRejectionQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
-        if (isset($params['clinics']) && trim($params['clinics']) != '') {
+        if (isset($params['clinics']) && trim((string) ($params['clinics'] ?? '')) != '') {
             $mostRejectionQuery = $mostRejectionQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
@@ -6037,16 +6037,16 @@ class SampleTable extends AbstractTableGateway
                     ->where("MONTH(sample_collection_date)='" . $month . "' AND Year(sample_collection_date)='" . $year . "'");
 
 
-                if (trim($params['provinces']) != '' || trim($params['districts']) != '' || trim($params['clinics']) != '') {
+                if (trim((string) ($params['provinces'] ?? '')) != '' || trim((string) ($params['districts'] ?? '')) != '' || trim((string) ($params['clinics'] ?? '')) != '') {
                     $rejectionQuery = $rejectionQuery->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'));
                 }
-                if (isset($params['provinces']) && trim($params['provinces']) != '') {
+                if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
                     $rejectionQuery = $rejectionQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
                 }
-                if (isset($params['districts']) && trim($params['districts']) != '') {
+                if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
                     $rejectionQuery = $rejectionQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
                 }
-                if (isset($params['clinics']) && trim($params['clinics']) != '') {
+                if (isset($params['clinics']) && trim((string) ($params['clinics'] ?? '')) != '') {
                     $rejectionQuery = $rejectionQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinics'])]);
                 }
                 if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
@@ -6590,10 +6590,10 @@ class SampleTable extends AbstractTableGateway
             ->group('vl.current_regimen')
             ->order('total_samples_valid DESC')
             ->limit(20);
-        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+        if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
             $sQuery = $sQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
-        if (isset($params['districts']) && trim($params['districts']) != '') {
+        if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
             $sQuery = $sQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
 
@@ -6605,7 +6605,7 @@ class SampleTable extends AbstractTableGateway
                                             AND sample_collection_date <= '" . $endMonth . " 23:59:59'");
         }
 
-        if (isset($params['clinics']) && trim($params['clinics']) != '') {
+        if (isset($params['clinics']) && trim((string) ($params['clinics'] ?? '')) != '') {
             $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         $queryStr = $sql->buildSqlString($sQuery);
@@ -6906,13 +6906,13 @@ class SampleTable extends AbstractTableGateway
             //->where("sample_collection_date >= DATE_ADD(Now(),interval - 12 month)")
             ->group(array(new Expression('YEAR(sample_collection_date)'), new Expression('MONTH(sample_collection_date)')));
 
-        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+        if (isset($params['provinces']) && trim((string) ($params['provinces'] ?? '')) != '') {
             $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         }
-        if (isset($params['districts']) && trim($params['districts']) != '') {
+        if (isset($params['districts']) && trim((string) ($params['districts'] ?? '')) != '') {
             $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where(['f.facility_district_id' => CommonService::parseIdList($params['districts'])]);
         }
-        if (isset($params['clinics']) && trim($params['clinics']) != '') {
+        if (isset($params['clinics']) && trim((string) ($params['clinics'] ?? '')) != '') {
             $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where(['vl.facility_id' => CommonService::parseIdList($params['clinics'])]);
         }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {

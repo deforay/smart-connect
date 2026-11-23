@@ -57,13 +57,13 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                     }
                     if (strpos($statName, '(<') != false) {
                         $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">' . ($statName) . '</a>';
-                        $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">' . number_format($statValue) . '</a>';
+                        $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">' . number_format((float) $statValue) . '</a>';
                     } else if (strpos($statName, '(>') != false) {
                         $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'>\');">' . ($statName) . '</a>';
-                        $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'>\');">' . number_format($statValue) . '</a>';
+                        $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'>\');">' . number_format((float) $statValue) . '</a>';
                     } else {
                         $statName = ($statName);
-                        $statValue = number_format($statValue);
+                        $statValue = number_format((float) $statValue);
                     }
                     ?>
                     <tr>

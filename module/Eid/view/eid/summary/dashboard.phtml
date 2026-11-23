@@ -41,7 +41,7 @@ if (isset($summaryTabInfo[0]["positive_samples"]) && $summaryTabInfo[0]["positiv
 $positiveSamplepercentage = ($positiveSampleTotal > 0 && $totalSampleTested > 0) ? round((($positiveSampleTotal / $totalSampleTested) * 100), 2) : 0;
 
 $rejectionPercentage = ($summaryTabInfo[0]["total_samples_received"] > 0 && $rejectedSamples > 0) ? round((($rejectedSamples / $summaryTabInfo[0]["total_samples_received"]) * 100), 2) : 0;
-$tat = ceil($summaryTabInfo[0]["tat"]);
+$tat = ceil((float) ($summaryTabInfo[0]["tat"] ?? 0));
 
 ?>
 <link rel="stylesheet" href="<?php echo $this->basePath('assets/plugins/datepicker/datepicker3.css') ?>">

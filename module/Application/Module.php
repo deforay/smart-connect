@@ -261,9 +261,6 @@ class Module
 		}
 
 		$session = new Container('credo');
-		$shortControllerName = explode('Controller', $routeMatch->getParam('controller'));
-		$shortControllerName = substr($shortControllerName[1], 1);
-
 
 		/**
 		 * @var \Laminas\Mvc\Application $application
@@ -373,38 +370,6 @@ class Module
 					$event->stopPropagation();
 					return $response;
 				};
-				$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
-				return $response;
-			}
-
-			if ($shortControllerName == 'Clinic' && $session->role == '2') {
-				/** @var \Laminas\Http\PhpEnvironment\Response $response */
-				$response = $e->getResponse();
-				$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
-				$response->setStatusCode(302);
-				$response->sendHeaders();
-				// To avoid additional processing
-				// we can attach a listener for Event Route with a high priority
-				$stopCallBack = function ($event) use ($response) {
-					$event->stopPropagation();
-					return $response;
-				};
-				//Attach the "break" as a listener with a high priority
-				$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
-				return $response;
-			} elseif ($shortControllerName == 'Laboratory' && $session->role == '3') {
-				/** @var \Laminas\Http\PhpEnvironment\Response $response */
-				$response = $e->getResponse();
-				$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
-				$response->setStatusCode(302);
-				$response->sendHeaders();
-				// To avoid additional processing
-				// we can attach a listener for Event Route with a high priority
-				$stopCallBack = function ($event) use ($response) {
-					$event->stopPropagation();
-					return $response;
-				};
-				//Attach the "break" as a listener with a high priority
 				$application->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
 				return $response;
 			}
@@ -841,12 +806,18 @@ class Module
 	{
 		return [
 			'factories' => [
+				Controller\IndexController::class => new class {
+			public function __invoke($diContainer)
+			{
+				return new Controller\IndexController($diContainer->get('AppAcl'));
+			}
+				},
 				Controller\LoginController::class => new class {
 			public function __invoke($diContainer)
 			{
 				$configService = $diContainer->get('ConfigService');
 				$userService = $diContainer->get('UserService');
-				return new Controller\LoginController($userService, $configService);
+				return new Controller\LoginController($userService, $configService, $diContainer->get('AppAcl'));
 			}
 				},
 				'Application\Controller\UsersController' => new class {
