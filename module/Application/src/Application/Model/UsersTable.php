@@ -53,7 +53,22 @@ class UsersTable extends BaseTableGateway
         // below, which stamped a failed attempt with PHP's default zone and a
         // successful one with the configured zone, leaving the two kinds of row
         // in one table an hour apart on any deployment where they differ.
-        if (!empty($rResult) && $this->passwordVerify($rResult["user_id"], $params['password'], $rResult['password'])) {
+        $passwordOk = !empty($rResult) && $this->passwordVerify($rResult["user_id"], $params['password'], $rResult['password']);
+
+        // A role the ACL lets open none of the landing pages would sign in to
+        // a 403 and stay there, because /login sends a signed-in user on to
+        // the same page. Refuse the sign-in and say why instead.
+        $landing = $passwordOk
+            ? \Application\Service\LandingPage::for($this->sm->get('AppAcl'), $rResult['role_code'], $rResult['role'])
+            : null;
+
+        if ($passwordOk && $landing === null) {
+            $userHistoryTable->userHistoryLog($rResult["user_name"], 'failed');
+            $container->alertMsg = 'Your role has no pages assigned to it. Please ask an administrator to grant access.';
+            return ['route' => 'login', 'params' => []];
+        }
+
+        if ($passwordOk) {
             $facilities_id = [];
             $facilities_name = [];
             $facilities_code = [];
@@ -117,13 +132,7 @@ class UsersTable extends BaseTableGateway
             }
 
 
-            if ($loginContainer->role == 3) {
-                return 'clinics';
-            } elseif ($loginContainer->role == 2) {
-                return 'laboratory';
-            } else {
-                return 'summary';
-            }
+            return $landing;
         } else {
             // Record the attempt that failed. user_login_history only ever held
             // successful logins, because this was the one branch that never
@@ -146,7 +155,7 @@ class UsersTable extends BaseTableGateway
 
             $container = new Container('alert');
             $container->alertMsg = 'Please check your login credentials';
-            return 'login';
+            return ['route' => 'login', 'params' => []];
         }
     }
 

@@ -48,13 +48,13 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                     }
                     if (strpos($statName, '(<') != false) {
                         $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">' . ($statName) . '</a>';
-                        $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">' . number_format($statValue) . '</a>';
+                        $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">' . number_format((float) $statValue) . '</a>';
                     } else if (strpos($statName, '(>') != false) {
                         $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'>\');">' . ($statName) . '</a>';
-                        $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'>\');">' . number_format($statValue) . '</a>';
+                        $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'>\');">' . number_format((float) $statValue) . '</a>';
                     } else {
                         $statName = ($statName);
-                        $statValue = number_format($statValue);
+                        $statValue = number_format((float) $statValue);
                     }
                 ?>
                     <tr>
@@ -77,7 +77,7 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                 <small class="font-blue-sharp"><?php echo $this->translate('SAMPLES TESTED'); ?></small><br>
                 <!--<small class="font-blue-sharp"><?php echo $testedDate; ?></small>-->
                 <?php
-                if (trim($params['daterange']) == '') {
+                if (trim((string) ($params['daterange'] ?? '')) == '') {
                 ?>
                     <small class="font-blue-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
                 <?php } ?>
@@ -99,7 +99,7 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                 <small class="font-red-haze"><?php echo $this->translate('SAMPLES REJECTED'); ?></small><br>
                 <!--<small class="font-red-haze"><?php echo $rejectedDate; ?></small>-->
                 <?php
-                if (trim($params['daterange']) == '') {
+                if (trim((string) ($params['daterange'] ?? '')) == '') {
                 ?>
                     <small class="font-red-haze"><?php echo $this->translate('Last 28 days'); ?></small>
                 <?php } ?>

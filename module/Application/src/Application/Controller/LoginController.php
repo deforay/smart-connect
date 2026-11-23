@@ -4,7 +4,9 @@ namespace Application\Controller;
 
 use Application\Session\Container;
 use Laminas\View\Model\ViewModel;
+use Application\Model\Acl;
 use Application\Service\CommonService;
+use Application\Service\LandingPage;
 use Laminas\Mvc\Controller\AbstractActionController;
 
 class LoginController extends AbstractActionController
@@ -12,11 +14,13 @@ class LoginController extends AbstractActionController
 
     private \Application\Service\UserService $userService;
     private \Application\Service\ConfigService $configService;
+    private Acl $acl;
 
-    public function __construct($userService, $configService)
+    public function __construct($userService, $configService, Acl $acl)
     {
         $this->userService = $userService;
         $this->configService = $configService;
+        $this->acl = $acl;
     }
 
 
@@ -36,13 +40,25 @@ class LoginController extends AbstractActionController
                 CommonService::generateCSRF(true);
                 $container = new Container('alert');
                 $container->alertMsg = 'Could not process your login request. Please try again.';
-                return '/login';
+                // A string is not a response. Returning '/login' rendered the
+                // form again only by accident of the view listeners.
+                return $this->redirect()->toRoute('login');
             }
-            $url = $this->userService->login($params);
-            return $this->redirect()->toRoute($url);
+            $target = $this->userService->login($params);
+            return $this->redirect()->toRoute($target['route'], $target['params']);
         }
-        if (property_exists($loginContainer, 'userId') && $loginContainer->userId !== null && $loginContainer->userId != "") {
-            return $this->redirect()->toRoute("summary");
+        if (!empty($loginContainer->userId)) {
+            $target = LandingPage::for($this->acl, $loginContainer->roleCode, $loginContainer->role);
+            if ($target !== null) {
+                return $this->redirect()->toRoute($target['route'], $target['params']);
+            }
+            // The role lost every landing page since this session began.
+            // Sending it on would answer 403 and send it back here, so end the
+            // session and show the form instead.
+            $loginContainer->getManager()->getStorage()->clear();
+            $alert = new Container('alert');
+            $alert->alertMsg = 'Your role has no pages assigned to it. Please ask an administrator to grant access.';
+            return $this->redirect()->toRoute('login');
         } else {
             $config = $this->configService->getAllGlobalConfig();
             $vm = new ViewModel();

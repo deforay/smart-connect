@@ -108,6 +108,17 @@ $csrfToken = CommonService::generateCSRF();
                 <button class="close" data-close="alert"></button>
                 <span> <?php echo $this->translate('Enter any username and password'); ?>. </span>
             </div>
+            <?php
+            // This page renders without the layout, which is where alertMsg is
+            // shown everywhere else, so a refused login used to say nothing.
+            $alertContainer = new Container('alert');
+            if (!empty($alertContainer->alertMsg)) { ?>
+                <div class="alert alert-danger">
+                    <span><?php echo $this->escapeHtml($this->translate($alertContainer->alertMsg)); ?></span>
+                </div>
+            <?php
+                unset($alertContainer->alertMsg);
+            } ?>
             <div class="form-group">
                 <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
                 <label class="control-label visible-ie8 visible-ie9"><?php echo $this->translate('Email'); ?></label>

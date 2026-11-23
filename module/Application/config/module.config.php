@@ -267,11 +267,6 @@ return [
             ],
         ],
     ],
-    'controllers' => [
-        'invokables' => [
-            'Application\Controller\IndexController' => Controller\IndexController::class
-        ]
-    ],
     'view_manager' => [
         // Off unless the deployment asks for them. Both of these render the
         // exception message and stack trace into the page, and
