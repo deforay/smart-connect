@@ -60,7 +60,7 @@ Four files under `config/autoload` belong to the deployment. The deploy never ov
 
 Everything else under `config/autoload` is upstream code and does get updated.
 
-These directories are left alone as well: `vendor/`, `data/cache/`, `data/logs/`, `public/uploads/`, `public/temporary/`, `temporary/`, and `backup/`.
+These directories are left alone as well: `vendor/`, `data/cache/`, `data/logs/`, `public/uploads/`, `temporary/`, `backup/`, and `var/`.
 
 The deploy runs without `--delete`, so files the release does not ship stay where they are.
 

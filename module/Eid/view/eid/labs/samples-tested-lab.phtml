@@ -591,7 +591,7 @@ if (isset($facilityInfo['labDistricts']) && !empty($facilityInfo['labDistricts']
                 if (data == "" || data == null || data == undefined) {
                     alert('<?php echo $this->translate('Unable to export excel'); ?>');
                 } else {
-                    window.open('../temporary/' + data, '_blank');
+                    window.open('/download/' + data, '_blank');
                 }
             });
     }

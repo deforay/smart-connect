@@ -2024,7 +2024,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                 if (data == "" || data == null || data == undefined) {
                     alert('<?php echo $this->translate('Unable to export excel') ?>');
                 } else {
-                    window.open('/temporary/' + data, '_blank');
+                    window.open('/download/' + data, '_blank');
                 }
             });
     }
@@ -2041,7 +2041,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                 if (data == "" || data == null || data == undefined) {
                     alert('<?php echo $this->translate('Unable to export excel') ?>');
                 } else {
-                    window.open('/temporary/' + data, '_blank');
+                    window.open('/download/' + data, '_blank');
                 }
             });
     }

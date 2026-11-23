@@ -14,8 +14,6 @@ backup/*
 !backup/index.php
 public/uploads/*
 !public/uploads/index.php
-public/temporary/*
-!public/temporary/index.php
 vendor/
 .venv-docs/
 site/

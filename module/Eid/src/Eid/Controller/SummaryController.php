@@ -283,4 +283,19 @@ class SummaryController extends AbstractActionController
       return $viewModel;
     }
   }
+
+  public function exportPositiveRateByFacilityAction()
+  {
+    /** @var \Laminas\Http\Request $request */
+    $request = $this->getRequest();
+    if ($request->isPost()) {
+      $params = $request->getPost();
+
+      $file = $this->summaryService->exportPositiveRateByFacility($params);
+      $viewModel = new ViewModel();
+      $viewModel->setVariables(array('file' => $file))
+        ->setTerminal(true);
+      return $viewModel;
+    }
+  }
 }
