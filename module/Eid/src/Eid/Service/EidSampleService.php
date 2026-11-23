@@ -155,7 +155,7 @@ class EidSampleService
 
             $id = $sampleDb->insertOrUpdate($data);
             if (isset($id) && !empty($id) && is_numeric($id)) {
-                $apiTrackDb->updateFacilityAttributes($data['facility_id'], $currentDateTime);
+                $apiTrackDb->updateFacilityAttributes($data['facility_id'], $currentDateTime, $source);
             }
             $numRows++;
         }

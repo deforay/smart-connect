@@ -49,7 +49,7 @@ class RolesTable extends AbstractTableGateway
                 'role_code' => $params['roleCode'],
                 'status' => $params['status']
             );
-            $this->update($rolesdata, array('role_id=' . $roleId));
+            $this->update($rolesdata, ['role_id' => (int) $roleId]);
             return $roleId;
         }
     }

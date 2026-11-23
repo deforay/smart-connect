@@ -700,38 +700,24 @@ foreach ($sampleType as $samples) {
         var testResult = $("#testResult").val();
         var sampleTypeId = $("#sampleTypeId").val();
         var gender = $("#gender").val();
+        // Option values '<2' and '>=50' are shared with other filters, so map
+        // them to the band keys the age-group chart accepts.
         var ageField = $("#age").val();
-        if (ageField == '<2') {
-            var age = {
-                'from': '> 0',
-                'to': '< 2',
-                'ageName': 'Age < 2'
-            };
-        } else if (ageField == '>=50') {
-            var age = {
-                'from': '>= 50',
-                'to': '<= 250',
-                'ageName': 'Age >=50'
-            };
-        } else if (ageField == 'unknown') {
-            var age = {
-                'from': 'unknown',
-                'to': 'unknown',
-                'ageName': 'Unknown'
-            };
-        } else {
-            var age = {
-                'from': $('#age').attr('data-from'),
-                'to': $('#age').attr('data-to'),
-                'ageName': 'Age' + $("#age option:selected").text()
-            };
-        }
+        var ageBandKeys = {
+            '<2': 'lt2',
+            '2to5': '2to5',
+            '6to14': '6to14',
+            '15to49': '15to49',
+            '>=50': '50plus',
+            'unknown': 'unknown'
+        };
+        var ageBand = ageBandKeys[ageField] || '';
         $.post("<?php echo $this->url('eid-clinics', array('action' => 'get-sample-test-result-age-group')); ?>", {
                 clinicId: clinicId,
                 sampleCollectionDate: dateRange,
                 testResult: testResult,
                 sampleTypeId: sampleTypeId,
-                age: age,
+                ageBand: ageBand,
                 gender: gender,
             },
             function(data) {

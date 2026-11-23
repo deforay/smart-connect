@@ -235,7 +235,7 @@ class SnapShotService
         $loginContainer = new Container('credo');
         $mappedFacilities = $loginContainer->mappedFacilities ?? null;
 
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
         $age['vl'] = "patient_age_in_years";
         $age['eid'] = "child_age";
         $query = [];

@@ -1328,7 +1328,8 @@ class SampleService
                     if (false !== $id && !empty($id) && is_numeric($id)) {
                         $this->apiTrackerTable->updateFacilityAttributes(
                             $data['facility_id'],
-                            $currentDateTime
+                            $currentDateTime,
+                            $source
                         );
                     }
                     $numRows++;

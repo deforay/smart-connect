@@ -3,6 +3,7 @@
 namespace Eid\Controller;
 
 
+use Eid\Model\EidSampleTable;
 use Eid\Service\EidSampleService;
 use Laminas\View\Model\ViewModel;
 use Application\Service\CommonService;
@@ -244,6 +245,15 @@ class ClinicsController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
+            // The page posts one band key (ageBand). Replace any posted age
+            // array with that key and its fixed label, so neither the query
+            // nor the chart uses text from the request.
+            $band = $params['ageBand'] ?? '';
+            $known = is_string($band) && isset(EidSampleTable::CLINIC_AGE_BANDS[$band]);
+            $params['age'] = [
+                'band' => $known ? $band : '',
+                'ageName' => $known ? EidSampleTable::CLINIC_AGE_BANDS[$band]['label'] : '',
+            ];
 
             $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();

@@ -243,7 +243,7 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         return $this->adapter->query(
             "UPDATE facility_details SET facility_attributes = JSON_SET(COALESCE(facility_attributes, '{}'), '$.lastDashboardHeartBeat', ?, '$.lastUpdateSource', ?)
                 WHERE facility_id IN (?)",
-            [$currentDateTime, $facilityId, $lastUpdateSource]
+            [$currentDateTime, $lastUpdateSource, $facilityId]
         );
     }
 }
