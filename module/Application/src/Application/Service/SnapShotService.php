@@ -37,6 +37,27 @@ class SnapShotService
      * Callers guard with !empty(), so the list always holds at least one value
      * and IN () cannot be generated.
      */
+    /**
+     * The alias every Snapshot query gives its dash_form_* table, so the
+     * conditions from buildFilters() name the same table in each of them.
+     */
+    private const FORM_ALIAS = 't';
+
+    /**
+     * Only dash_form_vl and dash_form_eid exist. An unknown test type would
+     * name a missing table ("Table 'dash_form_tb' doesn't exist") and fail the
+     * whole request, so it is dropped, and a selection with nothing left falls
+     * back to both.
+     */
+    private const SUPPORTED_TEST_TYPES = ['vl', 'eid'];
+
+    private static function testTypes($params): array
+    {
+        $requested = self::paramsArray($params)['testType'] ?? [];
+        $types = array_values(array_intersect((array) $requested, self::SUPPORTED_TEST_TYPES));
+        return empty($types) ? self::SUPPORTED_TEST_TYPES : $types;
+    }
+
     private static function inList(string $column, array $values): WhereExpression
     {
         $values = array_values($values);
@@ -72,13 +93,15 @@ class SnapShotService
      * both count the same rows. The POC condition reads icm.poc_device, so a
      * caller that passes flag=poc must join instrument_machines as icm.
      *
-     * $alias is the dash_form_* table's alias. The grid joins facility_details,
-     * which also has a facility_id, so the clinic filter must be qualified.
-     * Province and district live only on facility_details, so they go through
-     * a subquery on the lab and work whether or not the caller joins it.
+     * Every caller aliases its dash_form_* table as self::FORM_ALIAS. The grid
+     * joins facility_details, which also has a facility_id, so the clinic
+     * filter must be qualified. Province and district live only on
+     * facility_details, so they go through a subquery on the lab and work
+     * whether or not the caller joins it.
      */
-    private function buildFilters(array $params, ?array $mappedFacilities, string $alias): array
+    private function buildFilters(array $params, ?array $mappedFacilities): array
     {
+        $alias = self::FORM_ALIAS;
         $whereConditions = [];
 
         // Collection Date
@@ -133,13 +156,14 @@ class SnapShotService
         $loginContainer = new Container('credo');
         $mappedFacilities = $loginContainer->mappedFacilities ?? null;
 
-        $types = (!isset($params['testType']) || empty($params['testType'])) ? ["vl", "eid"] : (array) $params['testType'];
+        $types = self::testTypes($params);
         $testTypeQuery = [];
+        $whereConditions = $this->buildFilters(self::paramsArray($params), $mappedFacilities);
+        $t = self::FORM_ALIAS;
 
         foreach ($types as $type) {
-            $whereConditions = $this->buildFilters(self::paramsArray($params), $mappedFacilities, $type);
             $select = $sql->select()
-                ->from(["$type" => "dash_form_$type"])
+                ->from([$t => "dash_form_$type"])
                 ->columns([
                     'reg' => new Expression("COUNT(*)"),
                     'totalReceived' => new Expression("SUM(CASE WHEN sample_collection_date IS NOT NULL AND DATE(sample_collection_date) NOT IN ('1970-01-01', '0000-00-00') THEN 1 ELSE 0 END)"),
@@ -162,14 +186,14 @@ class SnapShotService
                 // for a facility saved with an empty name.
                 ->join(
                     ['f' => 'facility_details'],
-                    "$type.lab_id = f.facility_id",
+                    "$t.lab_id = f.facility_id",
                     ['facility_name' => new Expression("NULLIF(TRIM(f.facility_name), '')")],
                     Select::JOIN_LEFT
                 );
 
             // Add POC join if needed
             if (!empty($params['flag']) && $params['flag'] == 'poc') {
-                $select->join(['icm' => 'instrument_machines'], "$type.import_machine_name = icm.config_machine_id");
+                $select->join(['icm' => 'instrument_machines'], "$t.import_machine_name = icm.config_machine_id");
             }
 
             // Apply where conditions
@@ -215,21 +239,14 @@ class SnapShotService
         $age['vl'] = "patient_age_in_years";
         $age['eid'] = "child_age";
         $query = [];
-        // Only dash_form_vl and dash_form_eid exist. An unknown test type would
-        // name a missing table and fail the whole panel, so it is dropped, and
-        // a selection with nothing left falls back to both.
-        $supportedTypes = ["vl", "eid"];
-        $types = array_values(array_intersect((array) ($params['testType'] ?? []), $supportedTypes));
-        if (empty($types)) {
-            $types = $supportedTypes;
-        }
-        // Every quick stats query aliases its table as vl.
-        $whereConditions = $this->buildFilters(self::paramsArray($params), $mappedFacilities, 'vl');
+        $types = self::testTypes($params);
+        $t = self::FORM_ALIAS;
+        $whereConditions = $this->buildFilters(self::paramsArray($params), $mappedFacilities);
         $isPoc = !empty($params['flag']) && $params['flag'] == 'poc';
         if (!empty($types)) {
             foreach ($types as $type) {
                 $gender = ($type == 'eid') ? 'child_gender' : 'patient_gender';
-                $quickStatsquery = $sql->select()->from(array("vl" => "dash_form_" . $type))
+                $quickStatsquery = $sql->select()->from(array($t => "dash_form_" . $type))
                     ->columns(
                         array(
                             $this->translator->translate("total") => new Expression('COUNT(*)'),
@@ -250,7 +267,7 @@ class SnapShotService
                         )
                     );
                 // recevied data
-                $receivedQuery = $sql->select()->from(array("vl" => "dash_form_" . $type))
+                $receivedQuery = $sql->select()->from(array($t => "dash_form_" . $type))
                     ->columns(array('total' => new Expression("SUM(
                         CASE WHEN(
                             sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'
@@ -259,7 +276,7 @@ class SnapShotService
                     // ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
                     ->group(array("receivedDate"));
                 //tested data
-                $testedQuery = $sql->select()->from(array("vl" => "dash_form_" . $type))
+                $testedQuery = $sql->select()->from(array($t => "dash_form_" . $type))
                     ->columns(array('total' => new Expression("SUM(
                         CASE WHEN(
                             (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')
@@ -268,7 +285,7 @@ class SnapShotService
                     // ->where("(is_sample_rejected IS NULL AND is_sample_rejected = '' AND is_sample_rejected like 'no') AND (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')")
                     ->group(array("testedDate"));
                 //get rejected data
-                $rejectedQuery = $sql->select()->from(array("vl" => "dash_form_" . $type))
+                $rejectedQuery = $sql->select()->from(array($t => "dash_form_" . $type))
                     ->columns(array('total' => new Expression("SUM(
                     CASE WHEN (
                         ((reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection != '' AND reason_for_sample_rejection != 0) OR is_sample_rejected LIKE 'yes')
@@ -282,7 +299,7 @@ class SnapShotService
                 foreach ([$quickStatsquery, $receivedQuery, $testedQuery, $rejectedQuery] as $select) {
                     if ($isPoc) {
                         // buildFilters() adds the icm.poc_device condition.
-                        $select->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array());
+                        $select->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = ' . $t . '.import_machine_name', array());
                     }
                     foreach ($whereConditions as $condition) {
                         $select->where($condition);
@@ -334,7 +351,7 @@ class SnapShotService
         $dimension = $params['dimension'] ?? 'testing_lab';
         // When dimension=health_facility we group by facility_id (the requesting site); otherwise by lab_id.
         $facilityColumn = ($dimension === 'health_facility') ? 'facility_id' : 'lab_id';
-        $types = (!isset($params['testType']) || empty($params['testType'])) ? ["vl", "eid"] : (array) $params['testType'];
+        $types = self::testTypes($params);
         $mode = $params['mode'] ?? 'backlog';
         $topN = isset($params['topN']) ? (int) $params['topN'] : 10;
 
@@ -343,11 +360,11 @@ class SnapShotService
         // query joins facility_details, which has a facility_id too, so MySQL
         // rejected it as ambiguous and the panel failed whenever a health
         // facility was selected.
-        $whereConditions = $this->buildFilters(self::paramsArray($params), $mappedFacilities, 't');
+        $whereConditions = $this->buildFilters(self::paramsArray($params), $mappedFacilities);
 
         $unionQueries = [];
         foreach ($types as $type) {
-            $tableAlias = "t";
+            $tableAlias = self::FORM_ALIAS;
             $facilityAlias = ($dimension === 'health_facility') ? 'hf' : 'lb';
 
             $select = $sql->select()
