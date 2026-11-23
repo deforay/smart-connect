@@ -2227,8 +2227,6 @@ class EidSampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
-        $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
         $lastSevenDay = date('Y-m-d', strtotime('-7 days'));
         $query = $sql->select()->from(array('eid' => $this->table))
             ->columns(
