@@ -35,6 +35,17 @@ use Generator;
 
 class CommonService
 {
+     /** Table and column pairs that /common/index may check for duplicates. */
+     private const FIELD_VALIDATION_COLUMNS = [
+          'dash_user_roles' => ['role_code', 'role_name'],
+          'facility_details' => ['facility_code', 'facility_name'],
+     ];
+
+     /** Primary key of each table above, the only column fnct may exclude by. */
+     private const FIELD_VALIDATION_PRIMARY_KEYS = [
+          'dash_user_roles' => 'role_id',
+          'facility_details' => 'facility_id',
+     ];
 
      public $sm = null;
      public $cache = null;
@@ -105,37 +116,16 @@ class CommonService
      }
 
 
-     public function checkMultipleFieldValidations($params)
-     {
-          $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
-          $jsonData = $params['json_data'];
-          $tableName = $jsonData['tableName'];
-          $sql = new Sql($adapter);
-          $select = $sql->select()->from($tableName);
-          foreach ($jsonData['columns'] as $val) {
-               if ($val['column_value'] != "") {
-                    $select->where($val['column_name'] . "=" . "'" . $val['column_value'] . "'");
-               }
-          }
-
-          //edit
-          if (isset($jsonData['tablePrimaryKeyValue']) && $jsonData['tablePrimaryKeyValue'] != null && $jsonData['tablePrimaryKeyValue'] != "null") {
-               $select->where($jsonData['tablePrimaryKeyId'] . "!=" . $jsonData['tablePrimaryKeyValue']);
-          }
-          //error_log($sql);
-          $statement = $sql->prepareStatementForSqlObject($select);
-          $result = $statement->execute();
-          return count($result);
-     }
-
-
      public function checkFieldValidations($params)
      {
           $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
-          $tableName = $params['tableName'];
-          $fieldName = $params['fieldName'];
-          $value = trim($params['value']);
-          $fnct = $params['fnct'];
+          $tableName = $params['tableName'] ?? '';
+          $fieldName = $params['fieldName'] ?? '';
+          if (!in_array($fieldName, self::FIELD_VALIDATION_COLUMNS[$tableName] ?? [], true)) {
+               return 0;
+          }
+          $value = trim((string) ($params['value'] ?? ''));
+          $fnct = $params['fnct'] ?? '';
           try {
                $sql = new Sql($adapter);
                if ($fnct == '' || $fnct == 'null') {
@@ -146,11 +136,17 @@ class CommonService
                     $result = $statement->execute();
                     $data = count($result);
                } else {
-                    $table = explode("##", $fnct);
+                    [$column, $id] = array_pad(explode("##", (string) $fnct, 2), 2, '');
+                    if ($column !== self::FIELD_VALIDATION_PRIMARY_KEYS[$tableName]) {
+                         return 0;
+                    }
 
                     $select = $sql->select()
                          ->from($tableName)
-                         ->where(["$fieldName='$value'", $table[0] . "!=" . "'$table[1]'"]);
+                         ->where([
+                              $fieldName => $value,
+                              new \Laminas\Db\Sql\Predicate\Operator($column, \Laminas\Db\Sql\Predicate\Operator::OPERATOR_NOT_EQUAL_TO, $id),
+                         ]);
                     $statement = $sql->prepareStatementForSqlObject($select);
                     $result = $statement->execute();
                     $data = count($result);
@@ -583,8 +579,8 @@ class CommonService
                'r_hepatitis_sample_rejection_reasons' => ['service' => 'HepatitisSampleRejectionReasonTable', 'name' => 'rejection_reason_name', 'id' => 'rejection_reason_id'],
                'r_hepatitis_risk_factors' => ['service' => 'HepatitisRiskFactorTable', 'name' => 'riskfactor_name', 'id' => 'riskfactor_id'],
                'r_hepatitis_test_reasons' => ['service' => 'HepatitisTestReasonsTable', 'name' => 'test_reason_name', 'id' => 'test_reason_id'],
-               'r_hepatitis_results' => ['service' => 'HepatitisResultsTable', 'name' => 'result', 'id' => 'result_id', 'quotedId' => true],
-               'r_hepatitis_sample_type' => ['service' => 'HepatitisSampleTypeTable', 'name' => 'sample_name', 'id' => 'sample_id', 'quotedId' => true],
+               'r_hepatitis_results' => ['service' => 'HepatitisResultsTable', 'name' => 'result', 'id' => 'result_id'],
+               'r_hepatitis_sample_type' => ['service' => 'HepatitisSampleTypeTable', 'name' => 'sample_name', 'id' => 'sample_id'],
           ];
      }
 
@@ -703,11 +699,11 @@ class CommonService
           $id = $definition['id'];
           $name = $definition['name'];
           // Preserve the legacy name-or-ID match and update-by-ID behavior.
-          $idValue = !empty($definition['quotedId']) ? '"' . $data[$id] . '" ' : $data[$id];
-          $condition = $name . ' LIKE "%' . $data[$name] . '%" OR ' . $id . ' = ' . $idValue;
+          $where = new \Laminas\Db\Sql\Where();
+          $where->like($name, '%' . $data[$name] . '%')->or->equalTo($id, $data[$id]);
           $sql = new Sql($dbAdapter);
-          $query = $sql->select()->from($table)->where([$condition]);
-          $existing = $dbAdapter->query($sql->buildSqlString($query), $dbAdapter::QUERY_MODE_EXECUTE)->current();
+          $query = $sql->select()->from($table)->where($where);
+          $existing = $sql->prepareStatementForSqlObject($query)->execute()->current();
           if ($existing) {
                $gateway->update($data, [$id => $data[$id]]);
           } else {

@@ -612,7 +612,7 @@ class FacilityTable extends AbstractTableGateway
             $sQuery = $sQuery->where(['facility_district' => CommonService::parseIdList($districtId)]);
         }
         if (!empty($facilityType)) {
-            $sQuery = $sQuery->where("f.facility_type = $facilityType");
+            $sQuery = $sQuery->where(['f.facility_type' => (int) $facilityType]);
         }
         if ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
