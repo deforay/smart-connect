@@ -34,21 +34,6 @@ class CommonController extends AbstractActionController
         return $viewModel;
     }
 
-    public function multipleFieldValidationAction()
-    {
-        $result = "";
-        /** @var \Laminas\Http\Request $request */
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            $this->commonService->checkMultipleFieldValidations($params);
-        }
-        $viewModel = new ViewModel();
-        $viewModel->setVariables(array('result' => $result))
-            ->setTerminal(true);
-        return $viewModel;
-    }
-
     public function clearCacheAction()
     {
         $result = "";
@@ -109,7 +94,7 @@ class CommonController extends AbstractActionController
             
             $params = $request->getPost();
             $viewModel = new ViewModel();
-            $params['facilityType'] = isset($params['facilityType']) ? $params['facilityType'] : 1;
+            $params['facilityType'] = (int) ($params['facilityType'] ?? 1);
             $res = $this->commonService->getFacilityList($params['districtName'], $params['facilityType']);
             $viewModel->setVariables(array('result' => $res))->setTerminal(true);
             return $viewModel;
