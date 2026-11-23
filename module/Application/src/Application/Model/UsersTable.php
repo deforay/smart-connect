@@ -232,13 +232,13 @@ class UsersTable extends BaseTableGateway
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(['u' => 'dash_users'])
             ->join(['r' => 'dash_user_roles'], 'u.role=r.role_id')
-            ->where("user_id= $userId");
+            ->where(['u.user_id' => $userId]);
         $sQueryStr = $sql->buildSqlString($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         if ($rResult) {
             $userFacilityMapQuery = $sql->select()->from(array('u_f_map' => 'dash_user_facility_map'))
                 ->columns(['facility_id'])
-                ->where("u_f_map.user_id= $userId");
+                ->where(['u_f_map.user_id' => $userId]);
             $userFacilityMapStr = $sql->buildSqlString($userFacilityMapQuery);
             $rResult['facilities'] = $dbAdapter->query($userFacilityMapStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             return $rResult;

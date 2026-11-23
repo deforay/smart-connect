@@ -556,7 +556,7 @@ class FacilityTable extends AbstractTableGateway
             ->where(array('f.facility_type' => 2))
             ->order('facility_name asc');
         if (isset($provinceDistricts) && !empty($provinceDistricts)) {
-            $labQuery = $labQuery->where('f.facility_district_id IN ("' . implode('", "', $provinceDistricts) . '")');
+            $labQuery = $labQuery->where(['f.facility_district_id' => CommonService::parseIdList($provinceDistricts)]);
         } elseif (isset($params['provinces']) && !empty($params['provinces'])) {
             $labQuery = $labQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         } elseif ($loginContainer->role != 1) {
@@ -571,7 +571,7 @@ class FacilityTable extends AbstractTableGateway
             ->where('f.facility_type IN ("1","4")')
             ->order('facility_name asc');
         if (isset($provinceDistricts) && !empty($provinceDistricts)) {
-            $clinicQuery = $clinicQuery->where('f.facility_district_id IN ("' . implode('", "', $provinceDistricts) . '")');
+            $clinicQuery = $clinicQuery->where(['f.facility_district_id' => CommonService::parseIdList($provinceDistricts)]);
         } elseif (isset($params['provinces']) && !empty($params['provinces'])) {
             $clinicQuery = $clinicQuery->where(['f.facility_state_id' => CommonService::parseIdList($params['provinces'])]);
         } elseif ($loginContainer->role != 1) {

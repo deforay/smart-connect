@@ -14,6 +14,37 @@ use Laminas\Db\Sql\Predicate\Expression as WhereExpression;
 class EidSampleTable extends AbstractTableGateway
 {
 
+    /**
+     * Age bands the EID clinic dashboard can ask for. The page sends only the
+     * key; the label and the SQL condition are fixed here.
+     */
+    public const CLINIC_AGE_BANDS = [
+        'lt2' => [
+            'label' => 'Age < 2',
+            'condition' => 'vl.child_age > 0 AND vl.child_age < 2',
+        ],
+        '2to5' => [
+            'label' => 'Age 2 - 5',
+            'condition' => 'vl.child_age >= 2 AND vl.child_age <= 5',
+        ],
+        '6to14' => [
+            'label' => 'Age 6 - 14',
+            'condition' => 'vl.child_age >= 6 AND vl.child_age <= 14',
+        ],
+        '15to49' => [
+            'label' => 'Age 15 - 49',
+            'condition' => 'vl.child_age >= 15 AND vl.child_age <= 49',
+        ],
+        '50plus' => [
+            'label' => 'Age >=50',
+            'condition' => 'vl.child_age >= 50 AND vl.child_age <= 250',
+        ],
+        'unknown' => [
+            'label' => 'Unknown',
+            'condition' => "vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported'",
+        ],
+    ];
+
     protected $table = 'dash_form_eid';
     public $sm = null;
     public array $config;
@@ -2031,7 +2062,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
 
         $query = $sql->select()->from(array('eid' => $this->table))
             ->columns(
@@ -2197,7 +2228,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
         $lastSevenDay = date('Y-m-d', strtotime('-7 days'));
         $query = $sql->select()->from(array('eid' => $this->table))
             ->columns(
@@ -2848,7 +2879,7 @@ class EidSampleTable extends AbstractTableGateway
         $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '') {
             $splitDate = CommonService::convertDateRange($params['daterange']);
         }
@@ -2952,7 +2983,7 @@ class EidSampleTable extends AbstractTableGateway
         $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '') {
             $splitDate = CommonService::convertDateRange($params['daterange']);
         }
@@ -3056,7 +3087,7 @@ class EidSampleTable extends AbstractTableGateway
         $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '') {
             $splitDate = CommonService::convertDateRange($params['daterange']);
         }
@@ -3160,7 +3191,7 @@ class EidSampleTable extends AbstractTableGateway
         $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '') {
             $splitDate = CommonService::convertDateRange($params['daterange']);
         }
@@ -3264,7 +3295,7 @@ class EidSampleTable extends AbstractTableGateway
 
 
         $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
 
         $aColumns = array('sample_code', "DATE_FORMAT(sample_collection_date,'%d-%b-%Y')", 'f.facility_code', 'f.facility_name', 'specimen_type', 'l.facility_code', 'l.facility_name', "DATE_FORMAT(sample_received_at_lab_datetime,'%d-%b-%Y')");
         $orderColumns = array('sample_code', 'sample_collection_date', 'f.facility_code', 'specimen_type', 'l.facility_name', 'sample_received_at_lab_datetime');
@@ -4706,7 +4737,7 @@ class EidSampleTable extends AbstractTableGateway
             } elseif (isset($params['gender']) && $params['gender'] == 'M') {
                 $query = $query->where("vl.child_gender IN ('m','male','M','MALE')");
             } elseif (isset($params['gender']) && $params['gender'] == 'not_specified') {
-                $query = $query->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')");
+                $query = $query->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded' OR vl.child_gender = 'Unreported' OR vl.child_gender = 'unreported')");
             }
 
             $queryStr = $sql->buildSqlString($query);
@@ -4744,15 +4775,14 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
                 $endDate = trim($s_c_date[1]);
             }
-            if (isset($params['age']['from']) && $params['age']['from'] == 'unknown') {
-                $caseQuery1 = new Expression("SUM(CASE WHEN ((vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported') and (vl.result like 'negative%' OR vl.result like 'Negative%')) THEN 1 ELSE 0 END)");
-                $caseQuery2 = new Expression("SUM(CASE WHEN ((vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported') and (vl.result like 'positive%' OR vl.result like 'Positive%' )) THEN 1 ELSE 0 END)");
-            } elseif (isset($params['age']['from']) && isset($params['age']['to'])) {
-                $from = $params['age']['from'];
-                $to = $params['age']['to'];
-                $caseQuery1 = new Expression("SUM(CASE WHEN ((vl.child_age $from AND vl.child_age  $to) and (vl.result like 'negative%' OR vl.result like 'Negative%')) THEN 1 ELSE 0 END)");
-                $caseQuery2 = new Expression("SUM(CASE WHEN ((vl.child_age $from AND vl.child_age  $to) and (vl.result like 'positive%' OR vl.result like 'Positive%' )) THEN 1 ELSE 0 END)");
+            $ageBand = $params['age']['band'] ?? '';
+            if (!is_string($ageBand) || !isset(self::CLINIC_AGE_BANDS[$ageBand])) {
+                return $result;
             }
+            $ageCondition = self::CLINIC_AGE_BANDS[$ageBand]['condition'];
+            $ageName = self::CLINIC_AGE_BANDS[$ageBand]['label'];
+            $caseQuery1 = new Expression("SUM(CASE WHEN (($ageCondition) and (vl.result like 'negative%' OR vl.result like 'Negative%')) THEN 1 ELSE 0 END)");
+            $caseQuery2 = new Expression("SUM(CASE WHEN (($ageCondition) and (vl.result like 'positive%' OR vl.result like 'Positive%' )) THEN 1 ELSE 0 END)");
             $query = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
                     array(
@@ -4761,11 +4791,11 @@ class EidSampleTable extends AbstractTableGateway
                         "positive" => $caseQuery2,
                     )
                 )
-                ->where(new WhereExpression("DATE(vl.sample_collection_date BETWEEN ? AND ? ", [$startDate, $endDate]));
+                ->where(new WhereExpression('vl.sample_collection_date BETWEEN ? AND ?', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']));
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $query = $query->where('vl.facility_id IN ( ? )', $params['clinicId']);
+                $query->where->in('vl.facility_id', CommonService::parseIdList($params['clinicId']));
             } elseif ($loginContainer->role != 1 && !empty($loginContainer->mappedFacilities)) {
-                $query = $query->where(new WhereExpression('vl.facility_id IN ( ? )', $loginContainer->mappedFacilities));
+                $query->where->in('vl.facility_id', array_values((array) $loginContainer->mappedFacilities));
             }
             if (isset($params['testResult']) && $params['testResult'] != '') {
                 $query = $query->where(new WhereExpression("(vl.result like ? OR vl.result like ? )", [$params['testResult'] . '%', ucwords($params['testResult']) . '%']));
@@ -4779,7 +4809,7 @@ class EidSampleTable extends AbstractTableGateway
             } elseif (isset($params['gender']) && $params['gender'] == 'M') {
                 $query = $query->where("vl.child_gender IN ('m','male','M','MALE')");
             } elseif (isset($params['gender']) && $params['gender'] == 'not_specified') {
-                $query = $query->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')");
+                $query = $query->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded' OR vl.child_gender = 'Unreported' OR vl.child_gender = 'unreported')");
             }
 
             $query = $query->group(array(new Expression('WEEK(sample_collection_date)')));
@@ -4793,10 +4823,10 @@ class EidSampleTable extends AbstractTableGateway
                 if ($sRow["monthDate"] == null) {
                     continue;
                 }
-                $result[$params['age']['ageName']]['Negative']['color'] = '#60d18f';
-                $result[$params['age']['ageName']]['Negative'][$j] = (isset($sRow["negative"])) ? $sRow["negative"] : 0;
-                $result[$params['age']['ageName']]['Positive']['color'] = '#ff1900';
-                $result[$params['age']['ageName']]['Positive'][$j] = (isset($sRow["positive"])) ? $sRow["positive"] : 0;
+                $result[$ageName]['Negative']['color'] = '#60d18f';
+                $result[$ageName]['Negative'][$j] = (isset($sRow["negative"])) ? $sRow["negative"] : 0;
+                $result[$ageName]['Positive']['color'] = '#ff1900';
+                $result[$ageName]['Positive'][$j] = (isset($sRow["positive"])) ? $sRow["positive"] : 0;
 
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
@@ -4828,9 +4858,9 @@ class EidSampleTable extends AbstractTableGateway
                 //->where('vl.reason_for_eid_test="'.$reason['test_reason_id'].'"');
                 ->group('tr.test_reason_id');
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $rQuery = $rQuery->where(new WhereExpression('vl.facility_id IN ( ? )', [$params['clinicId']]));
+                $rQuery->where->in('vl.facility_id', CommonService::parseIdList($params['clinicId']));
             } elseif ($loginContainer->role != 1 && !empty($loginContainer->mappedFacilities)) {
-                $rQuery = $rQuery->where(new WhereExpression('vl.facility_id IN ( ? )', [$loginContainer->mappedFacilities]));
+                $rQuery->where->in('vl.facility_id', array_values((array) $loginContainer->mappedFacilities));
             }
             if (isset($params['testResult']) && $params['testResult'] != '') {
                 $rQuery = $rQuery->where(new WhereExpression("(vl.result like ? OR vl.result like ? )", [$params['testResult'] . '%', ucwords($params['testResult'] . '%')]));
@@ -4874,7 +4904,8 @@ class EidSampleTable extends AbstractTableGateway
             }
 
             if (isset($params['testReason']) && trim($params['testReason']) != '') {
-                $rQuery = $rQuery->where(new WhereExpression("vl.reason_for_vl_testing = ? "), base64_decode($params['testReason']));
+                // dash_form_eid stores the reason in reason_for_eid_test (see the join above).
+                $rQuery = $rQuery->where(['vl.reason_for_eid_test' => base64_decode($params['testReason'])]);
             }
             $rQueryStr = $sql->buildSqlString($rQuery);
             // echo $rQueryStr;die;
@@ -5085,10 +5116,10 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where(new WhereExpression("vl.sample_collection_date >= ? AND vl.sample_collection_date <= ? ", [$startDate . ' 00:00:00', $endDate . ' 23:59:59']));
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
-            $sQuery = $sQuery->where(new WhereExpression('vl.facility_id IN ( ? )', [$parameters['clinicId']]));
+            // An empty list renders as IN (NULL), which matches nothing.
+            $sQuery->where->in('vl.facility_id', CommonService::parseIdList($parameters['clinicId']));
         } elseif ($loginContainer->role != 1) {
-            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-            $sQuery = $sQuery->where(new WhereExpression('vl.facility_id IN ("' . implode('", "', '?') . '")', $mappedFacilities));
+            $sQuery->where->in('vl.facility_id', array_values((array) ($loginContainer->mappedFacilities ?? [])));
         }
         if (isset($parameters['testResult']) && $parameters['testResult'] != '') {
             $sQuery = $sQuery->where(new WhereExpression("(vl.result like ? OR vl.result like ? )", [$parameters['testResult'] . '%', ucwords($parameters['testResult']) . '%']));

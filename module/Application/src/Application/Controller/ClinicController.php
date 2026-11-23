@@ -5,6 +5,7 @@ namespace Application\Controller;
 
 use Laminas\View\Model\ViewModel;
 use Application\Service\CommonService;
+use Application\Model\SampleTable;
 use Laminas\Mvc\Controller\AbstractActionController;
 
 class ClinicController extends AbstractActionController
@@ -19,6 +20,22 @@ class ClinicController extends AbstractActionController
         $this->sampleService = $sampleService;
     }
 
+
+    /**
+     * The age-group charts post one band key (ageBand). Replace any posted
+     * age array with the band key and its fixed label, so neither the query
+     * nor the chart uses text from the request.
+     */
+    private function withAgeBand($params)
+    {
+        $band = $params['ageBand'] ?? '';
+        $known = is_string($band) && isset(SampleTable::CLINIC_AGE_BANDS[$band]);
+        $params['age'] = [
+            'band' => $known ? $band : '',
+            'ageName' => $known ? SampleTable::CLINIC_AGE_BANDS[$band]['label'] : '',
+        ];
+        return $params;
+    }
 
     public function indexAction()
     {
@@ -260,7 +277,7 @@ class ClinicController extends AbstractActionController
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $params = $request->getPost();
+            $params = $this->withAgeBand($request->getPost());
 
             $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
@@ -274,7 +291,7 @@ class ClinicController extends AbstractActionController
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $params = $request->getPost();
+            $params = $this->withAgeBand($request->getPost());
 
             $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
@@ -288,7 +305,7 @@ class ClinicController extends AbstractActionController
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $params = $request->getPost();
+            $params = $this->withAgeBand($request->getPost());
 
             $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
@@ -302,7 +319,7 @@ class ClinicController extends AbstractActionController
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $params = $request->getPost();
+            $params = $this->withAgeBand($request->getPost());
 
             $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
@@ -316,7 +333,7 @@ class ClinicController extends AbstractActionController
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $params = $request->getPost();
+            $params = $this->withAgeBand($request->getPost());
 
             $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
@@ -330,7 +347,7 @@ class ClinicController extends AbstractActionController
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $params = $request->getPost();
+            $params = $this->withAgeBand($request->getPost());
 
             $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();

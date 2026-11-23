@@ -917,17 +917,13 @@ foreach ($sampleType as $samples) {
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        var age = {
-            'from': '> 0',
-            'to': '< 2',
-            'ageName': 'Age < 2'
-        };
+        var ageBand = 'lt2';
         $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-age-group')); ?>", {
                 clinicId: clinicId,
                 sampleCollectionDate: dateRange,
                 testResult: testResult,
                 sampleTypeId: sampleTypeId,
-                age: age,
+                ageBand: ageBand,
                 adherence: adherence,
                 gender: gender,
                 isPregnant: isPregnant,
@@ -947,17 +943,13 @@ foreach ($sampleType as $samples) {
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        var age = {
-            'from': '>= 2',
-            'to': '<= 5',
-            'ageName': 'Age 2-5'
-        };
+        var ageBand = '2to5';
         $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-age-group-two-to-five')); ?>", {
                 clinicId: clinicId,
                 sampleCollectionDate: dateRange,
                 testResult: testResult,
                 sampleTypeId: sampleTypeId,
-                age: age,
+                ageBand: ageBand,
                 adherence: adherence,
                 gender: gender,
                 isPregnant: isPregnant,
@@ -977,17 +969,13 @@ foreach ($sampleType as $samples) {
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        var age = {
-            'from': '>= 6',
-            'to': '<= 14',
-            'ageName': 'Age 6-14'
-        };
+        var ageBand = '6to14';
         $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-age-group-six-to-fourteen')); ?>", {
                 clinicId: clinicId,
                 sampleCollectionDate: dateRange,
                 testResult: testResult,
                 sampleTypeId: sampleTypeId,
-                age: age,
+                ageBand: ageBand,
                 adherence: adherence,
                 gender: gender,
                 isPregnant: isPregnant,
@@ -1007,17 +995,13 @@ foreach ($sampleType as $samples) {
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        var age = {
-            'from': '>= 15',
-            'to': '<= 49',
-            'ageName': 'Age 15-49'
-        };
+        var ageBand = '15to49';
         $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-age-group-fifteen-to-fourtynine')); ?>", {
                 clinicId: clinicId,
                 sampleCollectionDate: dateRange,
                 testResult: testResult,
                 sampleTypeId: sampleTypeId,
-                age: age,
+                ageBand: ageBand,
                 adherence: adherence,
                 gender: gender,
                 isPregnant: isPregnant,
@@ -1037,17 +1021,13 @@ foreach ($sampleType as $samples) {
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        var age = {
-            'from': '>= 50',
-            'to': '<= 250',
-            'ageName': 'Age >=50'
-        };
+        var ageBand = '50plus';
         $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-age-group-greater-fifty')); ?>", {
                 clinicId: clinicId,
                 sampleCollectionDate: dateRange,
                 testResult: testResult,
                 sampleTypeId: sampleTypeId,
-                age: age,
+                ageBand: ageBand,
                 adherence: adherence,
                 gender: gender,
                 isPregnant: isPregnant,
@@ -1067,16 +1047,13 @@ foreach ($sampleType as $samples) {
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        var age = {
-            'from': 'unknown',
-            'ageName': 'Age Unknown'
-        };
+        var ageBand = 'unknown';
         $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-age-group-unknown')); ?>", {
                 clinicId: clinicId,
                 sampleCollectionDate: dateRange,
                 testResult: testResult,
                 sampleTypeId: sampleTypeId,
-                age: age,
+                ageBand: ageBand,
                 adherence: adherence,
                 gender: gender,
                 isPregnant: isPregnant,

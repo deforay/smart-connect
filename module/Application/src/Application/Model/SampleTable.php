@@ -15,6 +15,37 @@ use Laminas\Db\Sql\Predicate\Expression as WhereExpression;
 class SampleTable extends AbstractTableGateway
 {
 
+    /**
+     * Age bands the clinic dashboard can ask for. The page sends only the key;
+     * the label and the SQL condition are fixed here.
+     */
+    public const CLINIC_AGE_BANDS = [
+        'lt2' => [
+            'label' => 'Age < 2',
+            'condition' => 'vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2',
+        ],
+        '2to5' => [
+            'label' => 'Age 2-5',
+            'condition' => 'vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5',
+        ],
+        '6to14' => [
+            'label' => 'Age 6-14',
+            'condition' => 'vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14',
+        ],
+        '15to49' => [
+            'label' => 'Age 15-49',
+            'condition' => 'vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49',
+        ],
+        '50plus' => [
+            'label' => 'Age >=50',
+            'condition' => 'vl.patient_age_in_years >= 50 AND vl.patient_age_in_years <= 250',
+        ],
+        'unknown' => [
+            'label' => 'Age Unknown',
+            'condition' => "vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported'",
+        ],
+    ];
+
     protected $table = 'dash_form_vl';
     protected $sm = null;
     protected array $config;
@@ -63,7 +94,7 @@ class SampleTable extends AbstractTableGateway
 
 
         $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
 
         $query = $sql->select()->from(array('vl' => $this->table))
             ->columns(
@@ -1533,8 +1564,7 @@ class SampleTable extends AbstractTableGateway
                 }
             }
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $query->where("vl.arv_adherance_percentage = ?", $params['adherence']);
-                //$query = $query->where(['vl.arv_adherance_percentage' => $params['adherence']]);
+                $query->where(['vl.arv_adherance_percentage' => $params['adherence']]);
             }
 
             if (isset($params['gender'])) {
@@ -1757,15 +1787,13 @@ class SampleTable extends AbstractTableGateway
             if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
                 $endDate = trim($s_c_date[1]);
             }
-            if ($params['age']['from'] == 'unknown') {
-                $caseQuery1 = new Expression("SUM(CASE WHEN ((vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported') and (vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)) THEN 1 ELSE 0 END)");
-                $caseQuery2 = new Expression("SUM(CASE WHEN ((vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported') and (vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )) THEN 1 ELSE 0 END)");
-            } else {
-                $from = $params['age']['from'];
-                $to = $params['age']['to'];
-                $caseQuery1 = new Expression("SUM(CASE WHEN ((vl.patient_age_in_years $from AND vl.patient_age_in_years  $to) and (vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)) THEN 1 ELSE 0 END)");
-                $caseQuery2 = new Expression("SUM(CASE WHEN ((vl.patient_age_in_years $from AND vl.patient_age_in_years  $to) and (vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )) THEN 1 ELSE 0 END)");
+            $ageBand = $params['age']['band'] ?? '';
+            if (!is_string($ageBand) || !isset(self::CLINIC_AGE_BANDS[$ageBand])) {
+                return $result;
             }
+            $ageCondition = self::CLINIC_AGE_BANDS[$ageBand]['condition'];
+            $caseQuery1 = new Expression("SUM(CASE WHEN (($ageCondition) and (vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)) THEN 1 ELSE 0 END)");
+            $caseQuery2 = new Expression("SUM(CASE WHEN (($ageCondition) and (vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )) THEN 1 ELSE 0 END)");
             $query = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
                     array(
@@ -1842,9 +1870,9 @@ class SampleTable extends AbstractTableGateway
                 if ($sRow["monthDate"] == null) {
                     continue;
                 }
-                $result[$params['age']['ageName']]['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["AgeLtVLGt1000"])) ? $sRow["AgeLtVLGt1000"] : 0;
+                $result[self::CLINIC_AGE_BANDS[$ageBand]['label']]['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["AgeLtVLGt1000"])) ? $sRow["AgeLtVLGt1000"] : 0;
 
-                $result[$params['age']['ageName']]['VL (< 1000 cp/ml)'][$j] = (isset($sRow["AgeLtVLLt1000"])) ? $sRow["AgeLtVLLt1000"] : 0;
+                $result[self::CLINIC_AGE_BANDS[$ageBand]['label']]['VL (< 1000 cp/ml)'][$j] = (isset($sRow["AgeLtVLLt1000"])) ? $sRow["AgeLtVLLt1000"] : 0;
 
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
@@ -2111,30 +2139,6 @@ class SampleTable extends AbstractTableGateway
         return $rResult;
     }
     //end clinic details
-
-    //get distinict date
-    public function getDistinctDate($endDate, $startDate)
-    {
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-        $squery = $sql->select()->from(array('vl' => $this->table))
-            ->columns(array(new Expression('DISTINCT YEAR(sample_collection_date) as year,MONTH(sample_collection_date) as month,DAY(sample_collection_date) as day')))
-            //->where('vl.lab_id !=0')
-            ->order('month ASC')->order('day ASC');
-        if (isset($startDate) && trim($endDate) != '') {
-            if (trim($startDate) !== trim($endDate)) {
-                $squery = $squery->where(array("vl.sample_collection_date <='" . $endDate . " 23:59:59" . "'", "vl.sample_collection_date >='" . $startDate . " 00:00:00" . "'"));
-            } else {
-                $fromMonth = date("Y-m", strtotime(trim($startDate)));
-                $month = strtotime($fromMonth);
-                $m = date('m', $month);
-                $year = date('Y', $month);
-                $squery = $squery->where("Month(sample_collection_date)='" . $m . "' AND Year(sample_collection_date)='" . $year . "'");
-            }
-        }
-        $sQueryStr = $sql->buildSqlString($squery);
-        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-    }
 
     public function fetchAllTestResults($parameters)
     {
@@ -3830,7 +3834,7 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '') {
             $splitDate = CommonService::convertDateRange($params['daterange']);
         }
@@ -3942,7 +3946,7 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '') {
             $splitDate = CommonService::convertDateRange($params['daterange']);
         }
@@ -4056,7 +4060,7 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '') {
             $splitDate = CommonService::convertDateRange($params['daterange']);
         }
@@ -4170,7 +4174,7 @@ class SampleTable extends AbstractTableGateway
         $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim((string) ($params['daterange'] ?? '')) != '') {
             $splitDate = CommonService::convertDateRange($params['daterange']);
         }
@@ -4284,7 +4288,7 @@ class SampleTable extends AbstractTableGateway
 
 
         $globalDb = $this->sm->get('GlobalTable');
-        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
 
         $aColumns = array('sample_code', "DATE_FORMAT(sample_collection_date,'%d-%b-%Y')", 'f.facility_code', 'f.facility_name', 'sample_name', 'l.facility_code', 'l.facility_name', "DATE_FORMAT(sample_received_at_lab_datetime,'%d-%b-%Y')");
         $orderColumns = array('sample_code', 'sample_collection_date', 'f.facility_code', 'sample_name', 'l.facility_name', 'sample_received_at_lab_datetime');
@@ -6694,7 +6698,11 @@ class SampleTable extends AbstractTableGateway
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $totalSamples = $parameters['t_received'];
+        $totalSamples = (int) ($parameters['t_received'] ?? 0);
+        // With no received total there is no share to show.
+        $percentageOfSamples = $totalSamples > 0
+            ? new Expression("ROUND((COUNT(*)/$totalSamples)*100,2)")
+            : new Expression('NULL');
 
         $validQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
@@ -6727,7 +6735,7 @@ class SampleTable extends AbstractTableGateway
                     "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
                     //"total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' ) THEN 1 ELSE 0 END))"),
                     "suppression_rate" => new Expression("ROUND(((total_suppressed_samples)/(total_samples_valid))*100,2)"),
-                    "percentage_of_samples" => new Expression("ROUND((COUNT(*)/$totalSamples)*100,2)"),
+                    "percentage_of_samples" => $percentageOfSamples,
                     'current_regimen'
                 )
             )
