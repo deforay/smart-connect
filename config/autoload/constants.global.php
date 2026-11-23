@@ -9,9 +9,6 @@ defined('WEB_ROOT')
 defined('UPLOAD_PATH')
     || define('UPLOAD_PATH', WEB_ROOT . DIRECTORY_SEPARATOR . 'uploads');
 
-defined('TEMP_UPLOAD_PATH')
-    || define('TEMP_UPLOAD_PATH', WEB_ROOT . DIRECTORY_SEPARATOR . 'temporary');
-
 // Where AppLogger writes and the log viewer reads. Defined here so a deployment
 // can point the logs at another volume without patching code.
 defined('LOG_PATH')
@@ -21,6 +18,11 @@ defined('LOG_PATH')
 // Beside public/, never under it, so none of them can be fetched by URL.
 defined('VAR_PATH')
     || define('VAR_PATH', APPLICATION_PATH . DIRECTORY_SEPARATOR . 'var');
+
+// Excel exports and result PDFs. They hold sample and patient data, so they
+// are served only through /download/:file, which needs a login.
+defined('EXPORT_PATH')
+    || define('EXPORT_PATH', VAR_PATH . DIRECTORY_SEPARATOR . 'exports');
 
 // returning this empty array to avoid error in config merging
 return [];

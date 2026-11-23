@@ -934,7 +934,7 @@ class CommonService
                          }
                          $writer = IOFactory::createWriter($excel, 'Xlsx');
                          $filename = 'SAMPLE-SYNC-STATUS-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
-                         $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                         $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                          return $filename;
                     } else {
                          return "";
