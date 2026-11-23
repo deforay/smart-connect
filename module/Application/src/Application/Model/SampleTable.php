@@ -1564,7 +1564,18 @@ class SampleTable extends AbstractTableGateway
                 }
             }
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $query->where(['vl.arv_adherance_percentage' => $params['adherence']]);
+                // Only the values the adherence filter offers; anything else matches nothing.
+                $adherence = match ($params['adherence']) {
+                    'good' => 'good',
+                    'fair' => 'fair',
+                    'poor' => 'poor',
+                    default => null,
+                };
+                if ($adherence === null) {
+                    $query->where('1 = 0');
+                } else {
+                    $query->where(['vl.arv_adherance_percentage' => $adherence]);
+                }
             }
 
             if (isset($params['gender'])) {
