@@ -107,7 +107,6 @@ class UsersTable extends BaseTableGateway
             $loginContainer->role = $rResult["role"];
             $loginContainer->roleCode = $rResult["role_code"];
             $loginContainer->email = $rResult["email"];
-            //$loginContainer->accessType = $rResult["access_type"];
             $loginContainer->mappedFacilities = $facilities_id;
             $loginContainer->mappedFacilitiesName = $facilities_name;
             $loginContainer->mappedFacilitiesCode = $facilities_code;

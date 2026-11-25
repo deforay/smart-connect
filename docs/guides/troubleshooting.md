@@ -123,7 +123,7 @@ A `status` of `failed` with zero processed means nothing stored at all. Read the
 
 The data is in `dash_form_*`, so this is display, not sync.
 
-Dashboards are cached. `cache-expiry` in `config/autoload/custom.global.php` sets the window in minutes, and it defaults to 1440, which is a full day. Use the clear cache link at the bottom of any page to see fresh numbers immediately.
+Dashboards are cached for a full day. The window is fixed in code (`CachedMethodProxy`), not set in config. Use the clear cache link at the bottom of any page to see fresh numbers immediately.
 
 If `use-current-sample-table` is on, the screens read snapshot tables rather than the raw tables. Rebuild them.
 
