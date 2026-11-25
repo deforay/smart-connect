@@ -506,7 +506,7 @@ check_php_version() {
 # URL. Safe to run on every upgrade: once the old folders are gone it does
 # nothing. Expects var/api-payloads/{requests,responses} to exist already.
 move_private_files() {
-    local app_path="$1" kind old_dir new_dir file stranded
+    local app_path="$1" kind old_dir new_dir file stranded before remaining moved
 
     # API payload copies are kept, so Sync History still shows old payloads.
     for kind in requests responses; do
@@ -514,23 +514,32 @@ move_private_files() {
         new_dir="$app_path/var/api-payloads/$kind"
         [ -d "$old_dir" ] || continue
 
+        # The trailing slash makes find enter the folder when it is a symlink
+        # to another volume. Without it find sees only the link, moves nothing,
+        # and the rm below drops the link while the files stay at its target.
+        before=$(find "$old_dir/" -mindepth 1 -maxdepth 1 -type f | wc -l)
+
         # -n never overwrites a file already in var/. Its exit status differs
         # between coreutils versions, so what is left behind is checked instead.
-        find "$old_dir" -mindepth 1 -maxdepth 1 -type f \
+        find "$old_dir/" -mindepth 1 -maxdepth 1 -type f \
             -exec mv -n -t "$new_dir" {} + 2>>"$log_file" || true
+        remaining=$(find "$old_dir/" -mindepth 1 -maxdepth 1 -type f | wc -l)
+        moved=$((before - remaining))
 
         # Anything still here either has a copy in var/ already (safe to drop)
         # or failed to move (keep the folder, so nothing is lost).
         stranded=0
         while IFS= read -r -d '' file; do
             [ -e "$new_dir/$(basename "$file")" ] || stranded=$((stranded + 1))
-        done < <(find "$old_dir" -mindepth 1 -maxdepth 1 -print0)
+        done < <(find "$old_dir/" -mindepth 1 -maxdepth 1 -print0)
         if [ "$stranded" -gt 0 ]; then
             say warning "${stranded} file(s) in ${old_dir} could not be moved to ${new_dir}. Left in place."
             continue
         fi
         rm -rf "$old_dir"
-        say info "Moved API payloads from public/uploads/track-api/${kind} to var/api-payloads/${kind}."
+        if [ "$moved" -gt 0 ]; then
+            say info "Moved ${moved} API payload file(s) from public/uploads/track-api/${kind} to var/api-payloads/${kind}."
+        fi
     done
     if [ -d "$app_path/public/uploads/track-api" ]; then
         rmdir "$app_path/public/uploads/track-api" 2>/dev/null || true
@@ -616,7 +625,7 @@ upgrade_instance() {
         rsync_excludes+=(--exclude="$pattern")
     done
     for exclude in '.git' '.env' 'vendor/' 'data/cache/' 'data/logs/' \
-        'public/uploads/' 'temporary/' 'backup/' 'var/'; do
+        'public/uploads/' 'temporary/' 'backup/' '/var/'; do
         rsync_excludes+=(--exclude="$exclude")
     done
 

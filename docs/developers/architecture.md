@@ -86,7 +86,7 @@ Records land in `dash_form_vl` and `dash_form_eid` through
 those tables are therefore load-bearing. Dropping one changes an update into a duplicate row.
 
 `dash_track_api_requests` records every API call. Request bodies are written as zipped files
-under `public/uploads/track-api/`, and only form parameters are captured, not JSON bodies.
+under `var/api-payloads/`, and only form parameters are captured, not JSON bodies.
 
 ## Where the data lives
 
