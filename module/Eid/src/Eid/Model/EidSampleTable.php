@@ -2925,25 +2925,23 @@ class EidSampleTable extends AbstractTableGateway
             $where = '';
             $counter = count($age);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($age[$a] == '<2') {
-                    $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                 } elseif ($age[$a] == '2to5') {
-                    $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                 } elseif ($age[$a] == '6to14') {
-                    $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                 } elseif ($age[$a] == '15to49') {
-                    $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                 } elseif ($age[$a] == '>=50') {
-                    $where .= "(vl.child_age >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                 } elseif ($age[$a] == 'unknown') {
-                    $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'unreported' OR vl.child_age = 'Unreported')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'unreported' OR vl.child_age = 'Unreported')";
                 }
             }
-            $where = '(' . $where . ')';
-            $countQuery = $countQuery->where($where);
+            if (trim($where) !== '') {
+                $countQuery = $countQuery->where('(' . $where . ')');
+            }
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
             $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
@@ -3030,25 +3028,23 @@ class EidSampleTable extends AbstractTableGateway
             $where = '';
             $counter = count($age);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($age[$a] == '<2') {
-                    $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                 } elseif ($age[$a] == '2to5') {
-                    $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                 } elseif ($age[$a] == '6to14') {
-                    $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                 } elseif ($age[$a] == '15to49') {
-                    $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                 } elseif ($age[$a] == '>=50') {
-                    $where .= "(vl.child_age >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                 } elseif ($age[$a] == 'unknown') {
-                    $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'unreported' OR vl.child_age = 'Unreported')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'unreported' OR vl.child_age = 'Unreported')";
                 }
             }
-            $where = '(' . $where . ')';
-            $countQuery = $countQuery->where($where);
+            if (trim($where) !== '') {
+                $countQuery = $countQuery->where('(' . $where . ')');
+            }
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
             $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
@@ -3133,25 +3129,23 @@ class EidSampleTable extends AbstractTableGateway
             $where = '';
             $counter = count($age);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($age[$a] == '<2') {
-                    $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                 } elseif ($age[$a] == '2to5') {
-                    $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                 } elseif ($age[$a] == '6to14') {
-                    $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                 } elseif ($age[$a] == '15to49') {
-                    $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                 } elseif ($age[$a] == '>=50') {
-                    $where .= "(vl.child_age >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                 } elseif ($age[$a] == 'unknown') {
-                    $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
                 }
             }
-            $where = '(' . $where . ')';
-            $countQuery = $countQuery->where($where);
+            if (trim($where) !== '') {
+                $countQuery = $countQuery->where('(' . $where . ')');
+            }
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
             $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
@@ -3237,25 +3231,23 @@ class EidSampleTable extends AbstractTableGateway
             $where = '';
             $counter = count($age);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($age[$a] == '<2') {
-                    $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                 } elseif ($age[$a] == '2to5') {
-                    $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                 } elseif ($age[$a] == '6to14') {
-                    $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                 } elseif ($age[$a] == '15to49') {
-                    $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                 } elseif ($age[$a] == '>=50') {
-                    $where .= "(vl.child_age >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                 } elseif ($age[$a] == 'unknown') {
-                    $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
                 }
             }
-            $where = '(' . $where . ')';
-            $countQuery = $countQuery->where($where);
+            if (trim($where) !== '') {
+                $countQuery = $countQuery->where('(' . $where . ')');
+            }
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
             $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
@@ -3395,25 +3387,23 @@ class EidSampleTable extends AbstractTableGateway
             $parameters['age'] = explode(',', $parameters['age']);
             $counter = count($parameters['age']);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($parameters['age'][$a] == '<2') {
-                    $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                 } elseif ($parameters['age'][$a] == '2to5') {
-                    $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                 } elseif ($parameters['age'][$a] == '6to14') {
-                    $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                 } elseif ($parameters['age'][$a] == '15to49') {
-                    $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                 } elseif ($parameters['age'][$a] == '>=50') {
-                    $where .= "(vl.child_age >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                 } elseif ($parameters['age'][$a] == 'unknown') {
-                    $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
                 }
             }
-            $where = '(' . $where . ')';
-            $sQuery = $sQuery->where($where);
+            if (trim($where) !== '') {
+                $sQuery = $sQuery->where('(' . $where . ')');
+            }
         }
 
 
@@ -3557,25 +3547,23 @@ class EidSampleTable extends AbstractTableGateway
                     $where = '';
                     $counter = count($age);
                     for ($a = 0; $a < $counter; $a++) {
-                        if (trim($where) != '') {
-                            $where .= ' OR ';
-                        }
                         if ($age[$a] == '<2') {
-                            $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                         } elseif ($age[$a] == '2to5') {
-                            $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                         } elseif ($age[$a] == '6to14') {
-                            $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                         } elseif ($age[$a] == '15to49') {
-                            $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                         } elseif ($age[$a] == '>=50') {
-                            $where .= "(vl.child_age >= 50)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                         } elseif ($age[$a] == 'unknown') {
-                            $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
                         }
                     }
-                    $where = '(' . $where . ')';
-                    $countQuery = $countQuery->where($where);
+                    if (trim($where) !== '') {
+                        $countQuery = $countQuery->where('(' . $where . ')');
+                    }
                 }
 
                 if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -3662,25 +3650,23 @@ class EidSampleTable extends AbstractTableGateway
                     $where = '';
                     $counter = count($age);
                     for ($a = 0; $a < $counter; $a++) {
-                        if (trim($where) != '') {
-                            $where .= ' OR ';
-                        }
                         if ($age[$a] == '<2') {
-                            $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                         } elseif ($age[$a] == '2to5') {
-                            $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                         } elseif ($age[$a] == '6to14') {
-                            $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                         } elseif ($age[$a] == '15to49') {
-                            $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                         } elseif ($age[$a] == '>=50') {
-                            $where .= "(vl.child_age >= 50)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                         } elseif ($age[$a] == 'unknown') {
-                            $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
                         }
                     }
-                    $where = '(' . $where . ')';
-                    $countQuery = $countQuery->where($where);
+                    if (trim($where) !== '') {
+                        $countQuery = $countQuery->where('(' . $where . ')');
+                    }
                 }
 
                 if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -3751,25 +3737,23 @@ class EidSampleTable extends AbstractTableGateway
                 $where = '';
                 $counter = count($age);
                 for ($a = 0; $a < $counter; $a++) {
-                    if (trim($where) != '') {
-                        $where .= ' OR ';
-                    }
                     if ($age[$a] == '<2') {
-                        $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                     } elseif ($age[$a] == '2to5') {
-                        $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                     } elseif ($age[$a] == '6to14') {
-                        $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                     } elseif ($age[$a] == '15to49') {
-                        $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                     } elseif ($age[$a] == '>=50') {
-                        $where .= "(vl.child_age >= 50)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                     } elseif ($age[$a] == 'unknown') {
-                        $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
                     }
                 }
-                $where = '(' . $where . ')';
-                $sQuery = $sQuery->where($where);
+                if (trim($where) !== '') {
+                    $sQuery = $sQuery->where('(' . $where . ')');
+                }
             }
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
                 $sQuery = $sQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
@@ -3860,25 +3844,23 @@ class EidSampleTable extends AbstractTableGateway
                 $where = '';
                 $counter = count($age);
                 for ($a = 0; $a < $counter; $a++) {
-                    if (trim($where) != '') {
-                        $where .= ' OR ';
-                    }
                     if ($age[$a] == '<2') {
-                        $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                     } elseif ($age[$a] == '2to5') {
-                        $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                     } elseif ($age[$a] == '6to14') {
-                        $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                     } elseif ($age[$a] == '15to49') {
-                        $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                     } elseif ($age[$a] == '>=50') {
-                        $where .= "(vl.child_age >= 50)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                     } elseif ($age[$a] == 'unknown') {
-                        $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
                     }
                 }
-                $where = '(' . $where . ')';
-                $sQuery = $sQuery->where($where);
+                if (trim($where) !== '') {
+                    $sQuery = $sQuery->where('(' . $where . ')');
+                }
             }
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
                 $sQuery = $sQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
@@ -4030,25 +4012,23 @@ class EidSampleTable extends AbstractTableGateway
             $where = '';
             $counter = count($age);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($age[$a] == '<2') {
-                    $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                 } elseif ($age[$a] == '2to5') {
-                    $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                 } elseif ($age[$a] == '6to14') {
-                    $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                 } elseif ($age[$a] == '15to49') {
-                    $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                 } elseif ($age[$a] == '>=50') {
-                    $where .= "(vl.child_age >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                 } elseif ($age[$a] == 'unknown') {
-                    $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
                 }
             }
-            $where = '(' . $where . ')';
-            $sQuery = $sQuery->where($where);
+            if (trim($where) !== '') {
+                $sQuery = $sQuery->where('(' . $where . ')');
+            }
         }
 
 
@@ -4242,25 +4222,23 @@ class EidSampleTable extends AbstractTableGateway
             $parameters['age'] = explode(',', $parameters['age']);
             $counter = count($parameters['age']);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($parameters['age'][$a] == '<2') {
-                    $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                 } elseif ($parameters['age'][$a] == '2to5') {
-                    $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                 } elseif ($parameters['age'][$a] == '6to14') {
-                    $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                 } elseif ($parameters['age'][$a] == '15to49') {
-                    $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                 } elseif ($parameters['age'][$a] == '>=50') {
-                    $where .= "(vl.child_age >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                 } elseif ($parameters['age'][$a] == 'unknown') {
-                    $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
                 }
             }
-            $where = '(' . $where . ')';
-            $sQuery = $sQuery->where($where);
+            if (trim($where) !== '') {
+                $sQuery = $sQuery->where('(' . $where . ')');
+            }
         }
 
 
@@ -4387,25 +4365,23 @@ class EidSampleTable extends AbstractTableGateway
                 $params['age'] = explode(',', $params['age']);
                 $counter = count($params['age']);
                 for ($a = 0; $a < $counter; $a++) {
-                    if (trim($where) != '') {
-                        $where .= ' OR ';
-                    }
                     if ($params['age'][$a] == '<2') {
-                        $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                     } elseif ($params['age'][$a] == '2to5') {
-                        $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                     } elseif ($params['age'][$a] == '6to14') {
-                        $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                     } elseif ($params['age'][$a] == '15to49') {
-                        $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                     } elseif ($params['age'][$a] == '>=50') {
-                        $where .= "(vl.child_age >= 50)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                     } elseif ($params['age'][$a] == 'unknown') {
-                        $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
                     }
                 }
-                $where = '(' . $where . ')';
-                $sQuery = $sQuery->where($where);
+                if (trim($where) !== '') {
+                    $sQuery = $sQuery->where('(' . $where . ')');
+                }
             }
 
             if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -4711,25 +4687,23 @@ class EidSampleTable extends AbstractTableGateway
                 $where = '';
                 $counter = count($age);
                 for ($a = 0; $a < $counter; $a++) {
-                    if (trim($where) != '') {
-                        $where .= ' OR ';
-                    }
                     if ($age[$a] == '<2') {
-                        $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                     } elseif ($age[$a] == '2to5') {
-                        $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                     } elseif ($age[$a] == '6to14') {
-                        $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                     } elseif ($age[$a] == '15to49') {
-                        $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                     } elseif ($age[$a] == '>=50') {
-                        $where .= "(vl.child_age >= 50)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                     } elseif ($age[$a] == 'unknown') {
-                        $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
                     }
                 }
-                $where = '(' . $where . ')';
-                $query = $query->where($where);
+                if (trim($where) !== '') {
+                    $query = $query->where('(' . $where . ')');
+                }
             }
 
             if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -4874,25 +4848,23 @@ class EidSampleTable extends AbstractTableGateway
                 $where = '';
                 $counter = count($age);
                 for ($a = 0; $a < $counter; $a++) {
-                    if (trim($where) != '') {
-                        $where .= ' OR ';
-                    }
                     if ($age[$a] == '<2') {
-                        $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                     } elseif ($age[$a] == '2to5') {
-                        $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                     } elseif ($age[$a] == '6to14') {
-                        $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                     } elseif ($age[$a] == '15to49') {
-                        $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                     } elseif ($age[$a] == '>=50') {
-                        $where .= "(vl.child_age >= 50)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                     } elseif ($age[$a] == 'unknown') {
-                        $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
                     }
                 }
-                $where = '(' . $where . ')';
-                $rQuery = $rQuery->where($where);
+                if (trim($where) !== '') {
+                    $rQuery = $rQuery->where('(' . $where . ')');
+                }
             }
 
             if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -4979,25 +4951,23 @@ class EidSampleTable extends AbstractTableGateway
                 $where = '';
                 $counter = count($age);
                 for ($a = 0; $a < $counter; $a++) {
-                    if (trim($where) != '') {
-                        $where .= ' OR ';
-                    }
                     if ($age[$a] == '<2') {
-                        $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                     } elseif ($age[$a] == '2to5') {
-                        $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                     } elseif ($age[$a] == '6to14') {
-                        $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                     } elseif ($age[$a] == '15to49') {
-                        $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                     } elseif ($age[$a] == '>=50') {
-                        $where .= "(vl.child_age >= 50)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                     } elseif ($age[$a] == 'unknown') {
-                        $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
                     }
                 }
-                $where = '(' . $where . ')';
-                $queryStr = $queryStr->where($where);
+                if (trim($where) !== '') {
+                    $queryStr = $queryStr->where('(' . $where . ')');
+                }
             }
 
             if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -5133,25 +5103,23 @@ class EidSampleTable extends AbstractTableGateway
             $where = '';
             $counter = count($age);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($age[$a] == '<2') {
-                    $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age > 0 AND vl.child_age < 2)";
                 } elseif ($age[$a] == '2to5') {
-                    $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 2 AND vl.child_age <= 5)";
                 } elseif ($age[$a] == '6to14') {
-                    $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 6 AND vl.child_age <= 14)";
                 } elseif ($age[$a] == '15to49') {
-                    $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 15 AND vl.child_age <= 49)";
                 } elseif ($age[$a] == '>=50') {
-                    $where .= "(vl.child_age >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age >= 50)";
                 } elseif ($age[$a] == 'unknown') {
-                    $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
                 }
             }
-            $where = '(' . $where . ')';
-            $sQuery = $sQuery->where($where);
+            if (trim($where) !== '') {
+                $sQuery = $sQuery->where('(' . $where . ')');
+            }
         }
         if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
             $sQuery = $sQuery->where("vl.child_gender IN ('f','female','F','FEMALE')");
