@@ -221,7 +221,7 @@ curl -X POST https://dashboard.example.org/api/v2/vl/weblims \
 
 ### POST /api/v2/vl/import
 
-Stores an uploaded file in `public/uploads/not-import-vl` for offline processing. Requires a `client` token.
+Stores an uploaded file in `var/not-import-vl` for offline processing. Requires a `client` token.
 
 | Field | Type | Description | Default |
 | --- | --- | --- | --- |

@@ -13,7 +13,7 @@ $timezone = date_default_timezone_get();
 $schedule = new Schedule();
 
 // Housekeeping — prune API payload dirs (vlsm-vl / vlsm-eid /
-// vlsm-reference), track-api JSON, temp files, cache and stale DB rows
+// vlsm-reference), API payloads, temp files, cache and stale DB rows
 $schedule->run("{$php} {$root}/bin/console housekeeping")
     ->dailyAt('02:00')
     ->timezone($timezone)
