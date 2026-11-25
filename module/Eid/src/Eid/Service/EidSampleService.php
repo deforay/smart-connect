@@ -215,6 +215,9 @@ class EidSampleService
         //$facilityTypeDb = $this->sm->get('FacilityTypeTable');
         $locationDb = $this->sm->get('LocationDetailsTable');
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
+        /** @var CommonService $commonService */
+        $commonService = $this->sm->get('CommonService');
+        $localDbFieldArray = $commonService->getTableFieldsAsArray('dash_form_eid', ['eid_id']);
 
 
         $extension = strtolower(pathinfo($_FILES['eidFile']['name'], PATHINFO_EXTENSION));
@@ -394,6 +397,8 @@ class EidSampleService
                     //     //sample data insert
                     //     $sampleDb->insert($data);
                     // }
+                    // The row keys come from the uploaded file, so keep only real columns.
+                    $data = array_intersect_key($data, $localDbFieldArray);
                     $sampleDb->insertOrUpdate($data);
                 }
             }
@@ -432,8 +437,7 @@ class EidSampleService
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))
             ->where(array('l.geo_parent' => $parent, 'l.geo_name' => trim($location)));
-        $sQuery = $sql->buildSqlString($sQuery);
-        return $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $sql->prepareStatementForSqlObject($sQuery)->execute()->current();
     }
 
     public function checkFacilityDetails($clinicName)
@@ -441,24 +445,21 @@ class EidSampleService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from('facility_details')->where(array('facility_name' => $clinicName));
-        $fQueryStr = $sql->buildSqlString($fQuery);
-        return $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $sql->prepareStatementForSqlObject($fQuery)->execute()->current();
     }
     public function checkFacilityTypeDetails($facilityTypeName)
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from('facility_type')->where(array('facility_type' => $facilityTypeName));
-        $fQueryStr = $sql->buildSqlString($fQuery);
-        return $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $sql->prepareStatementForSqlObject($fQuery)->execute()->current();
     }
     public function checkTestingReson($testingReson)
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $tQuery = $sql->select()->from('r_eid_test_reasons')->where(array('test_reason_name' => $testingReson));
-        $tQueryStr = $sql->buildSqlString($tQuery);
-        return $dbAdapter->query($tQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $sql->prepareStatementForSqlObject($tQuery)->execute()->current();
     }
     public function checkSampleStatus($testingStatus)
     {
@@ -466,8 +467,7 @@ class EidSampleService
         $sql = new Sql($dbAdapter);
         $testStatusDb = $this->sm->get('SampleStatusTable');
         $sQuery = $sql->select()->from('r_sample_status')->where(array('status_name' => $testingStatus));
-        $sQueryStr = $sql->buildSqlString($sQuery);
-        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        $sResult = $sql->prepareStatementForSqlObject($sQuery)->execute()->current();
         if ($sResult) {
             $resultStatus = $sResult['status_id'];
         } else {
@@ -481,8 +481,7 @@ class EidSampleService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_eid_sample_type')->where(array('sample_name' => $sampleType));
-        $sQueryStr = $sql->buildSqlString($sQuery);
-        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $sql->prepareStatementForSqlObject($sQuery)->execute()->current();
     }
 
     public function checkTestReason($reasonName)
@@ -508,8 +507,7 @@ class EidSampleService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_eid_sample_rejection_reasons')->where(array('rejection_reason_name' => $rejectReasonName));
-        $sQueryStr = $sql->buildSqlString($sQuery);
-        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $sql->prepareStatementForSqlObject($sQuery)->execute()->current();
     }
 
     public function getAllLabName()

@@ -476,7 +476,7 @@ class UsersTable extends BaseTableGateway
     public function checkExistUser($name)
     {
         $where = new \Laminas\Db\Sql\Where();
-        $where->like('user_name', $name . '%');
+        $where->like('user_name', addcslashes($name, '%_\\') . '%');
         $userInfo = $this->select($where)->current();
         if ($userInfo) {
             return $userInfo['user_id'];
