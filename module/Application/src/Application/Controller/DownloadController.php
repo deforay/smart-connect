@@ -39,15 +39,23 @@ class DownloadController extends AbstractActionController
             return $this->refuse(Response::STATUS_CODE_401);
         }
 
-        // basename() keeps the request inside EXPORT_PATH: whatever the
-        // segment holds, only its last path component is looked up.
+        // Only the last path component is looked up, and never a dot file:
+        // the app writes none, so a name starting with "." is not one of ours.
         $name = basename((string) $this->params()->fromRoute('file', ''));
-        if ($name === '' || str_starts_with($name, '..')) {
+        if ($name === '' || str_starts_with($name, '.')) {
             return $this->refuse(Response::STATUS_CODE_404);
         }
 
-        $path = $this->exportPath . DIRECTORY_SEPARATOR . $name;
-        if (!is_file($path)) {
+        // realpath() resolves symlinks, so a link inside EXPORT_PATH that
+        // points elsewhere is refused too.
+        $root = realpath($this->exportPath);
+        $path = realpath($this->exportPath . DIRECTORY_SEPARATOR . $name);
+        if (
+            $root === false
+            || $path === false
+            || !str_starts_with($path, $root . DIRECTORY_SEPARATOR)
+            || !is_file($path)
+        ) {
             return $this->refuse(Response::STATUS_CODE_404);
         }
 

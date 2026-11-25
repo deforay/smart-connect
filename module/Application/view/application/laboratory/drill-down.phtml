@@ -650,7 +650,7 @@ if (isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts'])
                 if (data == "" || data == null || data == undefined) {
                     alert('<?php echo $this->translate('Unable to export excel'); ?>');
                 } else {
-                    window.open('/download/' + data, '_blank');
+                    window.open('/download/' + encodeURIComponent(data), '_blank');
                 }
             });
     }
