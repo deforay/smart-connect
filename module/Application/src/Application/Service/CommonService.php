@@ -929,7 +929,7 @@ class CommonService
                               $colorNo++;
                          }
                          $writer = IOFactory::createWriter($excel, 'Xlsx');
-                         $filename = 'SAMPLE-SYNC-STATUS-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
+                         $filename = CommonService::exportFileName('SAMPLE-SYNC-STATUS-REPORT-' . date('d-M-Y-H-i-s'), 'xlsx');
                          $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                          return $filename;
                     } else {
@@ -1026,6 +1026,24 @@ class CommonService
           }
 
           return mkdir($path, $mode, $recursive);
+     }
+
+     /**
+      * Name for a new file in EXPORT_PATH, which is created if it is missing.
+      *
+      * Files there are served by name to any logged-in user, so the random
+      * part keeps one user from guessing or overwriting another user's file.
+      * The prefix keeps only safe characters, since it may hold a sample code.
+      */
+     public static function exportFileName(string $prefix, string $extension): string
+     {
+          if (!is_dir(EXPORT_PATH) && !@mkdir(EXPORT_PATH, 0775, true) && !is_dir(EXPORT_PATH)) {
+               throw new RuntimeException('Could not create the export folder ' . EXPORT_PATH);
+          }
+
+          $prefix = preg_replace('/[^A-Za-z0-9_-]/', '_', $prefix);
+
+          return $prefix . '-' . bin2hex(random_bytes(8)) . '.' . $extension;
      }
 
      public static function zipJson($json, $fileName)

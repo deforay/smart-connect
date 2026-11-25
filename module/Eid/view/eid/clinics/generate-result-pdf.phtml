@@ -271,7 +271,7 @@ if (sizeof($sampleResult) > 0) {
           $html .= '</table>';
           $pdf->writeHTML($html);
           $pdf->lastPage();
-          $filename = EXPORT_PATH . DIRECTORY_SEPARATOR . 'p' . $page . '.pdf';
+          $filename = EXPORT_PATH . DIRECTORY_SEPARATOR . CommonService::exportFileName('result-page-' . $page, 'pdf');
           $pdf->Output($filename, "F");
           $pages[] = $filename;
           $page++;
@@ -283,7 +283,10 @@ if (!empty($pages)) {
      $resultPdf->setPrintHeader(false);
      $resultPdf->setPrintFooter(false);
      $resultPdf->concat();
-     $resultFilename = 'EID-Result-' . $result['sample_code'] . '.pdf';
+     $resultFilename = CommonService::exportFileName('EID-Result-' . $result['sample_code'], 'pdf');
      $resultPdf->Output(EXPORT_PATH . DIRECTORY_SEPARATOR . $resultFilename, "F");
+     foreach ($pages as $pageFile) {
+          unlink($pageFile);
+     }
 }
 echo $resultFilename;

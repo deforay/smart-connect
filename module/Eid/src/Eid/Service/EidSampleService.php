@@ -761,7 +761,7 @@ class EidSampleService
                         $currentRow++;
                     }
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = 'RESULTS-AWAITED--' . date('d-M-Y-H-i-s') . '.xlsx';
+                    $filename = CommonService::exportFileName('RESULTS-AWAITED-' . date('d-M-Y-H-i-s'), 'xlsx');
                     $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
@@ -925,7 +925,7 @@ class EidSampleService
                         $currentRow++;
                     }
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = 'TEST-RESULT-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
+                    $filename = CommonService::exportFileName('TEST-RESULT-REPORT-' . date('d-M-Y-H-i-s'), 'xlsx');
                     $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
@@ -1039,7 +1039,7 @@ class EidSampleService
                         $currentRow++;
                     }
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = 'SAMPLE-TESTED-LAB-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
+                    $filename = CommonService::exportFileName('SAMPLE-TESTED-LAB-REPORT-' . date('d-M-Y-H-i-s'), 'xlsx');
                     $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
@@ -1201,7 +1201,7 @@ class EidSampleService
                         $currentRow++;
                     }
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = 'HIGH-VL-SAMPLE-RESULT-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
+                    $filename = CommonService::exportFileName('HIGH-VL-SAMPLE-RESULT-REPORT-' . date('d-M-Y-H-i-s'), 'xlsx');
                     $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
@@ -1297,7 +1297,7 @@ class EidSampleService
                             $currentRow++;
                         }
                         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                        $filename = 'SAMPLE-TEST-RESULT-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
+                        $filename = CommonService::exportFileName('SAMPLE-TEST-RESULT-REPORT-' . date('d-M-Y-H-i-s'), 'xlsx');
                         $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                         return $filename;
                     } else {

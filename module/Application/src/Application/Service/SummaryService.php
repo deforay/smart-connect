@@ -220,7 +220,7 @@ class SummaryService
                     }
 
                     $writer = IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = 'VL-SUMMARY-KEY-INDICATORS-' . date('d-M-Y-H-i-s') . '.xlsx';
+                    $filename = CommonService::exportFileName('VL-SUMMARY-KEY-INDICATORS-' . date('d-M-Y-H-i-s'), 'xlsx');
                     $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
@@ -358,7 +358,7 @@ class SummaryService
                 }
 
                 $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                $filename = 'Facility-Wise-Suppression-Rate-' . date('d-M-Y-H-i-s') . '.xlsx';
+                $filename = CommonService::exportFileName('Facility-Wise-Suppression-Rate-' . date('d-M-Y-H-i-s'), 'xlsx');
                 $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                 return $filename;
             } else {

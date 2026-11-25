@@ -2,7 +2,6 @@ syntax: regexp
 ^data/cache/(?!index.php)
 ^backup/(?!index.php)
 ^public/uploads/(?!index.php)
-^public/temporary/(?!index.php)
 ^vendor
 error_log
 \.DS_Store$

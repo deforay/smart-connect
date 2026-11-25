@@ -207,7 +207,7 @@ class EidSummaryService
                     }
 
                     $writer = IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = 'EID-SUMMARY-KEY-INDICATORS-' . date('d-M-Y-H-i-s') . '.xlsx';
+                    $filename = CommonService::exportFileName('EID-SUMMARY-KEY-INDICATORS-' . date('d-M-Y-H-i-s'), 'xlsx');
                     $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
@@ -315,7 +315,7 @@ class EidSummaryService
                 }
 
                 $writer = IOFactory::createWriter($excel, 'Xlsx');
-                $filename = 'EID-Facility-Wise-Positive-Rate-' . date('d-M-Y-H-i-s') . '.xlsx';
+                $filename = CommonService::exportFileName('EID-Facility-Wise-Positive-Rate-' . date('d-M-Y-H-i-s'), 'xlsx');
                 $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
                 return $filename;
             } else {
