@@ -13,7 +13,6 @@ use Application\Model\FacilityTable;
 use Application\Service\CommonService;
 use Application\Model\LocationDetailsTable;
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use Application\Model\DashApiReceiverStatsTable;
 
 class SampleService
@@ -496,7 +495,6 @@ class SampleService
                     } elseif (trim($params['result']) == 'rejected') {
                         $sheet->getStyle('D1')->applyFromArray($styleArray);
                     }
-                    $currentRow = 2;
                     $endColumn = 5;
                     if (trim($params['result']) == 'result') {
                         $endColumn = 4;
@@ -505,26 +503,7 @@ class SampleService
                     } elseif (trim($params['result']) == 'rejected') {
                         $endColumn = 3;
                     }
-                    foreach ($output as $rowData) {
-                        $colNo = 1;
-                        foreach ($rowData as $field => $value) {
-                            if (!isset($value)) {
-                                $value = "";
-                            }
-                            if ($colNo > $endColumn) {
-                                break;
-                            }
-                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                            // $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $currentRow)->applyFromArray($borderStyle);
-                            // $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $currentRow)->getAlignment()->setWrapText(true);
-                            $colNo++;
-                        }
-                        $currentRow++;
-                    }
-                    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = CommonService::exportFileName('TEST-RESULT-REPORT-' . date('d-M-Y-H-i-s'), 'xlsx');
-                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
-                    return $filename;
+                    return CommonService::exportRows($excel, $output, 'TEST-RESULT-REPORT', lastColumn: $endColumn);
                 } else {
                     return "";
                 }
@@ -680,24 +659,7 @@ class SampleService
                     $sheet->getStyle('X1')->applyFromArray($styleArray);
                     $sheet->getStyle('Y1')->applyFromArray($styleArray);
 
-                    $currentRow = 2;
-                    foreach ($output as $rowData) {
-                        $colNo = 1;
-                        foreach ($rowData as $field => $value) {
-                            if (!isset($value)) {
-                                $value = "";
-                            }
-                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                            $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $currentRow)->getAlignment()->setWrapText(true);
-                            $colNo++;
-                        }
-                        $currentRow++;
-                    }
-                    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = CommonService::exportFileName('HIGH-VL-SAMPLE-RESULT-REPORT-' . date('d-M-Y-H-i-s'), 'xlsx');
-                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
-                    return $filename;
+                    return CommonService::exportRows($excel, $output, 'HIGH-VL-SAMPLE-RESULT-REPORT', cellStyle: $borderStyle, wrapText: true);
                 } else {
                     return "";
                 }
@@ -780,29 +742,7 @@ class SampleService
                         $sheet->getStyle('F1')->applyFromArray($styleArray);
                         $sheet->getStyle('G1')->applyFromArray($styleArray);
 
-                        $currentRow = 2;
-                        foreach ($output as $rowData) {
-                            $colNo = 1;
-                            foreach ($rowData as $field => $value) {
-                                if (!isset($value)) {
-                                    $value = "";
-                                }
-                                if ($colNo > 6) {
-                                    break;
-                                }
-                                $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                                $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $currentRow)->applyFromArray($borderStyle);
-                                // $sheet->getDefaultRowDimension()->setRowHeight(20);
-                                // $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
-                                // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
-                                $colNo++;
-                            }
-                            $currentRow++;
-                        }
-                        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                        $filename = CommonService::exportFileName('SAMPLE-TEST-RESULT-REPORT-' . date('d-M-Y-H-i-s'), 'xlsx');
-                        $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
-                        return $filename;
+                        return CommonService::exportRows($excel, $output, 'SAMPLE-TEST-RESULT-REPORT', lastColumn: 6, cellStyle: $borderStyle);
                     } else {
                         return "";
                     }
@@ -889,25 +829,7 @@ class SampleService
 
                     $sheet->getStyle('A1:I1')->applyFromArray($styleArray);
 
-                    $currentRow = 2;
-                    foreach ($output as $rowData) {
-                        $colNo = 1;
-                        foreach ($rowData as $field => $value) {
-                            if (!isset($value)) {
-                                $value = "";
-                            }
-                            if ($colNo > 8) {
-                                break;
-                            }
-                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                            $colNo++;
-                        }
-                        $currentRow++;
-                    }
-                    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = CommonService::exportFileName('SAMPLE-TESTED-LAB-REPORT-' . date('d-M-Y-H-i-s'), 'xlsx');
-                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
-                    return $filename;
+                    return CommonService::exportRows($excel, $output, 'SAMPLE-TESTED-LAB-REPORT', lastColumn: 8);
                 } else {
                     return "";
                 }
@@ -990,25 +912,7 @@ class SampleService
                     $sheet->getStyle('G1')->applyFromArray($styleArray);
                     $sheet->getStyle('H1')->applyFromArray($styleArray);
 
-                    $currentRow = 2;
-                    foreach ($output as $rowData) {
-                        $colNo = 1;
-                        foreach ($rowData as $field => $value) {
-                            if (!isset($value)) {
-                                $value = "";
-                            }
-                            if ($colNo > 7) {
-                                break;
-                            }
-                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                            $colNo++;
-                        }
-                        $currentRow++;
-                    }
-                    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = CommonService::exportFileName('LAB-TAT-REPORT-' . date('d-M-Y-H-i-s'), 'xlsx');
-                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
-                    return $filename;
+                    return CommonService::exportRows($excel, $output, 'LAB-TAT-REPORT', lastColumn: 7);
                 } else {
                     return "";
                 }
@@ -1118,25 +1022,7 @@ class SampleService
                     $sheet->getStyle('E1')->applyFromArray($styleArray);
                     $sheet->getStyle('F1')->applyFromArray($styleArray);
 
-                    $currentRow = 2;
-                    foreach ($output as $rowData) {
-                        $colNo = 1;
-                        foreach ($rowData as $field => $value) {
-                            if (!isset($value)) {
-                                $value = "";
-                            }
-                            if ($colNo > 5) {
-                                break;
-                            }
-                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                            $colNo++;
-                        }
-                        $currentRow++;
-                    }
-                    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = CommonService::exportFileName('RESULTS-AWAITED-' . date('d-M-Y-H-i-s'), 'xlsx');
-                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
-                    return $filename;
+                    return CommonService::exportRows($excel, $output, 'RESULTS-AWAITED', lastColumn: 5);
                 } else {
                     return "";
                 }
