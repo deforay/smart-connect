@@ -69,8 +69,7 @@ class SampleService
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))
             ->where(array('l.geo_parent' => $parent, 'l.geo_name' => trim($location)));
-        $sQuery = $sql->buildSqlString($sQuery);
-        return $this->dbAdapter->query($sQuery, Adapter::QUERY_MODE_EXECUTE)->current();
+        return $sql->prepareStatementForSqlObject($sQuery)->execute()->current();
     }
 
     public function checkFacilityDetails($clinicName)
@@ -78,8 +77,7 @@ class SampleService
 
         $sql = new Sql($this->dbAdapter);
         $fQuery = $sql->select()->from('facility_details')->where(array('facility_name' => $clinicName));
-        $fQueryStr = $sql->buildSqlString($fQuery);
-        return $this->dbAdapter->query($fQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
+        return $sql->prepareStatementForSqlObject($fQuery)->execute()->current();
     }
     public function checkFacilityTypeDetails($facilityTypeName)
     {
@@ -95,30 +93,26 @@ class SampleService
 
         $sql = new Sql($this->dbAdapter);
         $tQuery = $sql->select()->from('r_vl_test_reasons')->where(array('test_reason_name' => $testingReson));
-        $tQueryStr = $sql->buildSqlString($tQuery);
-        return $this->dbAdapter->query($tQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
+        return $sql->prepareStatementForSqlObject($tQuery)->execute()->current();
     }
     public function checkSampleStatus($testingStatus)
     {
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from('r_sample_status')->where(array('status_name' => $testingStatus));
-        $sQueryStr = $sql->buildSqlString($sQuery);
-        return $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
+        return $sql->prepareStatementForSqlObject($sQuery)->execute()->current();
     }
     public function checkSampleType($sampleType)
     {
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from('r_vl_sample_type')->where(array('sample_name' => $sampleType));
-        $sQueryStr = $sql->buildSqlString($sQuery);
-        return $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
+        return $sql->prepareStatementForSqlObject($sQuery)->execute()->current();
     }
     public function checkSampleRejectionReason($rejectReasonName)
     {
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from('r_vl_sample_rejection_reasons')
             ->where(array('rejection_reason_name' => $rejectReasonName));
-        $sQueryStr = $sql->buildSqlString($sQuery);
-        return $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
+        return $sql->prepareStatementForSqlObject($sQuery)->execute()->current();
     }
 
     public function checkTestReason($reasonName)

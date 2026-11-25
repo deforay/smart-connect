@@ -799,8 +799,7 @@ class CommonService
           }
           $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))
                ->where($where);
-          $sQuery = $sql->buildSqlString($sQuery);
-          return $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+          return $sql->prepareStatementForSqlObject($sQuery)->execute()->current();
      }
 
      public function getMonthsInRange($startDate, $endDate)
@@ -1421,10 +1420,11 @@ class CommonService
                $update[] = $platform->quoteIdentifier($key) . ' = VALUES(' . $platform->quoteIdentifier($key) . ')';
           }
 
-          $query = $sql->buildSqlString($insert) . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $update);
+          $stmt = $sql->prepareStatementForSqlObject($insert);
+          $stmt->setSql($stmt->getSql() . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $update));
 
           /** @var \Laminas\Db\Adapter\Driver\ResultInterface $result */
-          $result = $adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
+          $result = $stmt->execute();
 
           return $result->getGeneratedValue(); // Get the last generated value
      }
