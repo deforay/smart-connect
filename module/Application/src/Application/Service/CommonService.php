@@ -928,10 +928,7 @@ class CommonService
                               }
                               $colorNo++;
                          }
-                         $writer = IOFactory::createWriter($excel, 'Xlsx');
-                         $filename = CommonService::exportFileName('SAMPLE-SYNC-STATUS-REPORT-' . date('d-M-Y-H-i-s'), 'xlsx');
-                         $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
-                         return $filename;
+                         return self::saveSpreadsheet($excel, 'SAMPLE-SYNC-STATUS-REPORT');
                     } else {
                          return "";
                     }
@@ -1044,6 +1041,51 @@ class CommonService
           $prefix = preg_replace('/[^A-Za-z0-9_-]/', '_', $prefix);
 
           return $prefix . '-' . bin2hex(random_bytes(8)) . '.' . $extension;
+     }
+
+     /**
+      * Writes $rows into the active sheet of $excel from row 2 and column A,
+      * one row per entry, then saves it like saveSpreadsheet() does.
+      *
+      * @param int|null   $lastColumn stop each row after this many columns
+      * @param array|null $cellStyle  style applied to every written cell
+      */
+     public static function exportRows(Spreadsheet $excel, iterable $rows, string $prefix, ?int $lastColumn = null, ?array $cellStyle = null, bool $wrapText = false): string
+     {
+          $sheet = $excel->getActiveSheet();
+          $rowNo = 2;
+          foreach ($rows as $row) {
+               $colNo = 1;
+               foreach ($row as $value) {
+                    if ($lastColumn !== null && $colNo > $lastColumn) {
+                         break;
+                    }
+                    $cell = Coordinate::stringFromColumnIndex($colNo) . $rowNo;
+                    $sheet->setCellValue($cell, html_entity_decode((string) ($value ?? ''), ENT_QUOTES, 'UTF-8'));
+                    if ($cellStyle !== null) {
+                         $sheet->getStyle($cell)->applyFromArray($cellStyle);
+                    }
+                    if ($wrapText) {
+                         $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
+                    }
+                    $colNo++;
+               }
+               $rowNo++;
+          }
+
+          return self::saveSpreadsheet($excel, $prefix);
+     }
+
+     /**
+      * Saves $excel in EXPORT_PATH as <prefix>-<date>-<random>.xlsx and
+      * returns the file name for /download/.
+      */
+     public static function saveSpreadsheet(Spreadsheet $excel, string $prefix): string
+     {
+          $filename = self::exportFileName($prefix . '-' . date('d-M-Y-H-i-s'), 'xlsx');
+          IOFactory::createWriter($excel, 'Xlsx')->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
+
+          return $filename;
      }
 
      public static function zipJson($json, $fileName)

@@ -7,7 +7,6 @@ use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Expression;
 use Application\Session\Container;
 use Application\Service\CommonService;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
@@ -196,20 +195,7 @@ class EidSummaryService
                     }
 
 
-                    $currentRow = 2;
-                    foreach ($output as $rowData) {
-                        $colNo = 1;
-                        foreach ($rowData as $field => $value) {
-                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value ?? "", ENT_QUOTES, 'UTF-8'));
-                            $colNo++;
-                        }
-                        $currentRow++;
-                    }
-
-                    $writer = IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = CommonService::exportFileName('EID-SUMMARY-KEY-INDICATORS-' . date('d-M-Y-H-i-s'), 'xlsx');
-                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
-                    return $filename;
+                    return CommonService::exportRows($excel, $output, 'EID-SUMMARY-KEY-INDICATORS');
                 } else {
                     return "";
                 }
@@ -298,26 +284,7 @@ class EidSummaryService
 
 
 
-                $currentRow = 2;
-                foreach ($output as $rowData) {
-                    $colNo = 1;
-                    foreach ($rowData as $field => $value) {
-                        if (!isset($value)) {
-                            $value = "";
-                        }
-                        // if ($colNo > 5) {
-                        //     break;
-                        // }
-                        $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                        $colNo++;
-                    }
-                    $currentRow++;
-                }
-
-                $writer = IOFactory::createWriter($excel, 'Xlsx');
-                $filename = CommonService::exportFileName('EID-Facility-Wise-Positive-Rate-' . date('d-M-Y-H-i-s'), 'xlsx');
-                $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
-                return $filename;
+                return CommonService::exportRows($excel, $output, 'EID-Facility-Wise-Positive-Rate');
             } else {
                 return "";
             }

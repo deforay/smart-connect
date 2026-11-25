@@ -8,7 +8,6 @@ use Laminas\Db\Sql\Expression;
 use Application\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use Application\Model\SampleTable;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class SummaryService
@@ -205,24 +204,7 @@ class SummaryService
                     }
 
 
-                    $currentRow = 2;
-                    foreach ($output as $rowData) {
-                        $colNo = 1;
-                        foreach ($rowData as $field => $value) {
-                            if (!isset($value)) {
-                                $value = "";
-                            }
-
-                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                            $colNo++;
-                        }
-                        $currentRow++;
-                    }
-
-                    $writer = IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = CommonService::exportFileName('VL-SUMMARY-KEY-INDICATORS-' . date('d-M-Y-H-i-s'), 'xlsx');
-                    $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
-                    return $filename;
+                    return CommonService::exportRows($excel, $output, 'VL-SUMMARY-KEY-INDICATORS');
                 } else {
                     return "";
                 }
@@ -341,26 +323,7 @@ class SummaryService
                 $sheet->getStyle('G1')->applyFromArray($styleArray);
                 $sheet->getStyle('H1')->applyFromArray($styleArray);
 
-                $currentRow = 2;
-                foreach ($output as $rowData) {
-                    $colNo = 1;
-                    foreach ($rowData as $field => $value) {
-                        if (!isset($value)) {
-                            $value = "";
-                        }
-                        // if ($colNo > 5) {
-                        //     break;
-                        // }
-                        $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                        $colNo++;
-                    }
-                    $currentRow++;
-                }
-
-                $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                $filename = CommonService::exportFileName('Facility-Wise-Suppression-Rate-' . date('d-M-Y-H-i-s'), 'xlsx');
-                $writer->save(EXPORT_PATH . DIRECTORY_SEPARATOR . $filename);
-                return $filename;
+                return CommonService::exportRows($excel, $output, 'Facility-Wise-Suppression-Rate');
             } else {
                 return "";
             }
