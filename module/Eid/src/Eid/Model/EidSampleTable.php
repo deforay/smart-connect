@@ -4694,7 +4694,9 @@ class EidSampleTable extends AbstractTableGateway
                 $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds));
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-                $query = $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
+                if (!empty($mappedFacilities)) {
+                    $query = $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
+                }
             }
 
             if (isset($params['testResult']) && $params['testResult'] != '') {

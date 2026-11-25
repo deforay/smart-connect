@@ -31,7 +31,6 @@ class SummaryController extends AbstractAppController
 
     public function dashboardAction()
     {
-        ini_set('display_errors', '1');
         if ($this->params()->fromQuery('f') && $this->params()->fromQuery('t')) {
             $params['fromDate'] = $this->params()->fromQuery('f');
             $params['toDate'] = $this->params()->fromQuery('t');

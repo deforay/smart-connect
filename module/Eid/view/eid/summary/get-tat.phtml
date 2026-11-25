@@ -111,7 +111,7 @@ use Zend\Debug\Debug;
             series: [
                 {
                     name:'Collection to Dispatch (C-D)',
-                    data: [<?php echo ceil(($result['total']));?>],
+                    data: [<?php echo ceil((float) ($result['total'] ?? 0));?>],
                     color: 'black',
                     dataLabels: {
                         enabled: true,
