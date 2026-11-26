@@ -9,6 +9,7 @@ if(count($result) > 0){
 
     /* To print the data and facility */
     $print = "";
+    $facility = [];
     foreach($result['result'] as $row){
         $facility[$row['facility_name']][$row['monthYear']] = $row['positive_rate'];
     }

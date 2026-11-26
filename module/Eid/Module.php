@@ -59,7 +59,7 @@ class Module
                     public function __invoke($diContainer)
                     {
                         $session = new Container('credo');
-                        $mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
+                        $mappedFacilities = !empty($session->mappedFacilities) ? $session->mappedFacilities : [];
                         $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
                         $eidSampleTable = property_exists($session, 'eidSampleTable') && $session->eidSampleTable !== null ? $session->eidSampleTable :  null;
                         $commonService = $diContainer->get('CommonService');
@@ -75,7 +75,7 @@ class Module
                     public function __invoke($diContainer)
                     {
                         $session = new Container('credo');
-                        $mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
+                        $mappedFacilities = !empty($session->mappedFacilities) ? $session->mappedFacilities : [];
                         $eidSampleTable = property_exists($session, 'eidSampleTable') && $session->eidSampleTable !== null ? $session->eidSampleTable :  null;
                         $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
                         $commonService = $diContainer->get('CommonService');

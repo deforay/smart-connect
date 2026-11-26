@@ -58,6 +58,22 @@ class SnapShotService
         return empty($types) ? self::SUPPORTED_TEST_TYPES : $types;
     }
 
+    /**
+     * The mapped-facility filter for the logged-in user: the mapped list when
+     * it is not empty, null (no filter) for an admin without one, and an empty
+     * list (match nothing) for any other user without one.
+     */
+    private static function mappedFacilitiesFilter(): ?array
+    {
+        $loginContainer = new Container('credo');
+        $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+        if (!empty($mappedFacilities)) {
+            return (array) $mappedFacilities;
+        }
+
+        return $loginContainer->role != 1 ? [] : null;
+    }
+
     private static function inList(string $column, array $values): WhereExpression
     {
         $values = array_values($values);
@@ -141,8 +157,10 @@ class SnapShotService
             $whereConditions[] = new WhereExpression("icm.poc_device = ?", ['yes']);
         }
 
-        // Mapped Facilities
-        if (!empty($mappedFacilities)) {
+        // Mapped Facilities. null applies no filter; an empty list matches nothing.
+        if ($mappedFacilities === []) {
+            $whereConditions[] = new WhereExpression('1 = 0');
+        } elseif ($mappedFacilities !== null) {
             $whereConditions[] = self::inList("$alias.lab_id", $mappedFacilities);
         }
 
@@ -153,8 +171,7 @@ class SnapShotService
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $loginContainer = new Container('credo');
-        $mappedFacilities = $loginContainer->mappedFacilities ?? null;
+        $mappedFacilities = self::mappedFacilitiesFilter();
 
         $types = self::testTypes($params);
         $testTypeQuery = [];
@@ -232,8 +249,7 @@ class SnapShotService
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $globalDb = $this->sm->get('GlobalTable');
-        $loginContainer = new Container('credo');
-        $mappedFacilities = $loginContainer->mappedFacilities ?? null;
+        $mappedFacilities = self::mappedFacilitiesFilter();
 
         $samplesWaitingFromLastXMonths = (int) $globalDb->getGlobalValue('sample_waiting_month_range');
         $age['vl'] = "patient_age_in_years";
@@ -345,8 +361,7 @@ class SnapShotService
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $loginContainer = new Container('credo');
-        $mappedFacilities = $loginContainer->mappedFacilities ?? null;
+        $mappedFacilities = self::mappedFacilitiesFilter();
 
         $dimension = $params['dimension'] ?? 'testing_lab';
         // When dimension=health_facility we group by facility_id (the requesting site); otherwise by lab_id.

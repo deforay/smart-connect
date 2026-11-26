@@ -502,7 +502,7 @@ class Module
 			public function __invoke($diContainer)
 			{
 				$session = new Container('credo');
-				$mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && !empty($session->mappedFacilities)) ? $session->mappedFacilities : [];
+				$mappedFacilities = !empty($session->mappedFacilities) ? $session->mappedFacilities : [];
 				$sampleTable = property_exists($session, 'sampleTable') && $session->sampleTable !== null ? $session->sampleTable : null;
 				$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 				$commonService = $diContainer->get('CommonService');
@@ -516,7 +516,7 @@ class Module
 			public function __invoke($diContainer)
 			{
 				$session = new Container('credo');
-				$mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && !empty($session->mappedFacilities)) ? $session->mappedFacilities : [];
+				$mappedFacilities = !empty($session->mappedFacilities) ? $session->mappedFacilities : [];
 				$sampleTable = property_exists($session, 'sampleTable') && $session->sampleTable !== null ? $session->sampleTable : null;
 				$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 				$commonService = $diContainer->get('CommonService');
