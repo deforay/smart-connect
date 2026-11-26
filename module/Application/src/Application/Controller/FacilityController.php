@@ -5,19 +5,22 @@ namespace Application\Controller;
 
 use Laminas\View\Model\ViewModel;
 use Application\Service\CommonService;
-use Laminas\Mvc\Controller\AbstractActionController;
 
-class FacilityController extends AbstractActionController
+class FacilityController extends AbstractAppController
 {
 
     private $facilityService = null;
 
-    public function __construct($facilityService)
+    public function __construct($facilityService, \Application\Model\Acl $acl)
     {
+        $this->setAcl($acl);
         $this->facilityService = $facilityService;
     }
     public function indexAction()
     {
+        if (!$this->hasPrivilege('index')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'facility');
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
@@ -30,6 +33,9 @@ class FacilityController extends AbstractActionController
 
     public function addAction()
     {
+        if (!$this->hasPrivilege('add')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'facility');
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
@@ -46,6 +52,9 @@ class FacilityController extends AbstractActionController
 
     public function editAction()
     {
+        if (!$this->hasPrivilege('edit')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'facility');
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();

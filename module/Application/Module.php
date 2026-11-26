@@ -826,14 +826,14 @@ class Module
 				$commonService = $diContainer->get('CommonService');
 				$orgService = $diContainer->get('OrganizationService');
 				$userService = $diContainer->get('UserService');
-				return new \Application\Controller\UsersController($userService, $commonService, $orgService);
+				return new \Application\Controller\UsersController($userService, $commonService, $orgService, $diContainer->get('AppAcl'));
 			}
 				},
 				'Application\Controller\UserLoginHistoryController' => new class {
 			public function __invoke($diContainer)
 			{
 				$userLoginHistoryService = $diContainer->get('UserLoginHistoryService');
-				return new \Application\Controller\UserLoginHistoryController($userLoginHistoryService);			
+				return new \Application\Controller\UserLoginHistoryController($userLoginHistoryService, $diContainer->get('AppAcl'));			
 			}
 				},
 				'Application\Controller\StatusController' => new class {
@@ -854,14 +854,14 @@ class Module
 			public function __invoke($diContainer)
 			{
 				$configService = $diContainer->get('ConfigService');
-				return new \Application\Controller\ConfigController($configService);
+				return new \Application\Controller\ConfigController($configService, $diContainer->get('AppAcl'));
 			}
 				},
 				'Application\Controller\FacilityController' => new class {
 			public function __invoke($diContainer)
 			{
 				$facilityService = $diContainer->get('FacilityService');
-				return new \Application\Controller\FacilityController($facilityService);
+				return new \Application\Controller\FacilityController($facilityService, $diContainer->get('AppAcl'));
 			}
 				},
 				'Application\Controller\ClientErrorController' => new class {
@@ -880,14 +880,14 @@ class Module
 			public function __invoke($diContainer)
 			{
 				$logFileReader = $diContainer->get('LogFileReader');
-				return new \Application\Controller\LogsController($logFileReader);
+				return new \Application\Controller\LogsController($logFileReader, $diContainer->get('AppAcl'));
 			}
 				},
 				'Application\Controller\ApiSyncHistoryController' => new class {
 			public function __invoke($diContainer)
 			{
 				$apiSyncHistoryService = $diContainer->get('ApiSyncHistoryService');
-				return new \Application\Controller\ApiSyncHistoryController($apiSyncHistoryService);
+				return new \Application\Controller\ApiSyncHistoryController($apiSyncHistoryService, $diContainer->get('AppAcl'));
 			}
 				},
 				'Application\Controller\SummaryController' => new class {
@@ -951,7 +951,7 @@ class Module
 			public function __invoke($diContainer)
 			{
 				$roleService = $diContainer->get('RoleService');
-				return new \Application\Controller\RolesController($roleService);
+				return new \Application\Controller\RolesController($roleService, $diContainer->get('AppAcl'));
 			}
 				},
 			],

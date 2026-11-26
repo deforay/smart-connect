@@ -4,7 +4,6 @@ namespace Application\Controller;
 
 use App\Log\LogFileReader;
 use Laminas\Http\Response\Stream;
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 
 /**
@@ -14,20 +13,24 @@ use Laminas\View\Model\ViewModel;
  * "check the logs" was not previously something anyone could act on. Read-only
  * by design: nothing here writes to, rotates, or deletes a log file.
  */
-class LogsController extends AbstractActionController
+class LogsController extends AbstractAppController
 {
     /** Kept small because an entry can carry a whole stack trace. */
     private const PAGE_SIZE = 50;
 
     private $reader = null;
 
-    public function __construct(LogFileReader $reader)
+    public function __construct(LogFileReader $reader, \Application\Model\Acl $acl)
     {
+        $this->setAcl($acl);
         $this->reader = $reader;
     }
 
     public function indexAction()
     {
+        if (!$this->hasPrivilege('index')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'logs');
 
         return new ViewModel([
@@ -37,6 +40,9 @@ class LogsController extends AbstractActionController
 
     public function viewAction()
     {
+        if (!$this->hasPrivilege('view')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'logs');
 
         $files = $this->reader->listFiles();
@@ -75,6 +81,9 @@ class LogsController extends AbstractActionController
 
     public function downloadAction()
     {
+        if (!$this->hasPrivilege('download')) {
+            return $this->forbidden();
+        }
         $file = (string) $this->params()->fromQuery('file', '');
         $path = $this->reader->resolve($file);
 

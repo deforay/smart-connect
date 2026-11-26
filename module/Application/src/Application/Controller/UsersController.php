@@ -4,18 +4,18 @@ namespace Application\Controller;
 
 use Laminas\View\Model\ViewModel;
 use Application\Service\CommonService;
-use Laminas\Mvc\Controller\AbstractActionController;
 
 
-class UsersController extends AbstractActionController
+class UsersController extends AbstractAppController
 {
 
     private $userService = null;
     private \Application\Service\CommonService $commonService;
     private $orgService = null;
 
-    public function __construct($userService, $commonService, $orgService)
+    public function __construct($userService, $commonService, $orgService, \Application\Model\Acl $acl)
     {
+        $this->setAcl($acl);
         $this->userService = $userService;
         $this->commonService = $commonService;
         $this->orgService = $orgService;
@@ -23,6 +23,9 @@ class UsersController extends AbstractActionController
 
     public function indexAction()
     {
+        if (!$this->hasPrivilege('index')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'users');
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
@@ -36,6 +39,9 @@ class UsersController extends AbstractActionController
 
     public function addAction()
     {
+        if (!$this->hasPrivilege('add')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'users');
 
         /** @var \Laminas\Http\Request $request */
@@ -52,6 +58,9 @@ class UsersController extends AbstractActionController
 
     public function editAction()
     {
+        if (!$this->hasPrivilege('edit')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'users');
 
 
@@ -80,6 +89,9 @@ class UsersController extends AbstractActionController
     }
     public function mapAction()
     {
+        if (!$this->hasPrivilege('edit')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'admin');
         $this->layout()->setVariable('activeMenu', 'users');
 

@@ -6,22 +6,25 @@ use Laminas\Config\Config;
 
 use Laminas\View\Model\ViewModel;
 use Application\Service\CommonService;
-use Laminas\Mvc\Controller\AbstractActionController;
 
-class UserLoginHistoryController extends AbstractActionController
+class UserLoginHistoryController extends AbstractAppController
 {
 
 
     private $userLoginHistoryService = null;
 
-    public function __construct($userLoginHistoryService)
+    public function __construct($userLoginHistoryService, \Application\Model\Acl $acl)
     {
+        $this->setAcl($acl);
         $this->userLoginHistoryService = $userLoginHistoryService;
     }
 
 
     public function indexAction()
     {
+        if (!$this->hasPrivilege('index')) {
+            return $this->forbidden();
+        }
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {

@@ -2,6 +2,7 @@
 
 namespace DataManagement\Controller;
 
+use Application\Controller\Traits\AclAwareTrait;
 use Application\Service\CommonService;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
@@ -9,35 +10,19 @@ use Laminas\View\Model\ViewModel;
 
 class DuplicateDataController extends AbstractActionController
 {
+  use AclAwareTrait;
 
   public \Application\Service\SampleService $sampleService;
-
-  private \Application\Model\Acl $acl;
 
   public function __construct($sampleService, \Application\Model\Acl $acl)
   {
     $this->sampleService = $sampleService;
-    $this->acl = $acl;
-  }
-
-  private function isAllowed(string $privilege): bool
-  {
-    $role = (new \Application\Session\Container('credo'))->roleCode;
-    return $this->acl->isAllowed($role, 'DataManagement\Controller\DuplicateDataController', $privilege);
-  }
-
-  private function forbidden()
-  {
-    /** @var \Laminas\Http\Response $response */
-    $response = $this->getResponse();
-    $response->setStatusCode(403);
-    $response->setContent('Forbidden');
-    return $response;
+    $this->setAcl($acl);
   }
 
   public function indexAction()
   {
-    if (!$this->isAllowed('index')) {
+    if (!$this->hasPrivilege('index')) {
       return $this->forbidden();
     }
     $this->layout()->setVariable('activeTab', 'duplicate-data');
@@ -52,7 +37,7 @@ class DuplicateDataController extends AbstractActionController
 
   public function removeAction()
   {
-    if (!$this->isAllowed('edit')) {
+    if (!$this->hasPrivilege('edit')) {
       return $this->forbidden();
     }
     /** @var \Laminas\Http\Request $request */
@@ -69,7 +54,7 @@ class DuplicateDataController extends AbstractActionController
 
   public function editAction()
   {
-    if (!$this->isAllowed('edit')) {
+    if (!$this->hasPrivilege('edit')) {
       return $this->forbidden();
     }
     $this->layout()->setVariable('activeTab', 'duplicate-data');
