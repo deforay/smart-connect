@@ -388,15 +388,6 @@ class EidSampleService
                         $data['reason_for_sample_rejection'] = null;
                     }
                     // Debug::dump($data);die;
-                    //check existing sample code
-                    // $sampleCode = $this->checkSampleCode($sampleCode, $remoteSampleCode, $instanceCode);
-                    // if ($sampleCode) {
-                    //     //sample data update
-                    //     $sampleDb->update($data, array('eid_id' => $sampleCode['eid_id']));
-                    // } else {
-                    //     //sample data insert
-                    //     $sampleDb->insert($data);
-                    // }
                     // The row keys come from the uploaded file, so keep only real columns.
                     $data = array_intersect_key($data, $localDbFieldArray);
                     $sampleDb->insertOrUpdate($data);
@@ -412,24 +403,6 @@ class EidSampleService
         );
     }
 
-
-    public function checkSampleCode($sampleCode, $remoteSampleCode = null, $instanceCode = null, $dashTable = 'dash_form_vl')
-    {
-        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
-        $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from($dashTable);
-        if (isset($instanceCode) && $instanceCode != "") {
-            $sQuery = $sQuery->where(array('vlsm_instance_id' => $instanceCode));
-        }
-        if (isset($instanceCode) && $instanceCode != "") {
-            $sQuery = $sQuery->where(array('sample_code' => $sampleCode));
-        }
-        if (isset($instanceCode) && $instanceCode != "") {
-            $sQuery = $sQuery->where(array('remote_sample_code' => $remoteSampleCode));
-        }
-        $sQueryStr = $sql->buildSqlString($sQuery);
-        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-    }
 
     public function checkFacilityStateDistrictDetails($location, $parent)
     {

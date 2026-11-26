@@ -59,8 +59,7 @@ class SampleService
         if (isset($uniqueId) && $uniqueId != "") {
             $sQuery = $sQuery->where(array('unique_id' => $uniqueId), 'OR');
         }
-        $sQueryStr = $sql->buildSqlString($sQuery);
-        return $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
+        return $sql->prepareStatementForSqlObject($sQuery)->execute()->current();
     }
 
     public function checkFacilityStateDistrictDetails($location, $parent)
