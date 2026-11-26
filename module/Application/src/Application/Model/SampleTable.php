@@ -703,25 +703,23 @@ class SampleTable extends AbstractTableGateway
                 $where = '';
                 $counter = count($age);
                 for ($a = 0; $a < $counter; $a++) {
-                    if (trim($where) != '') {
-                        $where .= ' OR ';
-                    }
                     if ($age[$a] == '<2') {
-                        $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                     } elseif ($age[$a] == '2to5') {
-                        $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                     } elseif ($age[$a] == '6to14') {
-                        $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                     } elseif ($age[$a] == '15to49') {
-                        $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                     } elseif ($age[$a] == '>=50') {
-                        $where .= "(vl.patient_age_in_years >= 50)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                     } elseif ($age[$a] == 'unknown') {
-                        $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
                     }
                 }
-                $where = '(' . $where . ')';
-                $query = $query->where($where);
+                if (trim($where) !== '') {
+                    $query = $query->where('(' . $where . ')');
+                }
             }
             $query = $query->group(array(new Expression('MONTH(sample_collection_date)')));
             $query = $query->order('sample_collection_date ASC');
@@ -1304,25 +1302,23 @@ class SampleTable extends AbstractTableGateway
                 $params['age'] = explode(',', $params['age']);
                 $counter = count($params['age']);
                 for ($a = 0; $a < $counter; $a++) {
-                    if (trim($where) != '') {
-                        $where .= ' OR ';
-                    }
                     if ($params['age'][$a] == '<2') {
-                        $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                     } elseif ($params['age'][$a] == '2to5') {
-                        $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                     } elseif ($params['age'][$a] == '6to14') {
-                        $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                     } elseif ($params['age'][$a] == '15to49') {
-                        $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                     } elseif ($params['age'][$a] == '>=50') {
-                        $where .= "(vl.patient_age_in_years >= 50)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                     } elseif ($params['age'][$a] == 'unknown') {
-                        $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
                     }
                 }
-                $where = '(' . $where . ')';
-                $sQuery = $sQuery->where($where);
+                if (trim($where) !== '') {
+                    $sQuery = $sQuery->where('(' . $where . ')');
+                }
             }
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
                 $sQuery = $sQuery->where("vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' ");
@@ -1434,25 +1430,23 @@ class SampleTable extends AbstractTableGateway
                 $age = explode(',', $params['age']);
                 $counter = count($age);
                 for ($a = 0; $a < $counter; $a++) {
-                    if (trim($ageWhere) != '') {
-                        $ageWhere .= ' OR ';
-                    }
                     if ($age[$a] == '<2') {
-                        $ageWhere .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                        $ageWhere .= ($ageWhere === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                     } elseif ($age[$a] == '2to5') {
-                        $ageWhere .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                        $ageWhere .= ($ageWhere === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                     } elseif ($age[$a] == '6to14') {
-                        $ageWhere .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                        $ageWhere .= ($ageWhere === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                     } elseif ($age[$a] == '15to49') {
-                        $ageWhere .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                        $ageWhere .= ($ageWhere === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                     } elseif ($age[$a] == '>=50') {
-                        $ageWhere .= "(vl.patient_age_in_years >= 50)";
+                        $ageWhere .= ($ageWhere === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                     } elseif ($age[$a] == 'unknown') {
-                        $ageWhere .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                        $ageWhere .= ($ageWhere === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
                     }
                 }
-                $ageWhere = '(' . $ageWhere . ')';
-                $squery = $squery->where($ageWhere);
+                if (trim($ageWhere) !== '') {
+                    $squery = $squery->where('(' . $ageWhere . ')');
+                }
             }
 
             if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -2280,25 +2274,23 @@ class SampleTable extends AbstractTableGateway
             $where = '';
             $counter = count($age);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($age[$a] == '<2') {
-                    $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                 } elseif ($age[$a] == '2to5') {
-                    $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                 } elseif ($age[$a] == '6to14') {
-                    $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                 } elseif ($age[$a] == '15to49') {
-                    $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                 } elseif ($age[$a] == '>=50') {
-                    $where .= "(vl.patient_age_in_years >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                 } elseif ($age[$a] == 'unknown') {
-                    $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
                 }
             }
-            $where = '(' . $where . ')';
-            $sQuery = $sQuery->where($where);
+            if (trim($where) !== '') {
+                $sQuery = $sQuery->where('(' . $where . ')');
+            }
         }
         if (isset($parameters['adherence']) && trim($parameters['adherence']) != '') {
             $sQuery = $sQuery->where(['vl.arv_adherance_percentage' => $parameters['adherence']]);
@@ -2618,25 +2610,23 @@ class SampleTable extends AbstractTableGateway
                     $where = '';
                     $counter = count($age);
                     for ($a = 0; $a < $counter; $a++) {
-                        if (trim($where) != '') {
-                            $where .= ' OR ';
-                        }
                         if ($age[$a] == '<2') {
-                            $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                         } elseif ($age[$a] == '2to5') {
-                            $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                         } elseif ($age[$a] == '6to14') {
-                            $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                         } elseif ($age[$a] == '15to49') {
-                            $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                         } elseif ($age[$a] == '>=50') {
-                            $where .= "(vl.patient_age_in_years >= 50)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                         } elseif ($age[$a] == 'unknown') {
-                            $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
                         }
                     }
-                    $where = '(' . $where . ')';
-                    $countQuery = $countQuery->where($where);
+                    if (trim($where) !== '') {
+                        $countQuery = $countQuery->where('(' . $where . ')');
+                    }
                 }
                 if (isset($params['testResult']) && $params['testResult'] == '<1000') {
                     $countQuery = $countQuery->where("(vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )");
@@ -2759,25 +2749,23 @@ class SampleTable extends AbstractTableGateway
                     $where = '';
                     $counter = count($age);
                     for ($a = 0; $a < $counter; $a++) {
-                        if (trim($where) != '') {
-                            $where .= ' OR ';
-                        }
                         if ($age[$a] == '<2') {
-                            $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                         } elseif ($age[$a] == '2to5') {
-                            $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                         } elseif ($age[$a] == '6to14') {
-                            $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                         } elseif ($age[$a] == '15to49') {
-                            $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                         } elseif ($age[$a] == '>=50') {
-                            $where .= "(vl.patient_age_in_years >= 50)";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                         } elseif ($age[$a] == 'unknown') {
-                            $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                            $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
                         }
                     }
-                    $where = '(' . $where . ')';
-                    $countQuery = $countQuery->where($where);
+                    if (trim($where) !== '') {
+                        $countQuery = $countQuery->where('(' . $where . ')');
+                    }
                 }
                 if (isset($params['testResult']) && $params['testResult'] == '<1000') {
                     $countQuery = $countQuery->where("(vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )");
@@ -2891,25 +2879,23 @@ class SampleTable extends AbstractTableGateway
                 $where = '';
                 $counter = count($age);
                 for ($a = 0; $a < $counter; $a++) {
-                    if (trim($where) != '') {
-                        $where .= ' OR ';
-                    }
                     if ($age[$a] == '<2') {
-                        $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                     } elseif ($age[$a] == '2to5') {
-                        $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                     } elseif ($age[$a] == '6to14') {
-                        $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                     } elseif ($age[$a] == '15to49') {
-                        $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                     } elseif ($age[$a] == '>=50') {
-                        $where .= "(vl.patient_age_in_years >= 50)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                     } elseif ($age[$a] == 'unknown') {
-                        $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
                     }
                 }
-                $where = '(' . $where . ')';
-                $sQuery = $sQuery->where($where);
+                if (trim($where) !== '') {
+                    $sQuery = $sQuery->where('(' . $where . ')');
+                }
             }
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
                 $sQuery = $sQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
@@ -3013,25 +2999,23 @@ class SampleTable extends AbstractTableGateway
                 $where = '';
                 $counter = count($age);
                 for ($a = 0; $a < $counter; $a++) {
-                    if (trim($where) != '') {
-                        $where .= ' OR ';
-                    }
                     if ($age[$a] == '<2') {
-                        $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                     } elseif ($age[$a] == '2to5') {
-                        $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                     } elseif ($age[$a] == '6to14') {
-                        $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                     } elseif ($age[$a] == '15to49') {
-                        $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                     } elseif ($age[$a] == '>=50') {
-                        $where .= "(vl.patient_age_in_years >= 50)";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                     } elseif ($age[$a] == 'unknown') {
-                        $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                        $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
                     }
                 }
-                $where = '(' . $where . ')';
-                $sQuery = $sQuery->where($where);
+                if (trim($where) !== '') {
+                    $sQuery = $sQuery->where('(' . $where . ')');
+                }
             }
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
                 $sQuery = $sQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
@@ -3296,25 +3280,23 @@ class SampleTable extends AbstractTableGateway
             $where = '';
             $counter = count($age);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($age[$a] == '<2') {
-                    $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                 } elseif ($age[$a] == '2to5') {
-                    $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                 } elseif ($age[$a] == '6to14') {
-                    $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                 } elseif ($age[$a] == '15to49') {
-                    $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                 } elseif ($age[$a] == '>=50') {
-                    $where .= "(vl.patient_age_in_years >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                 } elseif ($age[$a] == 'unknown') {
-                    $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
                 }
             }
-            $where = '(' . $where . ')';
-            $sQuery = $sQuery->where($where);
+            if (trim($where) !== '') {
+                $sQuery = $sQuery->where('(' . $where . ')');
+            }
         }
         if (isset($parameters['testResult']) && $parameters['testResult'] == '<1000') {
             $sQuery = $sQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
@@ -3530,25 +3512,23 @@ class SampleTable extends AbstractTableGateway
             $parameters['age'] = explode(',', $parameters['age']);
             $counter = count($parameters['age']);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($parameters['age'][$a] == '<2') {
-                    $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                 } elseif ($parameters['age'][$a] == '2to5') {
-                    $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                 } elseif ($parameters['age'][$a] == '6to14') {
-                    $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                 } elseif ($parameters['age'][$a] == '15to49') {
-                    $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                 } elseif ($parameters['age'][$a] == '>=50') {
-                    $where .= "(vl.patient_age_in_years >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                 } elseif ($parameters['age'][$a] == 'unknown') {
-                    $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
                 }
             }
-            $where = '(' . $where . ')';
-            $sQuery = $sQuery->where($where);
+            if (trim($where) !== '') {
+                $sQuery = $sQuery->where('(' . $where . ')');
+            }
         }
         if (isset($parameters['testResult']) && $parameters['testResult'] == '<1000') {
             $sQuery = $sQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
@@ -3912,25 +3892,23 @@ class SampleTable extends AbstractTableGateway
             $where = '';
             $counter = count($age);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($age[$a] == '<2') {
-                    $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                 } elseif ($age[$a] == '2to5') {
-                    $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                 } elseif ($age[$a] == '6to14') {
-                    $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                 } elseif ($age[$a] == '15to49') {
-                    $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                 } elseif ($age[$a] == '>=50') {
-                    $where .= "(vl.patient_age_in_years >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                 } elseif ($age[$a] == 'unknown') {
-                    $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'unreported' OR vl.patient_age_in_years = 'Unreported')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'unreported' OR vl.patient_age_in_years = 'Unreported')";
                 }
             }
-            $where = '(' . $where . ')';
-            $countQuery = $countQuery->where($where);
+            if (trim($where) !== '') {
+                $countQuery = $countQuery->where('(' . $where . ')');
+            }
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
             $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
@@ -4025,25 +4003,23 @@ class SampleTable extends AbstractTableGateway
             $where = '';
             $counter = count($age);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($age[$a] == '<2') {
-                    $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                 } elseif ($age[$a] == '2to5') {
-                    $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                 } elseif ($age[$a] == '6to14') {
-                    $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                 } elseif ($age[$a] == '15to49') {
-                    $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                 } elseif ($age[$a] == '>=50') {
-                    $where .= "(vl.patient_age_in_years >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                 } elseif ($age[$a] == 'unknown') {
-                    $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'unreported' OR vl.patient_age_in_years = 'Unreported')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'unreported' OR vl.patient_age_in_years = 'Unreported')";
                 }
             }
-            $where = '(' . $where . ')';
-            $countQuery = $countQuery->where($where);
+            if (trim($where) !== '') {
+                $countQuery = $countQuery->where('(' . $where . ')');
+            }
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
             $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
@@ -4138,25 +4114,23 @@ class SampleTable extends AbstractTableGateway
             $where = '';
             $counter = count($age);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($age[$a] == '<2') {
-                    $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                 } elseif ($age[$a] == '2to5') {
-                    $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                 } elseif ($age[$a] == '6to14') {
-                    $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                 } elseif ($age[$a] == '15to49') {
-                    $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                 } elseif ($age[$a] == '>=50') {
-                    $where .= "(vl.patient_age_in_years >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                 } elseif ($age[$a] == 'unknown') {
-                    $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
                 }
             }
-            $where = '(' . $where . ')';
-            $countQuery = $countQuery->where($where);
+            if (trim($where) !== '') {
+                $countQuery = $countQuery->where('(' . $where . ')');
+            }
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
             $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
@@ -4252,25 +4226,23 @@ class SampleTable extends AbstractTableGateway
             $where = '';
             $counter = count($age);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($age[$a] == '<2') {
-                    $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                 } elseif ($age[$a] == '2to5') {
-                    $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                 } elseif ($age[$a] == '6to14') {
-                    $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                 } elseif ($age[$a] == '15to49') {
-                    $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                 } elseif ($age[$a] == '>=50') {
-                    $where .= "(vl.patient_age_in_years >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                 } elseif ($age[$a] == 'unknown') {
-                    $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
                 }
             }
-            $where = '(' . $where . ')';
-            $countQuery = $countQuery->where($where);
+            if (trim($where) !== '') {
+                $countQuery = $countQuery->where('(' . $where . ')');
+            }
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
             $countQuery = $countQuery->where(['vl.specimen_type' => base64_decode(trim($params['sampleType']))]);
@@ -4423,25 +4395,23 @@ class SampleTable extends AbstractTableGateway
             $parameters['age'] = explode(',', $parameters['age']);
             $counter = count($parameters['age']);
             for ($a = 0; $a < $counter; $a++) {
-                if (trim($where) != '') {
-                    $where .= ' OR ';
-                }
                 if ($parameters['age'][$a] == '<2') {
-                    $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                 } elseif ($parameters['age'][$a] == '2to5') {
-                    $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                 } elseif ($parameters['age'][$a] == '6to14') {
-                    $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                 } elseif ($parameters['age'][$a] == '15to49') {
-                    $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                 } elseif ($parameters['age'][$a] == '>=50') {
-                    $where .= "(vl.patient_age_in_years >= 50)";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                 } elseif ($parameters['age'][$a] == 'unknown') {
-                    $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
+                    $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
                 }
             }
-            $where = '(' . $where . ')';
-            $sQuery = $sQuery->where($where);
+            if (trim($where) !== '') {
+                $sQuery = $sQuery->where('(' . $where . ')');
+            }
         }
         if (isset($parameters['sampleType']) && trim($parameters['sampleType']) != '') {
             $sQuery = $sQuery->where(['vl.specimen_type' => base64_decode(trim($parameters['sampleType']))]);
@@ -7304,25 +7274,23 @@ class SampleTable extends AbstractTableGateway
                         $where = '';
                         $counter = count($age);
                         for ($a = 0; $a < $counter; $a++) {
-                            if (trim($where) != '') {
-                                $where .= ' OR ';
-                            }
                             if ($age[$a] == '<2') {
-                                $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                                $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
                             } elseif ($age[$a] == '2to5') {
-                                $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                                $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
                             } elseif ($age[$a] == '6to14') {
-                                $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                                $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
                             } elseif ($age[$a] == '15to49') {
-                                $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                                $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
                             } elseif ($age[$a] == '>=50') {
-                                $where .= "(vl.patient_age_in_years >= 50)";
+                                $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years >= 50)";
                             } elseif ($age[$a] == 'unknown') {
-                                $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                                $where .= ($where === '' ? '' : ' OR ') . "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
                             }
                         }
-                        $where = '(' . $where . ')';
-                        $rQuery = $rQuery->where($where);
+                        if (trim($where) !== '') {
+                            $rQuery = $rQuery->where('(' . $where . ')');
+                        }
                     }
 
                     if (isset($params['gender']) && $params['gender'] == 'F') {
