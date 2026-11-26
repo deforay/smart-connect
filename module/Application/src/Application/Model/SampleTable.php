@@ -305,6 +305,9 @@ class SampleTable extends AbstractTableGateway
             }
             if ($facilityIdList != null) {
                 $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+            } elseif (trim((string) ($params['facilityId'] ?? '')) == '' && (new Container('credo'))->role != 1) {
+                // A non-admin whose mapped facilities match no lab sees no data.
+                $queryStr->where('1 = 0');
             }
 
             $queryStr = $queryStr->where("
@@ -462,6 +465,9 @@ class SampleTable extends AbstractTableGateway
             }
             if ($facilityIdList != null) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+            } elseif (trim((string) ($params['facilityId'] ?? '')) == '' && (new Container('credo'))->role != 1) {
+                // A non-admin whose mapped facilities match no lab sees no data.
+                $query->where('1 = 0');
             }
 
             $queryStr = $sql->buildSqlString($query);
@@ -615,6 +621,9 @@ class SampleTable extends AbstractTableGateway
 
             if (!empty($facilityIdList)) {
                 $query->where->addPredicate(new WhereExpression('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")'));
+            } elseif (trim((string) ($params['facilityId'] ?? '')) == '' && (new Container('credo'))->role != 1) {
+                // A non-admin whose mapped facilities match no lab sees no data.
+                $query->where('1 = 0');
             }
 
             $query = $query->group('monthDate');
@@ -1517,6 +1526,8 @@ class SampleTable extends AbstractTableGateway
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
                     $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
+                } else {
+                    $query->where('1 = 0');
                 }
             }
 
@@ -1672,6 +1683,8 @@ class SampleTable extends AbstractTableGateway
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
                     $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
+                } else {
+                    $query->where('1 = 0');
                 }
             }
 
@@ -1823,6 +1836,8 @@ class SampleTable extends AbstractTableGateway
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
                     $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
+                } else {
+                    $query->where('1 = 0');
                 }
             }
 
@@ -1949,6 +1964,8 @@ class SampleTable extends AbstractTableGateway
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
                     $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
+                } else {
+                    $query->where('1 = 0');
                 }
             }
 
@@ -2052,6 +2069,8 @@ class SampleTable extends AbstractTableGateway
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
                     $rQuery->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
+                } else {
+                    $rQuery->where('1 = 0');
                 }
             }
 
@@ -6999,6 +7018,8 @@ class SampleTable extends AbstractTableGateway
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
                     $rQuery->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
+                } else {
+                    $rQuery->where('1 = 0');
                 }
             }
 
@@ -7131,6 +7152,8 @@ class SampleTable extends AbstractTableGateway
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
                     $rQuery->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
+                } else {
+                    $rQuery->where('1 = 0');
                 }
             }
             if (isset($params['testReason']) && trim($params['testReason']) != '') {
@@ -7352,8 +7375,10 @@ class SampleTable extends AbstractTableGateway
         $labIds = null;
         if (!empty($labs)) {
             $labIds = CommonService::parseIdList($labs);
-        } elseif ($loginContainer->role != 1 && !empty($loginContainer->mappedFacilities)) {
-            $labIds = CommonService::parseIdList($loginContainer->mappedFacilities);
+        } elseif ($loginContainer->role != 1) {
+            $labIds = !empty($loginContainer->mappedFacilities)
+                ? CommonService::parseIdList($loginContainer->mappedFacilities)
+                : []; // an empty list matches no lab
         }
 
         $sql = new Sql($this->adapter);

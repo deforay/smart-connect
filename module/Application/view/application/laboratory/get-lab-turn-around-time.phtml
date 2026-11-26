@@ -74,7 +74,7 @@ die; */
         series: [{
                 type: 'column',
                 name: '<?= $this->translate('No. of Samples Tested') ?>',
-                data: [<?php echo implode(",", $result['totalSamples']); ?>],
+                data: [<?php echo implode(",", $result['totalSamples'] ?? []); ?>],
                 color: '#7CB5ED',
                 yAxis: 1
             },

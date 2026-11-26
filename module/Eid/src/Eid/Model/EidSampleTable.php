@@ -2489,6 +2489,9 @@ class EidSampleTable extends AbstractTableGateway
 
             if ($facilityIdList != null) {
                 $queryStr = $queryStr->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+            } elseif (trim((string) ($params['facilityId'] ?? '')) == '' && (new Container('credo'))->role != 1) {
+                // A non-admin whose mapped facilities match no lab sees no data.
+                $queryStr->where('1 = 0');
             }
             if (isset($params['flag']) && $params['flag'] == 'poc') {
                 $queryStr = $queryStr->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
@@ -2568,6 +2571,9 @@ class EidSampleTable extends AbstractTableGateway
 
             if ($facilityIdList != null) {
                 $query = $query->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+            } elseif (trim((string) ($params['facilityId'] ?? '')) == '' && (new Container('credo'))->role != 1) {
+                // A non-admin whose mapped facilities match no lab sees no data.
+                $query->where('1 = 0');
             }
             if (isset($params['flag']) && $params['flag'] == 'poc') {
                 $query = $query->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
@@ -2652,6 +2658,9 @@ class EidSampleTable extends AbstractTableGateway
 
             if (!empty($facilityIdList)) {
                 $query->where->addPredicate(new WhereExpression('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")'));
+            } elseif (trim((string) ($params['facilityId'] ?? '')) == '' && (new Container('credo'))->role != 1) {
+                // A non-admin whose mapped facilities match no lab sees no data.
+                $query->where('1 = 0');
             }
 
             if (!empty($params['flag']) && $params['flag'] == 'poc') {
@@ -2800,6 +2809,9 @@ class EidSampleTable extends AbstractTableGateway
 
             if ($facilityIdList != null) {
                 $query = $query->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+            } elseif (trim((string) ($params['facilityId'] ?? '')) == '' && (new Container('credo'))->role != 1) {
+                // A non-admin whose mapped facilities match no lab sees no data.
+                $query->where('1 = 0');
             }
             if (isset($params['flag']) && $params['flag'] == 'poc') {
                 $query = $query->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
@@ -4473,6 +4485,9 @@ class EidSampleTable extends AbstractTableGateway
 
         if ($facilityIdList != null) {
             $eidOutcomesQuery = $eidOutcomesQuery->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+        } elseif (trim((string) ($params['facilityId'] ?? '')) == '' && (new Container('credo'))->role != 1) {
+            // A non-admin whose mapped facilities match no lab sees no data.
+            $eidOutcomesQuery->where('1 = 0');
         }
         if (isset($params['flag']) && $params['flag'] == 'poc') {
             $eidOutcomesQuery = $eidOutcomesQuery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
@@ -4537,6 +4552,9 @@ class EidSampleTable extends AbstractTableGateway
 
             if ($facilityIdList != null) {
                 $sQuery = $sQuery->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+            } elseif (trim((string) ($params['facilityId'] ?? '')) == '' && (new Container('credo'))->role != 1) {
+                // A non-admin whose mapped facilities match no lab sees no data.
+                $sQuery->where('1 = 0');
             }
             if (isset($params['flag']) && $params['flag'] == 'poc') {
                 $sQuery = $sQuery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
@@ -4672,6 +4690,8 @@ class EidSampleTable extends AbstractTableGateway
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
                     $query = $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
+                } else {
+                    $query = $query->where('1 = 0');
                 }
             }
 
@@ -4768,8 +4788,12 @@ class EidSampleTable extends AbstractTableGateway
                 ->where(new WhereExpression('vl.sample_collection_date BETWEEN ? AND ?', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']));
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $query->where->in('vl.facility_id', CommonService::parseIdList($params['clinicId']));
-            } elseif ($loginContainer->role != 1 && !empty($loginContainer->mappedFacilities)) {
-                $query->where->in('vl.facility_id', array_values((array) $loginContainer->mappedFacilities));
+            } elseif ($loginContainer->role != 1) {
+                if (!empty($loginContainer->mappedFacilities)) {
+                    $query->where->in('vl.facility_id', array_values((array) $loginContainer->mappedFacilities));
+                } else {
+                    $query->where('1 = 0');
+                }
             }
             if (isset($params['testResult']) && $params['testResult'] != '') {
                 $query = $query->where(new WhereExpression("(vl.result like ? OR vl.result like ? )", [$params['testResult'] . '%', ucwords($params['testResult']) . '%']));
@@ -4833,8 +4857,12 @@ class EidSampleTable extends AbstractTableGateway
                 ->group('tr.test_reason_id');
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $rQuery->where->in('vl.facility_id', CommonService::parseIdList($params['clinicId']));
-            } elseif ($loginContainer->role != 1 && !empty($loginContainer->mappedFacilities)) {
-                $rQuery->where->in('vl.facility_id', array_values((array) $loginContainer->mappedFacilities));
+            } elseif ($loginContainer->role != 1) {
+                if (!empty($loginContainer->mappedFacilities)) {
+                    $rQuery->where->in('vl.facility_id', array_values((array) $loginContainer->mappedFacilities));
+                } else {
+                    $rQuery->where('1 = 0');
+                }
             }
             if (isset($params['testResult']) && $params['testResult'] != '') {
                 $rQuery = $rQuery->where(new WhereExpression("(vl.result like ? OR vl.result like ? )", [$params['testResult'] . '%', ucwords($params['testResult'] . '%')]));
@@ -4935,6 +4963,8 @@ class EidSampleTable extends AbstractTableGateway
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
                     $queryStr = $queryStr->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
+                } else {
+                    $queryStr = $queryStr->where('1 = 0');
                 }
             }
             if (isset($params['testResult']) && $params['testResult'] != '') {
