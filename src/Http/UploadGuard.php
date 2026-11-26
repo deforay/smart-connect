@@ -30,7 +30,7 @@ final class UploadGuard
             return sprintf('Missing file upload "%s"', $field);
         }
 
-        // parseMultipartFormData() synthesises entries without an 'error' key.
+        // Treat a missing 'error' key as success.
         $error = (int) ($file['error'] ?? UPLOAD_ERR_OK);
         if ($error !== UPLOAD_ERR_OK) {
             return sprintf('Upload of "%s" failed (%s)', $field, self::describeUploadError($error));

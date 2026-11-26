@@ -2,7 +2,6 @@
 
 namespace Api\Controller;
 
-use Application\Service\CommonService;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 
 class VlsmEidController extends AbstractRestfulController
@@ -23,9 +22,6 @@ class VlsmEidController extends AbstractRestfulController
 
     public function create($params)
     {
-        // Ensure to parse raw input data if $_POST and $_FILES are empty
-        CommonService::parseMultipartFormData(VAR_PATH . DIRECTORY_SEPARATOR . "vlsm-eid");
-
         if (!isset($params['api-version'])) {
             $params['api-version'] = 'v1';
         }
