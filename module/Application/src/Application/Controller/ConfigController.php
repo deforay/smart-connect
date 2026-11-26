@@ -5,20 +5,23 @@ namespace Application\Controller;
 
 use Laminas\View\Model\ViewModel;
 use Application\Service\CommonService;
-use Laminas\Mvc\Controller\AbstractActionController;
 
-class ConfigController extends AbstractActionController
+class ConfigController extends AbstractAppController
 {
 
     private $configService = null;
 
-    public function __construct($configService)
+    public function __construct($configService, \Application\Model\Acl $acl)
     {
+        $this->setAcl($acl);
         $this->configService = $configService;
     }
 
     public function indexAction()
     {
+        if (!$this->hasPrivilege('index')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'config');
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
@@ -31,6 +34,9 @@ class ConfigController extends AbstractActionController
 
     public function editAction()
     {
+        if (!$this->hasPrivilege('edit')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'config');
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();

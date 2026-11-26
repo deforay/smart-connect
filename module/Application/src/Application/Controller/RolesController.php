@@ -5,19 +5,22 @@ namespace Application\Controller;
 
 use Laminas\View\Model\ViewModel;
 use Application\Service\CommonService;
-use Laminas\Mvc\Controller\AbstractActionController;
 
-class RolesController extends AbstractActionController
+class RolesController extends AbstractAppController
 {
 
     private $roleService = null;
 
-    public function __construct($roleService)
+    public function __construct($roleService, \Application\Model\Acl $acl)
     {
+        $this->setAcl($acl);
         $this->roleService = $roleService;
     }
     public function indexAction()
     {
+        if (!$this->hasPrivilege('index')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'roles');
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
@@ -30,6 +33,9 @@ class RolesController extends AbstractActionController
 
     public function addAction()
     {
+        if (!$this->hasPrivilege('add')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'roles');
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
@@ -47,6 +53,9 @@ class RolesController extends AbstractActionController
 
     public function editAction()
     {
+        if (!$this->hasPrivilege('edit')) {
+            return $this->forbidden();
+        }
         $this->layout()->setVariable('activeTab', 'roles');
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
