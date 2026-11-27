@@ -12,6 +12,7 @@ use Laminas\Mvc\Controller\AbstractActionController;
 
 class ClinicsController extends AbstractActionController
 {
+    use \Application\Controller\SampleResultActions;
 
     private $sampleService = null;
     private $configService = null;
@@ -121,25 +122,6 @@ class ClinicsController extends AbstractActionController
         }
     }
 
-    public function generateResultPdfAction()
-    {
-        /** @var \Laminas\Http\Request $request */
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-
-            $sampleResult = $this->sampleService->getSampleInfo($params);
-            if (empty($sampleResult)) {
-                return $this->notFoundAction();
-            }
-            $config = $this->configService->getAllGlobalConfig();
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('sampleResult' => $sampleResult, 'config' => $config))
-                ->setTerminal(true);
-            return $viewModel;
-        }
-    }
-
     public function exportResultExcelAction()
     {
         /** @var \Laminas\Http\Request $request */
@@ -161,17 +143,7 @@ class ClinicsController extends AbstractActionController
 
     public function testResultViewAction()
     {
-        $this->layout()->setVariable('activeTab', 'eid-clinics');
-        $params = [];
-        $params['id'] = base64_decode($this->params()->fromRoute('id'));
-
-        $sampleResult = $this->sampleService->getSampleInfo($params);
-        if (empty($sampleResult)) {
-            return $this->notFoundAction();
-        }
-        return new ViewModel(array(
-            'result' => $sampleResult
-        ));
+        return $this->testResultView('eid-clinics');
     }
 
     public function samplesTestReasonAction()
