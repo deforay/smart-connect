@@ -66,8 +66,13 @@ class Module
                         $tableObj = new \Eid\Model\EidSampleTable($dbAdapter, $diContainer, $mappedFacilities, $eidSampleTable, $commonService);
 
 
-                        // object key makes sure we have different caches for both current and archive
-                        return new CachedMethodProxy($tableObj, $diContainer->get('AppCache'), $eidSampleTable);
+                        // The object key keeps separate caches for the current and archive tables,
+                        // and for each role and set of mapped facilities, so one user never gets
+                        // a result cached for another.
+                        $userFacilities = \Application\Service\CommonService::parseIdList($mappedFacilities);
+                        sort($userFacilities);
+                        $objectKey = ($eidSampleTable ?? \Eid\Model\EidSampleTable::class) . '|role:' . ($session->role ?? '') . '|facilities:' . implode(',', $userFacilities);
+                        return new CachedMethodProxy($tableObj, $diContainer->get('AppCache'), $objectKey);
                     }
                 },
                 'EidSampleTableWithoutCache' => new class

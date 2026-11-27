@@ -394,6 +394,12 @@ class SampleService
             ->join(array('r_r_r' => 'r_vl_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left')
             ->join(array('rej_f' => 'facility_details'), 'rej_f.facility_id=vl.sample_rejection_facility', array('rejectionFacilityName' => 'facility_name'), 'left')
             ->where(array('vl.vl_sample_id' => $params['id']));
+        $loginContainer = new Container('credo');
+        if ($loginContainer->role != 1) {
+            // A non-admin sees only samples from their mapped facilities.
+            $mapped = CommonService::parseIdList($loginContainer->mappedFacilities ?? []);
+            $sQuery->where(['vl.facility_id' => $mapped ?: [0]]);
+        }
         $sQueryStr = $sql->buildSqlString($sQuery);
         return $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->toArray();
     }

@@ -508,8 +508,13 @@ class Module
 				$commonService = $diContainer->get('CommonService');
 				$tableObj = new SampleTable($dbAdapter, $diContainer, $mappedFacilities, $sampleTable, $commonService);
 
-				// object key makes sure we have different caches for both current and archive
-				return new CachedMethodProxy($tableObj, $diContainer->get('AppCache'), $sampleTable);
+				// The object key keeps separate caches for the current and archive tables,
+				// and for each role and set of mapped facilities, so one user never gets
+				// a result cached for another.
+				$userFacilities = CommonService::parseIdList($mappedFacilities);
+				sort($userFacilities);
+				$objectKey = ($sampleTable ?? SampleTable::class) . '|role:' . ($session->role ?? '') . '|facilities:' . implode(',', $userFacilities);
+				return new CachedMethodProxy($tableObj, $diContainer->get('AppCache'), $objectKey);
 			}
 				},
 				'SampleTableWithoutCache' => new class {

@@ -71,6 +71,23 @@ class SampleTable extends AbstractTableGateway
         $this->commonService = $commonService;
     }
 
+    /**
+     * The lab ids from a facilityId filter that this user may see. An admin
+     * gets every requested id; anyone else gets only the requested ids that are
+     * also in their mapped facilities. With no id left, returns [0], which
+     * matches no lab.
+     */
+    private function requestedLabIds($facilityId): array
+    {
+        $ids = CommonService::parseIdList($facilityId);
+        if ((new Container('credo'))->role != 1) {
+            $mapped = CommonService::parseIdList($this->mappedFacilities ?? []);
+            $ids = array_values(array_intersect($ids, $mapped));
+        }
+        return $ids ?: [0];
+    }
+
+
     public function fetchQuickStats($params)
     {
         $loginContainer = new Container('credo');
@@ -262,7 +279,7 @@ class SampleTable extends AbstractTableGateway
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
-                $fQuery = $fQuery->where(['f.facility_id' => CommonService::parseIdList($params['facilityId'])]);
+                $fQuery = $fQuery->where(['f.facility_id' => $this->requestedLabIds($params['facilityId'])]);
                 $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
@@ -305,8 +322,8 @@ class SampleTable extends AbstractTableGateway
             }
             if ($facilityIdList != null) {
                 $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
-            } elseif (trim((string) ($params['facilityId'] ?? '')) == '' && (new Container('credo'))->role != 1) {
-                // A non-admin whose mapped facilities match no lab sees no data.
+            } elseif (trim((string) ($params['facilityId'] ?? '')) != '' || (new Container('credo'))->role != 1) {
+                // The requested labs, or a non-admin's mapped facilities, match no active lab: show no data.
                 $queryStr->where('1 = 0');
             }
 
@@ -369,7 +386,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $queryStr = $queryStr->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
+                $queryStr = $queryStr->where(['vl.lab_id' => $this->requestedLabIds($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             }
@@ -415,7 +432,7 @@ class SampleTable extends AbstractTableGateway
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
-                $fQuery = $fQuery->where(['f.facility_id' => CommonService::parseIdList($params['facilityId'])]);
+                $fQuery = $fQuery->where(['f.facility_id' => $this->requestedLabIds($params['facilityId'])]);
                 $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
@@ -465,8 +482,8 @@ class SampleTable extends AbstractTableGateway
             }
             if ($facilityIdList != null) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
-            } elseif (trim((string) ($params['facilityId'] ?? '')) == '' && (new Container('credo'))->role != 1) {
-                // A non-admin whose mapped facilities match no lab sees no data.
+            } elseif (trim((string) ($params['facilityId'] ?? '')) != '' || (new Container('credo'))->role != 1) {
+                // The requested labs, or a non-admin's mapped facilities, match no active lab: show no data.
                 $query->where('1 = 0');
             }
 
@@ -520,7 +537,7 @@ class SampleTable extends AbstractTableGateway
                     ]
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
+                $query = $query->where(['vl.lab_id' => $this->requestedLabIds($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             }
@@ -577,7 +594,7 @@ class SampleTable extends AbstractTableGateway
                 ->where([
                     'f.facility_type' => 2,
                     'f.status' => 'active',
-                    'f.facility_id' => CommonService::parseIdList($params['facilityId'])
+                    'f.facility_id' => $this->requestedLabIds($params['facilityId'])
                 ]);
 
             $facilityResult = $dbAdapter->query($sql->buildSqlString($fQuery), $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -621,8 +638,8 @@ class SampleTable extends AbstractTableGateway
 
             if (!empty($facilityIdList)) {
                 $query->where->addPredicate(new WhereExpression('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")'));
-            } elseif (trim((string) ($params['facilityId'] ?? '')) == '' && (new Container('credo'))->role != 1) {
-                // A non-admin whose mapped facilities match no lab sees no data.
+            } elseif (trim((string) ($params['facilityId'] ?? '')) != '' || (new Container('credo'))->role != 1) {
+                // The requested labs, or a non-admin's mapped facilities, match no active lab: show no data.
                 $query->where('1 = 0');
             }
 
@@ -689,7 +706,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
+                $query = $query->where(['vl.lab_id' => $this->requestedLabIds($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             }
@@ -776,7 +793,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
+                $query = $query->where(['vl.lab_id' => $this->requestedLabIds($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             }
@@ -828,7 +845,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
+                $query = $query->where(['vl.lab_id' => $this->requestedLabIds($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             }
@@ -900,7 +917,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
+                $query = $query->where(['vl.lab_id' => $this->requestedLabIds($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             }
@@ -946,7 +963,7 @@ class SampleTable extends AbstractTableGateway
             $fQuery = $sql->select()->from(array('f' => 'facility_details'))
                 ->where('f.facility_type = 2 AND f.status="active"');
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $fQuery = $fQuery->where(['f.facility_id' => CommonService::parseIdList($params['facilityId'])]);
+                $fQuery = $fQuery->where(['f.facility_id' => $this->requestedLabIds($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -1002,7 +1019,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
+                $query = $query->where(['vl.lab_id' => $this->requestedLabIds($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -1039,7 +1056,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $query = $query->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
+                $query = $query->where(['vl.lab_id' => $this->requestedLabIds($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -1070,7 +1087,7 @@ class SampleTable extends AbstractTableGateway
                 ->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"))
                 ->group('vl.lab_id');
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $lQuery = $lQuery->where(['vl.lab_id' => CommonService::parseIdList($params['facilityId'])]);
+                $lQuery = $lQuery->where(['vl.lab_id' => $this->requestedLabIds($params['facilityId'])]);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 $lQuery = $lQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -4534,7 +4551,7 @@ class SampleTable extends AbstractTableGateway
             $quarters = implode(",", $quarterArray);
         }
 
-        $year = isset($parameters['year']) && $parameters['year'] != "" ? $parameters['year'] : date('Y');
+        $year = isset($parameters['year']) && $parameters['year'] != "" ? (int) $parameters['year'] : (int) date('Y');
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -4561,7 +4578,11 @@ class SampleTable extends AbstractTableGateway
             ->group(array(new Expression("DATE_FORMAT(sample_collection_date, '%m %Y')"), 'f.facility_id'));
 
         if (isset($parameters['labID']) && trim($parameters['labID']) != '') {
-            $sQuery = $sQuery->where(['vl.lab_id' => CommonService::parseIdList($parameters['labID'])]);
+            $sQuery = $sQuery->where(['vl.lab_id' => $this->requestedLabIds($parameters['labID'])]);
+        } elseif ($loginContainer->role != 1) {
+            // A non-admin sees only their mapped labs.
+            $mapped = CommonService::parseIdList($this->mappedFacilities ?? []);
+            $sQuery = $sQuery->where(['vl.lab_id' => $mapped ?: [0]]);
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
             $sQuery = $sQuery->where(['vl.facility_id' => CommonService::parseIdList($parameters['clinicId'])]);

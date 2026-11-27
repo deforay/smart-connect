@@ -786,6 +786,12 @@ class EidSampleService
             ->join(array('rtr' => 'r_eid_test_reasons'), 'rtr.test_reason_id=vl.reason_for_eid_test', array('test_reason_name'), 'left')
             ->join(array('r_r_r' => 'r_eid_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left')
             ->where(array('vl.eid_id' => $params['id']));
+        $loginContainer = new Container('credo');
+        if ($loginContainer->role != 1) {
+            // A non-admin sees only samples from their mapped facilities.
+            $mapped = CommonService::parseIdList($loginContainer->mappedFacilities ?? []);
+            $sQuery->where(['vl.facility_id' => $mapped ?: [0]]);
+        }
         $sQueryStr = $sql->buildSqlString($sQuery);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
