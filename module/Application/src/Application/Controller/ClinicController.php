@@ -10,6 +10,7 @@ use Laminas\Mvc\Controller\AbstractActionController;
 
 class ClinicController extends AbstractActionController
 {
+    use \Application\Controller\SampleResultActions;
 
     public \Application\Service\SampleService $sampleService;
     public \Application\Service\ConfigService $configService;
@@ -140,25 +141,6 @@ class ClinicController extends AbstractActionController
         }
     }
 
-    public function generateResultPdfAction()
-    {
-        /** @var \Laminas\Http\Request $request */
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-
-            $sampleResult = $this->sampleService->getSampleInfo($params);
-            if (empty($sampleResult)) {
-                return $this->notFoundAction();
-            }
-            $config = $this->configService->getAllGlobalConfig();
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('sampleResult' => $sampleResult, 'config' => $config))
-                ->setTerminal(true);
-            return $viewModel;
-        }
-    }
-
     public function exportResultExcelAction()
     {
         /** @var \Laminas\Http\Request $request */
@@ -180,17 +162,7 @@ class ClinicController extends AbstractActionController
 
     public function testResultViewAction()
     {
-        $this->layout()->setVariable('activeTab', 'clinics-dashboard');
-        $params = [];
-        $params['id'] = base64_decode($this->params()->fromRoute('id'));
-
-        $sampleResult = $this->sampleService->getSampleInfo($params);
-        if (empty($sampleResult)) {
-            return $this->notFoundAction();
-        }
-        return new ViewModel(array(
-            'result' => $sampleResult
-        ));
+        return $this->testResultView('clinics-dashboard');
     }
 
     public function samplesTestReasonAction()
