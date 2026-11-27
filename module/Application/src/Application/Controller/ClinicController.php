@@ -148,6 +148,9 @@ class ClinicController extends AbstractActionController
             $params = $request->getPost();
 
             $sampleResult = $this->sampleService->getSampleInfo($params);
+            if (empty($sampleResult)) {
+                return $this->notFoundAction();
+            }
             $config = $this->configService->getAllGlobalConfig();
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('sampleResult' => $sampleResult, 'config' => $config))
@@ -182,6 +185,9 @@ class ClinicController extends AbstractActionController
         $params['id'] = base64_decode($this->params()->fromRoute('id'));
 
         $sampleResult = $this->sampleService->getSampleInfo($params);
+        if (empty($sampleResult)) {
+            return $this->notFoundAction();
+        }
         return new ViewModel(array(
             'result' => $sampleResult
         ));
